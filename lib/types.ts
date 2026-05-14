@@ -1,0 +1,462 @@
+// 用户接口
+export interface User {
+  id: string
+  name: string
+  avatar?: string
+  email: string
+  department?: string
+}
+
+// 协作者接口
+export interface Collaborator {
+  userId: string
+  role: 'owner' | 'editor' | 'viewer'
+  addedAt: Date
+}
+
+// 难度等级
+export type Difficulty = 'easy' | 'medium' | 'hard'
+
+export const DIFFICULTY_LABELS: Record<Difficulty, string> = {
+  easy: '简单',
+  medium: '中等',
+  hard: '困难',
+}
+
+// 知识点
+export interface KnowledgePoint {
+  id: string
+  name: string
+}
+
+// 批次分组
+export interface Batch {
+  id: string
+  name: string
+  description?: string
+}
+
+// 部门
+export interface Department {
+  id: string
+  name: string
+}
+
+// 状态枚举
+export type Status = 'draft' | 'unsubmitted' | 'pending' | 'rejected' | 'toPublish' | 'published'
+
+// 状态中文映射
+export const STATUS_LABELS: Record<Status, string> = {
+  draft: '草稿',
+  unsubmitted: '未提交',
+  pending: '审批中',
+  rejected: '已驳回',
+  toPublish: '待发布',
+  published: '已发布',
+}
+
+// 题目类型枚举
+export type QuestionType = 'single' | 'multiple' | 'judge' | 'fill' | 'essay' | 'short_answer'
+
+// 题目类型中文映射
+export const QUESTION_TYPE_LABELS: Record<QuestionType, string> = {
+  single: '单选题',
+  multiple: '多选题',
+  judge: '判断题',
+  fill: '填空题',
+  essay: '问答题',
+  short_answer: '简答题',
+}
+
+// 题库接口
+export interface QuestionBank {
+  id: string
+  name: string
+  description: string
+  coverUrl?: string
+  status: Status
+  questionCount: number
+  collaboratorIds?: string[]
+  collaboratorDeptIds?: string[]
+  batchId?: string
+  version: string
+  ownerType: 'mine' | 'collaborate' | 'public'
+  isDraftPool?: boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
+// 题目接口
+export interface Question {
+  id: string
+  bankId: string
+  type: QuestionType
+  content: string
+  options?: string[]
+  answer: string | string[]
+  analysis?: string
+  score: number
+  difficulty?: Difficulty
+  knowledgePoints?: string[]
+  creatorId?: string
+  status: Status
+  createdAt: Date
+}
+
+// 试卷中的题目（快照）
+export interface ExamQuestion {
+  id: string
+  questionId: string
+  type: QuestionType
+  content: string
+  options?: string[]
+  answer: string | string[]
+  analysis?: string
+  score: number
+  order: number
+}
+
+// 试卷接口
+export interface Exam {
+  id: string
+  name: string
+  description: string
+  status: Status
+  totalScore: number
+  duration: number // 分钟
+  questions: ExamQuestion[]
+  collaboratorIds?: string[]
+  collaboratorDeptIds?: string[]
+  batchId?: string
+  version: string
+  ownerType: 'mine' | 'collaborate' | 'public'
+  creatorId?: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+// 创建题库表单数据
+export interface QuestionBankFormData {
+  name: string
+  description: string
+  coverUrl?: string
+  collaboratorIds?: string[]
+  collaboratorDeptIds?: string[]
+  batchId?: string
+}
+
+// 创建题目表单数据
+export interface QuestionFormData {
+  type: QuestionType
+  content: string
+  options?: string[]
+  answer: string | string[]
+  analysis?: string
+  score: number
+  difficulty?: Difficulty
+  knowledgePoints?: string[]
+}
+
+// 随机抽题筛选条件
+export interface RandomQuestionFilter {
+  bankIds: string[]
+  types: QuestionType[]
+  difficulties: Difficulty[]
+  knowledgePoints: string[]
+  count: number
+}
+
+// 创建试卷表单数据
+export interface ExamFormData {
+  name: string
+  description: string
+  duration: number
+  collaboratorIds?: string[]
+  collaboratorDeptIds?: string[]
+  batchId?: string
+}
+
+// 状态流转操作
+export type StatusAction = 
+  | 'save_draft'      // 保存草稿
+  | 'submit'          // 提交审批
+  | 'withdraw'        // 撤回
+  | 'approve'         // 通过
+  | 'reject'          // 驳回
+  | 'publish'         // 发布
+  | 'unpublish'       // 取消发布
+
+// 状态流转规则
+export const STATUS_TRANSITIONS: Record<StatusAction, { from: Status[], to: Status }> = {
+  save_draft: { from: ['draft', 'unsubmitted', 'rejected'], to: 'draft' },
+  submit: { from: ['draft', 'unsubmitted', 'rejected'], to: 'pending' },
+  withdraw: { from: ['pending'], to: 'unsubmitted' },
+  approve: { from: ['pending'], to: 'toPublish' },
+  reject: { from: ['pending'], to: 'rejected' },
+  publish: { from: ['toPublish'], to: 'published' },
+  unpublish: { from: ['published'], to: 'draft' },
+}
+
+// 判断操作是否可用
+export function canPerformAction(currentStatus: Status, action: StatusAction): boolean {
+  const transition = STATUS_TRANSITIONS[action]
+  return transition.from.includes(currentStatus)
+}
+
+// 获取下一个状态
+export function getNextStatus(action: StatusAction): Status {
+  return STATUS_TRANSITIONS[action].to
+}
+
+// 规则状态类型
+export type RuleStatus =
+  | 'draft' // 草稿
+  | 'not_submitted' // 未提交
+  | 'reviewing' // 审批中
+  | 'rejected' // 已驳回
+  | 'ready' // 待发布
+  | 'published' // 已发布
+  | 'none' // 无规则
+
+// 等级映射
+export interface LevelMapping {
+  level: string
+  min: number
+  max: number
+}
+
+// 关联任务
+export interface RelatedTask {
+  id: string
+  name: string
+  maxScore: number
+  weight: number
+}
+
+// 能力点
+export interface AbilityPoint {
+  id: string
+  name: string
+  description: string
+  mappingType: 'inherit' | 'custom'
+  customMapping?: LevelMapping[]
+  requiredLevel: string // 岗位所需掌握度
+  relatedTasks: RelatedTask[]
+}
+
+// 能力项
+export interface AbilityItem {
+  id: string
+  name: string
+  abilityPoints: AbilityPoint[]
+}
+
+// 岗位认证规则
+export interface CertificationRule {
+  id: string
+  positionName: string
+  status: RuleStatus
+  ruleSource: 'inherit' | 'custom'
+  abilityItems: AbilityItem[]
+}
+
+// 岗位信息（列表页使用）
+export interface Position {
+  id: string
+  name: string
+  positionCode: string
+  professionalDirection: string
+  relatedAbilityCount: number
+  ruleStatus: RuleStatus
+  lastUpdated: string
+  updatedBy: string
+}
+
+// 操作项配置
+export const actionConfig: Record<string, {
+  label: string
+  showInStatus: RuleStatus[]
+  variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost'
+}> = {
+  config: {
+    label: '配置规则',
+    showInStatus: ['draft', 'not_submitted', 'rejected', 'ready', 'published', 'none'],
+    variant: 'default',
+  },
+  invite: {
+    label: '邀请共建',
+    showInStatus: ['draft', 'not_submitted'],
+    variant: 'outline',
+  },
+  cancelApproval: {
+    label: '取消审批',
+    showInStatus: ['reviewing'],
+    variant: 'destructive',
+  },
+  publish: {
+    label: '发布',
+    showInStatus: ['ready'],
+    variant: 'default',
+  },
+  unpublish: {
+    label: '取消发布',
+    showInStatus: ['published'],
+    variant: 'destructive',
+  },
+}
+
+// 状态配置
+export const statusConfig: Record<
+  RuleStatus,
+  { label: string; color: string; bgColor: string }
+> = {
+  draft: {
+    label: '草稿',
+    color: 'text-slate-600',
+    bgColor: 'bg-slate-100',
+  },
+  not_submitted: {
+    label: '未提交',
+    color: 'text-slate-600',
+    bgColor: 'bg-slate-100',
+  },
+  reviewing: {
+    label: '审批中',
+    color: 'text-amber-600',
+    bgColor: 'bg-amber-50',
+  },
+  rejected: {
+    label: '已驳回',
+    color: 'text-red-600',
+    bgColor: 'bg-red-50',
+  },
+  ready: {
+    label: '待发布',
+    color: 'text-blue-600',
+    bgColor: 'bg-blue-50',
+  },
+  published: {
+    label: '已发布',
+    color: 'text-green-600',
+    bgColor: 'bg-green-50',
+  },
+  none: {
+    label: '无规则',
+    color: 'text-slate-500',
+    bgColor: 'bg-slate-50',
+  },
+}
+
+// 默认等级映射表
+export const defaultLevelMapping: LevelMapping[] = [
+  { level: '不合格', min: 0, max: 60 },
+  { level: '了解', min: 61, max: 70 },
+  { level: '理解', min: 71, max: 80 },
+  { level: '掌握', min: 81, max: 85 },
+  { level: '熟练', min: 86, max: 95 },
+  { level: '精通', min: 96, max: 100 },
+]
+
+// 根据分数计算等级
+export function calculateLevel(
+  score: number,
+  mapping: LevelMapping[],
+): string {
+  for (const level of mapping) {
+    if (score >= level.min && score <= level.max) {
+      return level.level
+    }
+  }
+  return '不合格'
+}
+
+// ==================== 场景任务测评相关 ====================
+
+// 一级测评分类
+export interface EvaluationMethodCategory {
+  id: string
+  name: string
+  order: number
+}
+
+// 二级测评方式
+export interface EvaluationMethod {
+  id: string
+  categoryId: string
+  name: string
+  enabled: boolean
+  relatedTaskIds: string[]
+}
+
+// 场景任务
+export interface SceneTask {
+  id: string
+  name: string
+  sceneName: string
+  methodIds: string[]
+}
+
+// 场景任务测评结果
+export interface SceneEvaluationResult {
+  id: string
+  methodId: string
+  evaluationTime: Date
+  taskId: string
+  taskName: string
+  sceneName: string
+  evaluateeType: 'student' | 'group'
+  evaluateeId: string
+  evaluateeName: string
+  evaluatorIds: string[]
+  evaluatorNames: string[]
+  evaluatorType: 'teacher' | 'expert'
+  evaluationStatus: 'evaluated' | 'pending'
+  score: number
+  maxScore: number
+  comment?: string
+}
+
+// 岗位能力测评结果
+export interface JobAbilityResult {
+  id: string
+  positionId: string
+  positionName: string
+  positionCode: string
+  studentName: string
+  studentId: string
+  totalAbilityPoints: number
+  achievedAbilityPoints: number
+  achievementRate: number // 0-100
+  evaluationTime: Date
+}
+
+// 审批类型
+export type ApprovalType = 'question' | 'questionBank' | 'exam' | 'onlineExam'
+
+export const APPROVAL_TYPE_LABELS: Record<ApprovalType, string> = {
+  question: '题目',
+  questionBank: '题库',
+  exam: '试卷',
+  onlineExam: '在线考试',
+}
+
+// 审批状态
+export type ApprovalStatus = 'pending' | 'approved' | 'rejected'
+
+export const APPROVAL_STATUS_LABELS: Record<ApprovalStatus, string> = {
+  pending: '待审批',
+  approved: '已通过',
+  rejected: '已驳回',
+}
+
+// 审批项
+export interface ApprovalItem {
+  id: string
+  type: ApprovalType
+  title: string
+  description?: string
+  submitterName: string
+  submitTime: Date
+  status: ApprovalStatus
+  remark?: string
+}

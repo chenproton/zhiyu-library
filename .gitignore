@@ -1,0 +1,12 @@
+node_modules/
+.next/
+*.log
+dist/
+build/
+.env
+.env.local
+.DS_Store
+tsconfig.tsbuildinfo
+package-lock.json
+pnpm-lock.yaml
+

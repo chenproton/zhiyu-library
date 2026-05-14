@@ -1,0 +1,391 @@
+"use client"
+
+import { useState, useMemo } from "react"
+import {
+  Search,
+  CheckCircle2,
+  XCircle,
+  Clock,
+  FileText,
+  BookOpen,
+  GraduationCap,
+  Laptop,
+  ClipboardCheck,
+  Send,
+  Ban,
+} from "lucide-react"
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import { Badge } from "@/components/ui/badge"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Textarea } from "@/components/ui/textarea"
+import { useData } from "@/components/providers/data-provider"
+import { APPROVAL_TYPE_LABELS, APPROVAL_STATUS_LABELS } from "@/lib/types"
+import type { ApprovalType, ApprovalItem, ApprovalStatus } from "@/lib/types"
+
+const typeTabs: { value: ApprovalType | "all"; label: string }[] = [
+  { value: "all", label: "全部" },
+  { value: "question", label: "题目" },
+  { value: "questionBank", label: "题库" },
+  { value: "exam", label: "试卷" },
+  { value: "onlineExam", label: "在线考试" },
+]
+
+const typeIcons: Record<ApprovalType, React.ReactNode> = {
+  question: <FileText className="size-4" />,
+  questionBank: <BookOpen className="size-4" />,
+  exam: <GraduationCap className="size-4" />,
+  onlineExam: <Laptop className="size-4" />,
+}
+
+export default function ApprovalCenterPage() {
+  const { approvalItems, approveItem, rejectItem } = useData()
+
+  const [search, setSearch] = useState("")
+  const [typeTab, setTypeTab] = useState<ApprovalType | "all">("all")
+  const [statusTab, setStatusTab] = useState<ApprovalStatus | "all">("all")
+  const [approveDialog, setApproveDialog] = useState<{ open: boolean; item: ApprovalItem | null }>({
+    open: false,
+    item: null,
+  })
+  const [rejectDialog, setRejectDialog] = useState<{ open: boolean; item: ApprovalItem | null }>({
+    open: false,
+    item: null,
+  })
+  const [remark, setRemark] = useState("")
+
+  const filteredItems = useMemo(() => {
+    let list = [...approvalItems]
+    if (typeTab !== "all") {
+      list = list.filter((item) => item.type === typeTab)
+    }
+    if (statusTab !== "all") {
+      list = list.filter((item) => item.status === statusTab)
+    }
+    if (search.trim()) {
+      const q = search.toLowerCase()
+      list = list.filter(
+        (item) =>
+          item.title.toLowerCase().includes(q) ||
+          item.submitterName.toLowerCase().includes(q) ||
+          (item.description && item.description.toLowerCase().includes(q))
+      )
+    }
+    return list.sort((a, b) => b.submitTime.getTime() - a.submitTime.getTime())
+  }, [approvalItems, typeTab, statusTab, search])
+
+  const stats = useMemo(() => {
+    const total = approvalItems.length
+    const pending = approvalItems.filter((i) => i.status === "pending").length
+    const approved = approvalItems.filter((i) => i.status === "approved").length
+    const rejected = approvalItems.filter((i) => i.status === "rejected").length
+    return { total, pending, approved, rejected }
+  }, [approvalItems])
+
+  const handleApprove = () => {
+    if (approveDialog.item) {
+      approveItem(approveDialog.item.id, remark || undefined)
+      setApproveDialog({ open: false, item: null })
+      setRemark("")
+    }
+  }
+
+  const handleReject = () => {
+    if (rejectDialog.item) {
+      rejectItem(rejectDialog.item.id, remark || undefined)
+      setRejectDialog({ open: false, item: null })
+      setRemark("")
+    }
+  }
+
+  const getStatusBadge = (status: ApprovalStatus) => {
+    switch (status) {
+      case "pending":
+        return (
+          <Badge variant="secondary" className="gap-1">
+            <Clock className="size-3" />
+            {APPROVAL_STATUS_LABELS[status]}
+          </Badge>
+        )
+      case "approved":
+        return (
+          <Badge variant="default" className="gap-1 bg-emerald-500">
+            <CheckCircle2 className="size-3" />
+            {APPROVAL_STATUS_LABELS[status]}
+          </Badge>
+        )
+      case "rejected":
+        return (
+          <Badge variant="destructive" className="gap-1">
+            <XCircle className="size-3" />
+            {APPROVAL_STATUS_LABELS[status]}
+          </Badge>
+        )
+    }
+  }
+
+  const formatDate = (date: Date) => {
+    return new Intl.DateTimeFormat("zh-CN", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(date)
+  }
+
+  return (
+    <div className="px-8 py-6">
+      {/* 页面标题 */}
+      <div className="mb-4 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">审批中心</h1>
+          <p className="text-muted-foreground">统一审批题目、题库、试卷、在线考试的提交申请</p>
+        </div>
+      </div>
+
+      {/* 精简统计 */}
+      <div className="mb-4 flex gap-3">
+        <div className="flex flex-1 items-center gap-3 rounded-lg border bg-white px-4 py-3">
+          <div className="flex size-8 items-center justify-center rounded-md bg-blue-50">
+            <ClipboardCheck className="size-4 text-blue-600" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="text-xs text-muted-foreground">审批概况</div>
+            <div className="flex items-center gap-2 text-xs">
+              <span>总数 <strong className="text-foreground">{stats.total}</strong></span>
+              <span className="text-gray-300">|</span>
+              <span>待审批 <strong className="text-amber-600">{stats.pending}</strong></span>
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-1 items-center gap-3 rounded-lg border bg-white px-4 py-3">
+          <div className="flex size-8 items-center justify-center rounded-md bg-emerald-50">
+            <CheckCircle2 className="size-4 text-emerald-600" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="text-xs text-muted-foreground">已通过</div>
+            <div className="flex items-center gap-2 text-xs">
+              <span>已通过 <strong className="text-emerald-600">{stats.approved}</strong></span>
+              <span className="text-gray-300">|</span>
+              <span>已驳回 <strong className="text-red-600">{stats.rejected}</strong></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Tab 切换 */}
+      <div className="mb-4">
+        <Tabs value={typeTab} onValueChange={(v) => setTypeTab(v as ApprovalType | "all")}>
+          <TabsList>
+            {typeTabs.map((tab) => (
+              <TabsTrigger key={tab.value} value={tab.value}>
+                {tab.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
+      </div>
+
+      {/* 筛选栏 */}
+      <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center">
+        <div className="relative flex-1 sm:max-w-xs">
+          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="搜索标题、提交人..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+        <Select value={statusTab} onValueChange={(v) => setStatusTab(v as ApprovalStatus | "all")}>
+          <SelectTrigger className="w-[140px]">
+            <SelectValue placeholder="全部状态" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectItem value="all">全部状态</SelectItem>
+              <SelectItem value="pending">待审批</SelectItem>
+              <SelectItem value="approved">已通过</SelectItem>
+              <SelectItem value="rejected">已驳回</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* 审批列表 */}
+      <div className="rounded-lg border bg-white px-4 py-3">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[100px]">审批类型</TableHead>
+                <TableHead className="w-[200px]">标题</TableHead>
+                <TableHead className="w-[240px]">描述</TableHead>
+                <TableHead className="w-[100px]">提交人</TableHead>
+                <TableHead className="w-[150px]">提交时间</TableHead>
+                <TableHead className="w-[100px]">状态</TableHead>
+                <TableHead className="w-[200px]">备注</TableHead>
+                <TableHead className="sticky right-0 w-[140px] bg-white text-right">操作</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredItems.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={8} className="h-24 text-center text-muted-foreground">
+                    暂无审批记录
+                  </TableCell>
+                </TableRow>
+              ) : (
+                filteredItems.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        {typeIcons[item.type]}
+                        <span className="text-sm">{APPROVAL_TYPE_LABELS[item.type]}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="font-medium">{item.title}</TableCell>
+                    <TableCell>
+                      <span className="text-sm text-muted-foreground line-clamp-2">
+                        {item.description || "-"}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm">{item.submitterName}</span>
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {formatDate(item.submitTime)}
+                    </TableCell>
+                    <TableCell>{getStatusBadge(item.status)}</TableCell>
+                    <TableCell>
+                      <span className="text-sm text-muted-foreground">
+                        {item.remark || "-"}
+                      </span>
+                    </TableCell>
+                    <TableCell className="sticky right-0 bg-white text-right">
+                      {item.status === "pending" ? (
+                        <div className="flex items-center justify-end gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-emerald-600 hover:text-emerald-600"
+                            onClick={() => {
+                              setApproveDialog({ open: true, item })
+                              setRemark("")
+                            }}
+                          >
+                            <CheckCircle2 className="mr-1 size-3.5" />
+                            同意
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-destructive hover:text-destructive"
+                            onClick={() => {
+                              setRejectDialog({ open: true, item })
+                              setRemark("")
+                            }}
+                          >
+                            <Ban className="mr-1 size-3.5" />
+                            驳回
+                          </Button>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">-</span>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+
+      {/* 同意弹窗 */}
+      <Dialog open={approveDialog.open} onOpenChange={(open) => !open && setApproveDialog({ open: false, item: null })}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>审批通过</DialogTitle>
+            <DialogDescription>
+              确认通过「{approveDialog.item?.title}」的审批申请？
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <label className="mb-2 block text-sm font-medium">审批备注（非必填）</label>
+            <Textarea
+              value={remark}
+              onChange={(e) => setRemark(e.target.value)}
+              placeholder="请输入审批备注..."
+              rows={3}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setApproveDialog({ open: false, item: null })}>
+              取消
+            </Button>
+            <Button onClick={handleApprove}>
+              <Send className="mr-2 size-4" />
+              确认通过
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* 驳回弹窗 */}
+      <Dialog open={rejectDialog.open} onOpenChange={(open) => !open && setRejectDialog({ open: false, item: null })}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>审批驳回</DialogTitle>
+            <DialogDescription>
+              确认驳回「{rejectDialog.item?.title}」的审批申请？
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <label className="mb-2 block text-sm font-medium">驳回备注（非必填）</label>
+            <Textarea
+              value={remark}
+              onChange={(e) => setRemark(e.target.value)}
+              placeholder="请输入驳回原因..."
+              rows={3}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRejectDialog({ open: false, item: null })}>
+              取消
+            </Button>
+            <Button variant="destructive" onClick={handleReject}>
+              <Ban className="mr-2 size-4" />
+              确认驳回
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  )
+}

@@ -11,9 +11,27 @@ import type {
   QuestionFormData,
   ExamFormData,
   StatusAction,
+  EvaluationMethodCategory,
+  EvaluationMethod,
+  SceneTask,
+  SceneEvaluationResult,
+  JobAbilityResult,
+  Position,
+  ApprovalItem,
 } from '@/lib/types'
 import { getNextStatus, canPerformAction } from '@/lib/types'
-import { mockQuestionBanks, mockQuestions, mockExams } from '@/lib/mock-data'
+import {
+  mockQuestionBanks,
+  mockQuestions,
+  mockExams,
+  mockEvaluationCategories,
+  mockEvaluationMethods,
+  mockSceneTasks,
+  mockSceneEvaluationResults,
+  mockJobAbilityResults,
+  positionsList,
+  mockApprovalItems,
+} from '@/lib/mock-data'
 
 interface DataContextValue {
   // 题库相关
@@ -31,6 +49,7 @@ interface DataContextValue {
   createQuestion: (bankId: string, data: QuestionFormData) => Question
   updateQuestion: (id: string, data: QuestionFormData) => void
   deleteQuestion: (id: string) => void
+  updateQuestionStatus: (id: string, action: StatusAction) => void
 
   // 试卷相关
   exams: Exam[]
@@ -43,6 +62,24 @@ interface DataContextValue {
   removeQuestionFromExam: (examId: string, examQuestionId: string) => void
   updateExamQuestionScore: (examId: string, examQuestionId: string, score: number) => void
   reorderExamQuestions: (examId: string, questions: ExamQuestion[]) => void
+
+  // 场景任务测评相关
+  evaluationCategories: EvaluationMethodCategory[]
+  evaluationMethods: EvaluationMethod[]
+  sceneTasks: SceneTask[]
+  sceneEvaluationResults: SceneEvaluationResult[]
+  updateEvaluationMethod: (id: string, data: Partial<EvaluationMethod>) => void
+  getSceneTasksByMethod: (methodId: string) => SceneTask[]
+  getResultsByMethod: (methodId: string) => SceneEvaluationResult[]
+
+  // 岗位能力测评结果
+  jobAbilityResults: JobAbilityResult[]
+  positionsList: Position[]
+
+  // 审批中心
+  approvalItems: ApprovalItem[]
+  approveItem: (id: string, remark?: string) => void
+  rejectItem: (id: string, remark?: string) => void
 }
 
 const DataContext = createContext<DataContextValue | null>(null)
@@ -51,6 +88,31 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const [questionBanks, setQuestionBanks] = useState<QuestionBank[]>(mockQuestionBanks)
   const [questions, setQuestions] = useState<Question[]>(mockQuestions)
   const [exams, setExams] = useState<Exam[]>(mockExams)
+
+  // 场景任务测评状态
+  const [evaluationCategories] = useState<EvaluationMethodCategory[]>(mockEvaluationCategories)
+  const [evaluationMethods, setEvaluationMethods] = useState<EvaluationMethod[]>(mockEvaluationMethods)
+  const [sceneTasks] = useState<SceneTask[]>(mockSceneTasks)
+  const [sceneEvaluationResults] = useState<SceneEvaluationResult[]>(mockSceneEvaluationResults)
+  const [jobAbilityResults] = useState<JobAbilityResult[]>(mockJobAbilityResults)
+  const [positionsListState] = useState<Position[]>(positionsList)
+  const [approvalItems, setApprovalItems] = useState<ApprovalItem[]>(mockApprovalItems)
+
+  const approveItem = useCallback((id: string, remark?: string) => {
+    setApprovalItems((prev) =>
+      prev.map((item) =>
+        item.id === id ? { ...item, status: 'approved' as const, remark } : item
+      )
+    )
+  }, [])
+
+  const rejectItem = useCallback((id: string, remark?: string) => {
+    setApprovalItems((prev) =>
+      prev.map((item) =>
+        item.id === id ? { ...item, status: 'rejected' as const, remark } : item
+      )
+    )
+  }, [])
 
   // 题库操作
   const getQuestionBank = useCallback(
@@ -87,9 +149,11 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const deleteQuestionBank = useCallback((id: string) => {
+    const bank = questionBanks.find((b) => b.id === id)
+    if (bank?.isDraftPool) return
     setQuestionBanks((prev) => prev.filter((bank) => bank.id !== id))
     setQuestions((prev) => prev.filter((q) => q.bankId !== id))
-  }, [])
+  }, [questionBanks])
 
   const updateQuestionBankStatus = useCallback((id: string, action: StatusAction) => {
     setQuestionBanks((prev) =>
@@ -139,6 +203,16 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const updateQuestion = useCallback((id: string, data: QuestionFormData) => {
     setQuestions((prev) =>
       prev.map((q) => (q.id === id ? { ...q, ...data } : q))
+    )
+  }, [])
+
+  const updateQuestionStatus = useCallback((id: string, action: StatusAction) => {
+    setQuestions((prev) =>
+      prev.map((q) => {
+        if (q.id !== id) return q
+        if (!canPerformAction(q.status, action)) return q
+        return { ...q, status: getNextStatus(action) }
+      })
     )
   }, [])
 
@@ -297,6 +371,23 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     )
   }, [])
 
+  // 场景任务测评操作
+  const updateEvaluationMethod = useCallback((id: string, data: Partial<EvaluationMethod>) => {
+    setEvaluationMethods((prev) =>
+      prev.map((method) => (method.id === id ? { ...method, ...data } : method))
+    )
+  }, [])
+
+  const getSceneTasksByMethod = useCallback(
+    (methodId: string) => sceneTasks.filter((task) => task.methodIds.includes(methodId)),
+    [sceneTasks]
+  )
+
+  const getResultsByMethod = useCallback(
+    (methodId: string) => sceneEvaluationResults.filter((res) => res.methodId === methodId),
+    [sceneEvaluationResults]
+  )
+
   const value: DataContextValue = {
     questionBanks,
     getQuestionBank,
@@ -310,6 +401,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     createQuestion,
     updateQuestion,
     deleteQuestion,
+    updateQuestionStatus,
     exams,
     getExam,
     createExam,
@@ -320,6 +412,18 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     removeQuestionFromExam,
     updateExamQuestionScore,
     reorderExamQuestions,
+    evaluationCategories,
+    evaluationMethods,
+    sceneTasks,
+    sceneEvaluationResults,
+    updateEvaluationMethod,
+    getSceneTasksByMethod,
+    getResultsByMethod,
+    jobAbilityResults,
+    positionsList: positionsListState,
+    approvalItems,
+    approveItem,
+    rejectItem,
   }
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>

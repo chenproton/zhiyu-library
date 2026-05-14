@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react"
 import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, GripVertical, Trash2, Eye, Clock, FileText, Award, Wand2, Hand, Plus } from "lucide-react"
+import { ArrowLeft, GripVertical, Trash2, Eye, Clock, FileText, Award, Wand2, Hand, Plus, Edit, Send, Save } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -12,15 +12,15 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { StatusBadge } from "@/components/shared/status-badge"
 import { ConfirmDialog } from "@/components/shared/confirm-dialog"
 import { ExamFormDialog } from "@/components/exams/exam-form-dialog"
-import { ExamStatusActions } from "@/components/exams/exam-status-actions"
 import { RandomQuestionDialog } from "@/components/exams/random-question-dialog"
 import { ManualQuestionDialog } from "@/components/exams/manual-question-dialog"
 import { AddQuestionToExamDialog } from "@/components/exams/add-question-to-exam-dialog"
 import { QuestionPreview } from "@/components/questions/question-preview"
 import { useData } from "@/components/providers/data-provider"
 import type { Question, ExamQuestion, ExamFormData } from "@/lib/types"
-import { QUESTION_TYPE_LABELS } from "@/lib/types"
+import { QUESTION_TYPE_LABELS, canPerformAction } from "@/lib/types"
 import { cn } from "@/lib/utils"
+import { useToast } from "@/hooks/use-toast"
 
 export default function ExamComposerPage() {
   const params = useParams()
@@ -47,6 +47,7 @@ export default function ExamComposerPage() {
   const [randomDialogOpen, setRandomDialogOpen] = useState(false)
   const [manualDialogOpen, setManualDialogOpen] = useState(false)
   const [addQuestionDialogOpen, setAddQuestionDialogOpen] = useState(false)
+  const { toast } = useToast()
 
   const selectedQuestionIds = useMemo(() => {
     return exam?.questions.map(q => q.questionId) || []
@@ -67,6 +68,8 @@ export default function ExamComposerPage() {
   }
 
   const canEdit = ['draft', 'unsubmitted', 'rejected'].includes(exam.status)
+  const canDelete = ['draft', 'unsubmitted', 'rejected'].includes(exam.status)
+  const canSubmit = canPerformAction(exam.status, 'submit')
 
   const handleExamUpdate = (data: ExamFormData) => {
     updateExam(examId, data)
@@ -176,12 +179,30 @@ export default function ExamComposerPage() {
               </span>
             </div>
           </div>
-          <ExamStatusActions
-            status={exam.status}
-            onEdit={() => setFormOpen(true)}
-            onDelete={handleExamDelete}
-            onStatusChange={(action) => updateExamStatus(examId, action)}
-          />
+          <div className="flex items-center gap-2">
+            {canEdit && (
+              <Button variant="outline" size="sm" onClick={() => setFormOpen(true)}>
+                <Edit className="mr-1 size-4" />
+                修改试卷基本信息
+              </Button>
+            )}
+            {canSubmit && (
+              <Button variant="outline" size="sm" onClick={() => updateExamStatus(examId, 'submit')}>
+                <Send className="mr-1 size-4" />
+                提交审批
+              </Button>
+            )}
+            {canDelete && (
+              <Button variant="outline" size="sm" className="text-destructive hover:text-destructive" onClick={handleExamDelete}>
+                <Trash2 className="mr-1 size-4" />
+                删除
+              </Button>
+            )}
+            <Button size="sm" onClick={() => toast({ title: "保存成功", description: "试卷已保存" })}>
+              <Save className="mr-1 size-4" />
+              保存试卷
+            </Button>
+          </div>
         </div>
       </div>
 

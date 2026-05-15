@@ -1,0 +1,2784 @@
+<!DOCTYPE html>
+<!-- saved from url=(0104)http://demo.zhiyu.com.cn:7813/html/appraisal/%E6%B5%8B%E8%AF%84%E4%B8%AD%E5%BF%83%E9%A6%96%E9%A1%B5.html -->
+<html lang="zh-CN"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>能力测评认证平台 - 公共服务大厅</title>
+    <link rel="stylesheet" href="./能力测评认证平台 - 公共服务大厅_files/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #3370ff;
+            --primary-hover: #2860e1;
+            --primary-light: #f0f5ff;
+            --success-color: #34c759;
+            --warning-color: #ff9500;
+            --danger-color: #ff3b30;
+            --purple-color: #7c3aed;
+            --cyan-color: #06b6d4;
+            --text-primary: #1f2329;
+            --text-secondary: #646a73;
+            --text-tertiary: #8f959e;
+            --text-white: #ffffff;
+            --border-color: #dee0e3;
+            --border-light: #e5e6eb;
+            --bg-body: #f5f6f7;
+            --bg-white: #ffffff;
+            --bg-hover: #f5f6f7;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-xl: 16px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* 顶部导航 */
+        .top-header {
+            background: var(--bg-white);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-inner {
+             width: 100%;
+            margin: 0 auto;
+            padding: 0 24px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 60px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-color), var(--purple-color));
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+
+        .logo-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .logo-subtitle {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+        }
+
+        .nav-item {
+            font-size: 14px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 8px 0;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: var(--bg-body);
+            border-radius: 20px;
+            padding: 8px 16px;
+            width: 240px;
+        }
+
+        .search-box input {
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 14px;
+            width: 100%;
+            margin-left: 8px;
+        }
+
+        .search-box i {
+            color: var(--text-tertiary);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-secondary);
+        }
+
+        .btn-ghost:hover {
+            background: var(--bg-hover);
+        }
+
+        .btn-text {
+            background: transparent;
+            color: var(--text-secondary);
+            padding: 4px 8px;
+            font-size: 12px;
+        }
+
+        .btn-text:hover {
+            color: var(--primary-color);
+            background: var(--primary-light);
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+
+        .btn-lg {
+            padding: 12px 24px;
+            font-size: 15px;
+        }
+
+        /* 主内容区 */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* Banner轮播区 */
+        .banner-section {
+            margin-bottom: 32px;
+        }
+
+        .banner-wrapper {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 16px;
+        }
+
+        .main-banner {
+            position: relative;
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .banner-slide {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            padding: 48px;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .banner-slide.active {
+            opacity: 1;
+        }
+
+        .banner-slide:nth-child(1) {
+            background: linear-gradient(135deg, #3370ff 0%, #7c3aed 100%);
+        }
+
+        .banner-slide:nth-child(2) {
+            background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
+        }
+
+        .banner-slide:nth-child(3) {
+            background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+        }
+
+        .banner-content {
+            flex: 1;
+            color: white;
+        }
+
+        .banner-tag {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-bottom: 16px;
+        }
+
+        .banner-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+
+        .banner-desc {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .banner-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            color: var(--primary-color);
+            padding: 12px 24px;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            text-decoration: none;
+            transition: transform 0.2s;
+        }
+
+        .banner-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .banner-image {
+            flex: 0 0 280px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .banner-image img {
+            max-width: 100%;
+            max-height: 260px;
+            filter: drop-shadow(0 20px 40px rgba(0,0,0,0.2));
+        }
+
+        .banner-image i {
+            font-size: 180px;
+            opacity: 0.3;
+        }
+
+        .banner-indicators {
+            position: absolute;
+            bottom: 24px;
+            left: 48px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .indicator {
+            width: 32px;
+            height: 4px;
+            background: rgba(255,255,255,0.4);
+            border-radius: 2px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .indicator.active {
+            background: white;
+            width: 48px;
+        }
+
+        /* 侧边快讯栏 */
+        .side-news {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .news-card {
+            flex: 1;
+            background: var(--bg-white);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid var(--border-light);
+        }
+
+        .news-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .news-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .news-card-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .news-card-icon.cert {
+            background: #fef3c7;
+            color: #f59e0b;
+        }
+
+        .news-card-icon.exam {
+            background: #fee2e2;
+            color: #ef4444;
+        }
+
+        .news-card-icon.rank {
+            background: #dbeafe;
+            color: #3b82f6;
+        }
+
+        .news-card-badge {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+
+        .badge-new {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .badge-hot {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .badge-live {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .news-card-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .news-card-meta {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: auto;
+        }
+
+        /* 快捷导航 */
+        .quick-nav {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 32px;
+            padding: 20px;
+            background: var(--bg-white);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-light);
+        }
+
+        .quick-nav-item {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            background: var(--bg-body);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .quick-nav-item:hover {
+            background: var(--primary-light);
+        }
+
+        .quick-nav-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .quick-nav-icon.blue {
+            background: linear-gradient(135deg, #3370ff, #60a5fa);
+            color: white;
+        }
+
+        .quick-nav-icon.purple {
+            background: linear-gradient(135deg, #7c3aed, #a78bfa);
+            color: white;
+        }
+
+        .quick-nav-icon.green {
+            background: linear-gradient(135deg, #10b981, #34d399);
+            color: white;
+        }
+
+        .quick-nav-icon.orange {
+            background: linear-gradient(135deg, #f59e0b, #fbbf24);
+            color: white;
+        }
+
+        .quick-nav-icon.cyan {
+            background: linear-gradient(135deg, #06b6d4, #22d3ee);
+            color: white;
+        }
+
+        .quick-nav-icon.pink {
+            background: linear-gradient(135deg, #ec4899, #f472b6);
+            color: white;
+        }
+
+        .quick-nav-info h4 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .quick-nav-info p {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        /* 模块区域 */
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-title h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .section-title .icon {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .section-title .desc {
+            font-size: 13px;
+            color: var(--text-tertiary);
+            margin-left: 8px;
+        }
+
+        .section-more {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .section-more:hover {
+            color: var(--primary-color);
+        }
+
+        /* 标签筛选 */
+        .filter-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-tab {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            background: var(--bg-body);
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-tab:hover {
+            background: var(--border-light);
+        }
+
+        .filter-tab.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* 测评资源库卡片 */
+        .resource-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        .resource-card {
+            background: var(--bg-white);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            border: 1px solid var(--border-light);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .resource-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-4px);
+        }
+
+        .resource-cover {
+            height: 140px;
+            background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .resource-cover i {
+            font-size: 48px;
+            color: var(--primary-color);
+            opacity: 0.6;
+        }
+
+        .resource-cover-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .resource-body {
+            padding: 16px;
+        }
+
+        .resource-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .resource-desc {
+            font-size: 13px;
+            color: var(--text-tertiary);
+            margin-bottom: 12px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .resource-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .resource-tag {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: var(--bg-body);
+            color: var(--text-secondary);
+        }
+
+        .resource-tag.primary {
+            background: var(--primary-light);
+            color: var(--primary-color);
+        }
+
+        .resource-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .resource-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        .resource-info span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .resource-actions {
+            display: flex;
+            gap: 4px;
+        }
+
+        /* 试卷列表 */
+        .exam-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .exam-item {
+            background: var(--bg-white);
+            border-radius: var(--radius-md);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border: 1px solid var(--border-light);
+            transition: all 0.2s;
+        }
+
+        .exam-item:hover {
+            box-shadow: var(--shadow-sm);
+            border-color: var(--primary-color);
+        }
+
+        .exam-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .exam-icon.real {
+            background: #fef3c7;
+            color: #f59e0b;
+        }
+
+        .exam-icon.mock {
+            background: #dbeafe;
+            color: #3b82f6;
+        }
+
+        .exam-icon.final {
+            background: #fee2e2;
+            color: #ef4444;
+        }
+
+        .exam-info {
+            flex: 1;
+        }
+
+        .exam-title {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .exam-meta {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            font-size: 13px;
+            color: var(--text-tertiary);
+        }
+
+        .exam-stats {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        /* 证书超市 */
+        .cert-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        .cert-card {
+            background: var(--bg-white);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            border: 1px solid var(--border-light);
+            transition: all 0.2s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cert-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-4px);
+        }
+
+        .cert-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, transparent 50%, rgba(51, 112, 255, 0.1) 50%);
+        }
+
+        .cert-badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .cert-preview {
+            width: 80px;
+            height: 100px;
+            margin: 0 auto 16px;
+            background: linear-gradient(135deg, #fef3c7, #fcd34d);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .cert-preview i {
+            font-size: 32px;
+            color: #b45309;
+        }
+
+        .cert-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .cert-org {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .cert-stats {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 12px 0;
+            border-top: 1px solid var(--border-light);
+            border-bottom: 1px solid var(--border-light);
+            margin-bottom: 12px;
+        }
+
+        .cert-stat {
+            text-align: center;
+        }
+
+        .cert-stat-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .cert-stat-label {
+            font-size: 11px;
+            color: var(--text-tertiary);
+        }
+
+        .cert-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .cert-footer {
+            display: flex;
+            gap: 8px;
+        }
+
+        .cert-footer .btn {
+            flex: 1;
+        }
+
+        /* 能力认证 */
+        .ability-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .ability-panel {
+            background: var(--bg-white);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-light);
+            overflow: hidden;
+        }
+
+        .ability-panel-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .ability-panel-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .ability-panel-title i {
+            color: var(--primary-color);
+        }
+
+        .ability-list {
+            padding: 12px;
+        }
+
+        .ability-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 12px;
+            border-radius: var(--radius-md);
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+
+        .ability-item:hover {
+            background: var(--bg-body);
+        }
+
+        .ability-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .ability-icon.micro {
+            background: #e0e7ff;
+            color: #4f46e5;
+        }
+
+        .ability-icon.enterprise {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .ability-info {
+            flex: 1;
+        }
+
+        .ability-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .ability-meta {
+            font-size: 12px;
+            color: var(--text-tertiary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .ability-progress {
+width: 100px;
+            height: 6px;
+            background: var(--bg-body);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .ability-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--cyan-color));
+            border-radius: 3px;
+        }
+
+        .ability-action {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* AI面试 */
+        .ai-interview-section {
+            background: var(--bg-white);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-light);
+            overflow: hidden;
+        }
+
+        .ai-interview-header {
+            padding: 20px 24px;
+            background: linear-gradient(135deg, #3370ff, #7c3aed);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .ai-interview-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .ai-interview-title h3 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .ai-interview-title p {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+      .ai-interview-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            padding: 20px;
+        }
+
+        .ai-interview-card {
+            background: var(--bg-body);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .ai-interview-card:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+        }
+
+        .ai-interview-icon {
+            width: 56px;
+            height: 56px;
+            margin: 0 auto 12px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .ai-interview-card:nth-child(1) .ai-interview-icon {
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
+            color: white;
+        }
+
+        .ai-interview-card:nth-child(2) .ai-interview-icon {
+            background: linear-gradient(135deg, #10b981, #34d399);
+            color: white;
+        }
+
+        .ai-interview-card:nth-child(3) .ai-interview-icon {
+            background: linear-gradient(135deg, #f59e0b, #fbbf24);
+            color: white;
+        }
+
+        .ai-interview-card:nth-child(4) .ai-interview-icon {
+            background: linear-gradient(135deg, #ec4899, #f472b6);
+            color: white;
+        }
+
+        .ai-interview-card:nth-child(5) .ai-interview-icon {
+            background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+            color: white;
+        }
+
+        .ai-interview-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .ai-interview-stats {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        .hot-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: #ef4444;
+        }
+
+        /* 画像与简历 */
+        .profile-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+        }
+
+        .profile-intro {
+            background: var(--bg-white);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-light);
+            padding: 24px;
+        }
+
+        .profile-intro-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .profile-intro-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: var(--radius-lg);
+            background: linear-gradient(135deg, #3370ff, #7c3aed);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: white;
+        }
+
+        .profile-intro-content h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .profile-intro-content p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .profile-dimensions {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .dimension-card {
+            background: var(--bg-body);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            text-align: center;
+        }
+
+        .dimension-icon {
+            width: 40px;
+            height: 40px;
+            margin: 0 auto 8px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .dimension-card:nth-child(1) .dimension-icon {
+            background: #dbeafe;
+            color: #3b82f6;
+        }
+
+        .dimension-card:nth-child(2) .dimension-icon {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .dimension-card:nth-child(3) .dimension-icon {
+            background: #fef3c7;
+            color: #f59e0b;
+        }
+
+        .dimension-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .dimension-desc {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        .profile-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .profile-quick {
+            background: var(--bg-white);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-light);
+            padding: 20px;
+        }
+
+        .quick-action-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: var(--bg-body);
+            border-radius: var(--radius-md);
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quick-action-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .quick-action-item:hover {
+            background: var(--primary-light);
+        }
+
+        .quick-action-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .quick-action-icon.view {
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
+            color: white;
+        }
+
+        .quick-action-icon.gen {
+            background: linear-gradient(135deg, #10b981, #34d399);
+            color: white;
+        }
+
+        .quick-action-info h4 {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .quick-action-info p {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        /* 毕业设计 */
+        .graduation-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .graduation-notice {
+            background: var(--bg-white);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-light);
+            overflow: hidden;
+        }
+
+        .graduation-notice-header {
+            padding: 16px 20px;
+            background: linear-gradient(135deg, #f59e0b, #fbbf24);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .graduation-notice-header h3 {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;
+        }
+
+        .notice-scroll {
+            height: 200px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .notice-list {
+            animation: scrollNotice 20s linear infinite;
+        }
+
+        @keyframes scrollNotice {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-50%); }
+        }
+
+        .notice-item {
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .notice-item:hover {
+            background: var(--bg-body);
+        }
+
+        .notice-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--primary-color);
+        }
+
+        .notice-content {
+            flex: 1;
+        }
+
+        .notice-title {
+            font-size: 14px;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .notice-date {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        .graduation-topics {
+            background: var(--bg-white);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-light);
+            overflow: hidden;
+        }
+
+        .graduation-topics-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .graduation-topics-header h3 {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .topic-list {
+            padding: 12px;
+        }
+
+        .topic-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .topic-item:hover {
+            background: var(--bg-body);
+        }
+
+        .topic-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            background: var(--primary-light);
+            color: var(--primary-color);
+        }
+
+        .topic-info {
+            flex: 1;
+        }
+
+        .topic-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .topic-meta {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        .topic-count {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* 底部 */
+        .footer {
+            background: #1f2329;
+            color: #8f959e;
+            padding: 48px 24px 24px;
+            margin-top: 48px;
+        }
+
+        .footer-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+            gap: 48px;
+            margin-bottom: 48px;
+        }
+
+        .footer-brand h3 {
+            color: white;
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+
+        .footer-brand p {
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .footer-links h4 {
+            color: white;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        .footer-links a {
+            display: block;
+            color: #8f959e;
+            font-size: 13px;
+            text-decoration: none;
+            margin-bottom: 10px;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            padding-top: 24px;
+            border-top: 1px solid #3c4048;
+            text-align: center;
+            font-size: 13px;
+        }
+
+        /* 响应式 */
+        @media (max-width: 1200px) {
+            .resource-grid, .cert-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .ai-interview-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 992px) {
+            .banner-wrapper {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+
+            .main-banner {
+                height: 300px;
+            }
+
+            .side-news {
+                flex-direction: row;
+            }
+
+            .quick-nav {
+                flex-wrap: wrap;
+            }
+
+            .quick-nav-item {
+                flex: 1 1 calc(33.333% - 8px);
+            }
+
+            .resource-grid, .cert-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .ability-section, .profile-section, .graduation-section {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+
+            .quick-nav-item {
+                flex: 1 1 calc(50% - 8px);
+            }
+
+            .resource-grid, .cert-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .ai-interview-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <header class="top-header">
+        <div class="header-inner">
+            <div class="logo-section">
+                <div class="logo-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <div>
+                    <div class="logo-text">能力测评认证平台</div>
+                    <div class="logo-subtitle">公共服务大厅</div>
+                </div>
+            </div>
+
+            <nav class="nav-menu">
+                <a href="http://demo.zhiyu.com.cn:7813/html/appraisal/%E6%B5%8B%E8%AF%84%E4%B8%AD%E5%BF%83%E9%A6%96%E9%A1%B5.html#" class="nav-item active">首页</a>
+                <a href="http://demo.zhiyu.com.cn:7813/html/appraisal/1%20%E4%BA%8C%E7%BA%A7%E9%A1%B5%20%E6%B5%8B%E8%AF%84%E8%B5%84%E6%BA%90%E5%BA%93.html" class="nav-item">测评资源库</a>
+                <a href="http://demo.zhiyu.com.cn:7813/html/appraisal/2%20%E4%BA%8C%E7%BA%A7%E9%A1%B5%20%E8%AF%81%E4%B9%A6%E8%B6%85%E5%B8%82.html" class="nav-item">证书超市</a>
+                <a href="http://demo.zhiyu.com.cn:7813/html/appraisal/3%20%E4%BA%8C%E7%BA%A7%E9%A1%B5%20%E8%83%BD%E5%8A%9B%E8%AE%A4%E8%AF%81.html" class="nav-item">能力认证</a>
+                <a href="http://demo.zhiyu.com.cn:7813/html/appraisal/4%20%E4%BA%8C%E7%BA%A7%E9%A1%B5%20AI%20%E9%9D%A2%E8%AF%95.html" class="nav-item">AI面试</a>
+                <a href="http://demo.zhiyu.com.cn:7813/html/appraisal/5%20%E4%BA%8C%E7%BA%A7%E9%A1%B5%20%E7%94%BB%E5%83%8F%E4%B8%8E%E7%AE%80%E5%8E%86.html" class="nav-item">画像与简历</a>
+                <a href="http://demo.zhiyu.com.cn:7813/html/appraisal/6%20%E4%BA%8C%E7%BA%A7%E9%A1%B5%20%E6%AF%95%E4%B8%9A%E8%AE%BE%E8%AE%A1.html" class="nav-item">毕业设计</a>
+            </nav>
+
+            <div class="header-actions">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="搜索题库、试卷、证书...">
+                </div>
+                <button class="btn btn-ghost">
+                    <i class="far fa-bell"></i>
+                </button>
+                <button class="btn btn-outline">登录</button>
+                <button class="btn btn-primary">注册</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="main-container">
+        <!-- Banner区域 -->
+        <section class="banner-section">
+            <div class="banner-wrapper">
+                <!-- 主Banner轮播 -->
+                <div class="main-banner">
+                    <div class="banner-slide">
+                        <div class="banner-content">
+                            <span class="banner-tag"><i class="fas fa-certificate"></i> 新证上架</span>
+                            <h2 class="banner-title">华为HCIA云计算认证<br>正式开放报名</h2>
+                            <p class="banner-desc">业界权威认证，涵盖云计算基础架构、虚拟化技术、云服务部署等核心技能，助力职业发展腾飞。</p>
+                            <a href="http://demo.zhiyu.com.cn:7813/html/appraisal/%E6%B5%8B%E8%AF%84%E4%B8%AD%E5%BF%83%E9%A6%96%E9%A1%B5.html#" class="banner-btn">
+                                立即了解 <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                        <div class="banner-image">
+                            <i class="fas fa-cloud"></i>
+                        </div>
+                    </div>
+
+                    <div class="banner-slide">
+                        <div class="banner-content">
+                            <span class="banner-tag"><i class="fas fa-fire"></i> 校级联考</span>
+                            <h2 class="banner-title">2024年春季学期<br>期末统一考试即将开始</h2>
+                            <p class="banner-desc">距离开考仅剩7天！请各位同学做好考前准备，查看考试安排与注意事项。</p>
+                            <a href="http://demo.zhiyu.com.cn:7813/html/appraisal/%E6%B5%8B%E8%AF%84%E4%B8%AD%E5%BF%83%E9%A6%96%E9%A1%B5.html#" class="banner-btn">
+                                查看详情 <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                        <div class="banner-image">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                    </div>
+
+                    <div class="banner-slide active">
+                        <div class="banner-content">
+                            <span class="banner-tag"><i class="fas fa-trophy"></i> 能力榜单</span>
+                            <h2 class="banner-title">本周能力之星<br>快来看看有没有你</h2>
+                            <p class="banner-desc">本周共有1,256名同学获得能力认证，328人完成微证书挑战，来看看他们的学习秘诀！</p>
+                            <a href="http://demo.zhiyu.com.cn:7813/html/appraisal/%E6%B5%8B%E8%AF%84%E4%B8%AD%E5%BF%83%E9%A6%96%E9%A1%B5.html#" class="banner-btn">
+                                查看榜单 <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                        <div class="banner-image">
+                            <i class="fas fa-medal"></i>
+                        </div>
+                    </div>
+
+                    <div class="banner-indicators">
+                        <span class="indicator" data-index="0"></span>
+                        <span class="indicator" data-index="1"></span>
+                        <span class="indicator active" data-index="2"></span>
+                    </div>
+                </div>
+
+                <!-- 侧边快讯 -->
+                <div class="side-news">
+                    <div class="news-card">
+                        <div class="news-card-header">
+                            <div class="news-card-icon cert">
+                                <i class="fas fa-certificate"></i>
+                            </div>
+                            <span class="news-card-badge badge-new">NEW</span>
+                        </div>
+                        <h4 class="news-card-title">阿里云ACP大数据分析师认证</h4>
+                        <div class="news-card-meta">
+                            <span><i class="far fa-clock"></i> 3天前上架</span>
+                            <span><i class="fas fa-user"></i> 156人关注</span>
+                        </div>
+                    </div>
+
+                    <div class="news-card">
+                        <div class="news-card-header">
+                            <div class="news-card-icon exam">
+                                <i class="fas fa-file-signature"></i>
+                            </div>
+                            <span class="news-card-badge badge-hot">倒计时</span>
+                        </div>
+                        <h4 class="news-card-title">计算机基础期末统考</h4>
+                        <div class="news-card-meta">
+                            <span><i class="far fa-calendar"></i> 距开考 7天</span>
+                            <span><i class="fas fa-users"></i> 2,340人报名</span>
+                        </div>
+                    </div>
+
+                    <div class="news-card">
+                        <div class="news-card-header">
+                            <div class="news-card-icon rank">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <span class="news-card-badge badge-live">实时</span>
+                        </div>
+                        <h4 class="news-card-title">本周能力认证TOP10榜单</h4>
+                        <div class="news-card-meta">
+                            <span><i class="fas fa-fire"></i> 1,256人上榜</span>
+                            <span><i class="fas fa-medal"></i> 查看详情</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 快捷导航 -->
+        <section class="quick-nav">
+            <a href="http://demo.zhiyu.com.cn:7813/html/appraisal/1%20%E4%BA%8C%E7%BA%A7%E9%A1%B5%20%E6%B5%8B%E8%AF%84%E8%B5%84%E6%BA%90%E5%BA%93.html" class="quick-nav-item">
+                <div class="quick-nav-icon blue">
+                    <i class="fas fa-database"></i>
+                </div>
+                <div class="quick-nav-info">
+                    <h4>测评资源库</h4>
+                    <p>8,500+ 题库与试卷</p>
+                </div>
+            </a>
+            <a href="http://demo.zhiyu.com.cn:7813/html/appraisal/2%20%E4%BA%8C%E7%BA%A7%E9%A1%B5%20%E8%AF%81%E4%B9%A6%E8%B6%85%E5%B8%82.html" class="quick-nav-item">
+                <div class="quick-nav-icon purple">
+                    <i class="fas fa-award"></i>
+                </div>
+                <div class="quick-nav-info">
+                    <h4>证书超市</h4>
+                    <p>120+ 职业资格证书</p>
+                </div>
+            </a>
+            <a href="http://demo.zhiyu.com.cn:7813/html/appraisal/3%20%E4%BA%8C%E7%BA%A7%E9%A1%B5%20%E8%83%BD%E5%8A%9B%E8%AE%A4%E8%AF%81.html" class="quick-nav-item">
+                <div class="quick-nav-icon green">
+                    <i class="fas fa-medal"></i>
+                </div>
+                <div class="quick-nav-info">
+                    <h4>能力认证</h4>
+                    <p>微证书与企业认证</p>
+                </div>
+            </a>
+            <a href="http://demo.zhiyu.com.cn:7813/html/appraisal/4%20%E4%BA%8C%E7%BA%A7%E9%A1%B5%20AI%20%E9%9D%A2%E8%AF%95.html" class="quick-nav-item">
+                <div class="quick-nav-icon orange">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="quick-nav-info">
+                    <h4>AI面试</h4>
+                    <p>智能模拟面试训练</p>
+                </div>
+            </a>
+            <a href="http://demo.zhiyu.com.cn:7813/html/appraisal/5%20%E4%BA%8C%E7%BA%A7%E9%A1%B5%20%E7%94%BB%E5%83%8F%E4%B8%8E%E7%AE%80%E5%8E%86.html" class="quick-nav-item">
+                <div class="quick-nav-icon cyan">
+                    <i class="fas fa-id-card"></i>
+                </div>
+                <div class="quick-nav-info">
+                    <h4>画像与简历</h4>
+                    <p>能力画像与简历生成</p>
+                </div>
+            </a>
+            <a href="http://demo.zhiyu.com.cn:7813/html/appraisal/6%20%E4%BA%8C%E7%BA%A7%E9%A1%B5%20%E6%AF%95%E4%B8%9A%E8%AE%BE%E8%AE%A1.html" class="quick-nav-item">
+                <div class="quick-nav-icon pink">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <div class="quick-nav-info">
+                    <h4>毕业设计</h4>
+                    <p>选题与作品管理</p>
+                </div>
+            </a>
+        </section>
+
+        <!-- 1.1 测评资源库 -->
+        <section id="resource" class="section">
+            <div class="section-header">
+                <div class="section-title">
+                    <div class="icon" style="background: #dbeafe; color: #3b82f6;">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <h2>测评资源库</h2>
+                    <span class="desc">聚合全校题库、试卷资源，支持多维度筛选</span>
+                </div>
+                <a href="http://demo.zhiyu.com.cn:7813/html/appraisal/%E6%B5%8B%E8%AF%84%E4%B8%AD%E5%BF%83%E9%A6%96%E9%A1%B5.html#" class="section-more">
+                    查看全部 <i class="fas fa-chevron-right"></i>
+                </a>
+            </div>
+
+            <!-- 筛选标签 -->
+            <div class="filter-tabs">
+                <button class="filter-tab active">全部</button>
+                <button class="filter-tab">计算机类</button>
+                <button class="filter-tab">经济管理</button>
+                <button class="filter-tab">电子信息</button>
+                <button class="filter-tab">机械制造</button>
+                <button class="filter-tab">建筑工程</button>
+                <button class="filter-tab">医药卫生</button>
+                <button class="filter-tab">
+                    <i class="fas fa-filter"></i> 更多筛选
+                </button>
+            </div>
+
+            <!-- 题库卡片 -->
+            <h4 style="font-size: 15px; color: var(--text-secondary); margin-bottom: 16px;">
+                <i class="fas fa-book" style="color: var(--primary-color);"></i> 题库中心
+            </h4>
+            <div class="resource-grid" style="margin-bottom: 32px;">
+                <div class="resource-card">
+                    <div class="resource-cover" style="background: linear-gradient(135deg, #dbeafe, #bfdbfe);">
+                        <i class="fas fa-code"></i>
+                        <span class="resource-cover-badge badge-hot">热门</span>
+                    </div>
+                    <div class="resource-body">
+                        <h4 class="resource-title">Python程序设计基础题库</h4>
+                        <p class="resource-desc">涵盖Python语法、数据结构、文件操作等核心知识点</p>
+                        <div class="resource-tags">
+                            <span class="resource-tag primary">计算机</span>
+                            <span class="resource-tag">程序设计</span>
+                            <span class="resource-tag">初级</span>
+                        </div>
+                        <div class="resource-meta">
+                            <div class="resource-info">
+                                <span><i class="fas fa-list"></i> 1,280题</span>
+                                <span><i class="fas fa-user"></i> 张老师</span>
+                            </div>
+                            <div class="resource-actions">
+                                <button class="btn btn-text">收藏</button>
+                                <button class="btn btn-text" style="color: var(--primary-color);">加入题库</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-cover" style="background: linear-gradient(135deg, #fef3c7, #fde68a);">
+                        <i class="fas fa-calculator"></i>
+                        <span class="resource-cover-badge badge-new">新上</span>
+                    </div>
+                    <div class="resource-body">
+                        <h4 class="resource-title">会计基础实务题库</h4>
+                        <p class="resource-desc">包含会计分录、财务报表、成本核算等实操题目</p>
+                        <div class="resource-tags">
+                            <span class="resource-tag primary">经管</span>
+                            <span class="resource-tag">会计</span>
+                            <span class="resource-tag">实务</span>
+                        </div>
+                        <div class="resource-meta">
+                            <div class="resource-info">
+                                <span><i class="fas fa-list"></i> 856题</span>
+                                <span><i class="fas fa-user"></i> 李老师</span>
+                            </div>
+                            <div class="resource-actions">
+                                <button class="btn btn-text">收藏</button>
+                                <button class="btn btn-text" style="color: var(--primary-color);">加入题库</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-cover" style="background: linear-gradient(135deg, #d1fae5, #a7f3d0);">
+                        <i class="fas fa-microchip"></i>
+                        <span class="resource-cover-badge" style="background: #d1fae5; color: #059669;">共建</span>
+                    </div>
+                    <div class="resource-body">
+                        <h4 class="resource-title">电子电路分析题库</h4>
+                        <p class="resource-desc">模拟电路、数字电路基础与分析方法训练</p>
+                        <div class="resource-tags">
+                            <span class="resource-tag primary">电子</span>
+                            <span class="resource-tag">电路</span>
+                            <span class="resource-tag">中级</span>
+                        </div>
+                        <div class="resource-meta">
+                            <div class="resource-info">
+                                <span><i class="fas fa-list"></i> 642题</span>
+                                <span><i class="fas fa-users"></i> 工学院</span>
+                            </div>
+                            <div class="resource-actions">
+                                <button class="btn btn-text" style="color: #059669;">申请共建</button>
+                                <button class="btn btn-text" style="color: var(--primary-color);">加入题库</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="resource-card">
+                    <div class="resource-cover" style="background: linear-gradient(135deg, #e0e7ff, #c7d2fe);">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <div class="resource-body">
+                        <h4 class="resource-title">机械制图与CAD题库</h4>
+                        <p class="resource-desc">工程制图标准、三视图、CAD操作技能训练</p>
+                        <div class="resource-tags">
+                            <span class="resource-tag primary">机械</span>
+                            <span class="resource-tag">制图</span>
+                            <span class="resource-tag">CAD</span>
+                        </div>
+                        <div class="resource-meta">
+                            <div class="resource-info">
+                                <span><i class="fas fa-list"></i> 528题</span>
+                                <span><i class="fas fa-user"></i> 王老师</span>
+                            </div>
+                            <div class="resource-actions">
+                                <button class="btn btn-text">收藏</button>
+                                <button class="btn btn-text" style="color: var(--primary-color);">加入题库</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 试卷中心 -->
+            <h4 style="font-size: 15px; color: var(--text-secondary); margin-bottom: 16px;">
+                <i class="fas fa-file-alt" style="color: var(--warning-color);"></i> 试卷中心
+            </h4>
+            <div class="exam-list">
+                <div class="exam-item">
+                    <div class="exam-icon real">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="exam-info">
+                        <h4 class="exam-title">2023年全国计算机等级考试二级Python真题</h4>
+                        <div class="exam-meta">
+                            <span><i class="far fa-clock"></i> 120分钟</span>
+                            <span><i class="fas fa-list-ol"></i> 40题</span>
+                            <span><i class="fas fa-signal"></i> 难度：中等</span>
+                            <span class="resource-tag primary" style="font-size: 11px;">历年真题</span>
+                        </div>
+                    </div>
+                    <div class="exam-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">2,840</div>
+                            <div class="stat-label">已测人数</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">76%</div>
+                            <div class="stat-label">平均正确率</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn btn-outline btn-sm">
+                            <i class="far fa-eye"></i> 预览
+                        </button>
+                        <button class="btn btn-primary btn-sm">
+                            <i class="fas fa-plus"></i> 加入我的试卷
+                        </button>
+                    </div>
+                </div>
+
+                <div class="exam-item">
+                    <div class="exam-icon mock">
+                        <i class="fas fa-edit"></i>
+                    </div>
+                    <div class="exam-info">
+                        <h4 class="exam-title">2024年春季学期《数据结构》模拟测试卷（一）</h4>
+                        <div class="exam-meta">
+                            <span><i class="far fa-clock"></i> 90分钟</span>
+                            <span><i class="fas fa-list-ol"></i> 35题</span>
+                            <span><i class="fas fa-signal"></i> 难度：较难</span>
+                            <span class="resource-tag" style="font-size: 11px; background: #dbeafe; color: #3b82f6;">模拟卷</span>
+                        </div>
+                    </div>
+                    <div class="exam-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">1,256</div>
+                            <div class="stat-label">已测人数</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">68%</div>
+                            <div class="stat-label">平均正确率</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn btn-outline btn-sm">
+                            <i class="far fa-eye"></i> 预览
+                        </button>
+                        <button class="btn btn-primary btn-sm">
+                            <i class="fas fa-plus"></i> 加入我的试卷
+                        </button>
+                    </div>
+                </div>
+
+                <div class="exam-item">
+                    <div class="exam-icon final">
+                        <i class="fas fa-file-signature"></i>
+                    </div>
+                    <div class="exam-info">
+                        <h4 class="exam-title">2023-2024学年第一学期《高等数学》公共课期末卷</h4>
+                        <div class="exam-meta">
+                            <span><i class="far fa-clock"></i> 120分钟</span>
+                            <span><i class="fas fa-list-ol"></i> 25题</span>
+                            <span><i class="fas fa-signal"></i> 难度：中等</span>
+                            <span class="resource-tag" style="font-size: 11px; background: #fee2e2; color: #dc2626;">期末卷</span>
+                        </div>
+                    </div>
+                    <div class="exam-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">3,520</div>
+                            <div class="stat-label">已测人数</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">72%</div>
+                            <div class="stat-label">平均正确率</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn btn-outline btn-sm">
+                            <i class="far fa-eye"></i> 预览
+                        </button>
+                        <button class="btn btn-primary btn-sm">
+                            <i class="fas fa-plus"></i> 加入我的试卷
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 1.2 证书超市 -->
+        <section id="cert" class="section">
+            <div class="section-header">
+                <div class="section-title">
+                    <div class="icon" style="background: #fef3c7; color: #f59e0b;">
+                        <i class="fas fa-award"></i>
+                    </div>
+                    <h2>证书超市</h2>
+                    <span class="desc">行业权威职业资格证书，助力职业发展</span>
+                </div>
+                <a href="http://demo.zhiyu.com.cn:7813/html/appraisal/%E6%B5%8B%E8%AF%84%E4%B8%AD%E5%BF%83%E9%A6%96%E9%A1%B5.html#" class="section-more">
+                    查看全部 <i class="fas fa-chevron-right"></i>
+                </a>
+            </div>
+
+            <div class="filter-tabs">
+                <button class="filter-tab active">全部证书</button>
+                <button class="filter-tab">IT技术</button>
+                <button class="filter-tab">财会金融</button>
+                <button class="filter-tab">工程建筑</button>
+                <button class="filter-tab">医疗健康</button>
+                <button class="filter-tab">教育培训</button>
+                <button class="filter-tab">企业认证</button>
+            </div>
+
+            <div class="cert-grid">
+                <div class="cert-card">
+                    <span class="cert-badge badge-hot">热门</span>
+                    <div class="cert-preview">
+                        <i class="fas fa-cloud"></i>
+                    </div>
+                    <h4 class="cert-name">华为HCIA云计算</h4>
+                    <p class="cert-org">华为技术有限公司</p>
+                    <div class="cert-stats">
+                        <div class="cert-stat">
+                            <div class="cert-stat-value">★★★</div>
+                            <div class="cert-stat-label">考取难度</div>
+                        </div>
+                        <div class="cert-stat">
+                            <div class="cert-stat-value">8.5k</div>
+                            <div class="cert-stat-label">月薪参考</div>
+                        </div>
+                    </div>
+                    <div class="cert-tags">
+                        <span class="resource-tag">云计算</span>
+                        <span class="resource-tag">运维工程师</span>
+                    </div>
+                    <div class="cert-footer">
+                        <button class="btn btn-outline btn-sm">
+                            <i class="far fa-heart"></i> 感兴趣
+                        </button>
+                        <button class="btn btn-primary btn-sm">
+                            查看详情
+                        </button>
+                    </div>
+                </div>
+
+                <div class="cert-card">
+                    <span class="cert-badge badge-new">新上架</span>
+                    <div class="cert-preview" style="background: linear-gradient(135deg, #fee2e2, #fca5a5);">
+                        <i class="fas fa-database" style="color: #dc2626;"></i>
+                    </div>
+                    <h4 class="cert-name">阿里云ACP大数据</h4>
+                    <p class="cert-org">阿里云计算有限公司</p>
+                    <div class="cert-stats">
+                        <div class="cert-stat">
+                            <div class="cert-stat-value">★★★★</div>
+                            <div class="cert-stat-label">考取难度</div>
+                        </div>
+                        <div class="cert-stat">
+                            <div class="cert-stat-value">12k</div>
+                            <div class="cert-stat-label">月薪参考</div>
+                        </div>
+                    </div>
+                    <div class="cert-tags">
+                        <span class="resource-tag">大数据</span>
+                        <span class="resource-tag">数据分析师</span>
+                    </div>
+                    <div class="cert-footer">
+                        <button class="btn btn-outline btn-sm">
+                            <i class="far fa-heart"></i> 感兴趣
+                        </button>
+                        <button class="btn btn-primary btn-sm">
+                            查看详情
+                        </button>
+                    </div>
+                </div>
+
+                <div class="cert-card">
+                    <div class="cert-preview" style="background: linear-gradient(135deg, #dbeafe, #93c5fd);">
+                        <i class="fas fa-bolt" style="color: #2563eb;"></i>
+                    </div>
+                    <h4 class="cert-name">低压电工操作证</h4>
+                    <p class="cert-org">国家应急管理部</p>
+                    <div class="cert-stats">
+                        <div class="cert-stat">
+                            <div class="cert-stat-value">★★</div>
+                            <div class="cert-stat-label">考取难度</div>
+                        </div>
+                        <div class="cert-stat">
+                            <div class="cert-stat-value">6k</div>
+                            <div class="cert-stat-label">月薪参考</div>
+                        </div>
+                    </div>
+                    <div class="cert-tags">
+                        <span class="resource-tag">电工</span>
+                        <span class="resource-tag">上岗必备</span>
+                    </div>
+                    <div class="cert-footer">
+                        <button class="btn btn-outline btn-sm">
+                            <i class="far fa-heart"></i> 感兴趣
+                        </button>
+                        <button class="btn btn-primary btn-sm">
+                            查看详情
+                        </button>
+                    </div>
+                </div>
+
+                <div class="cert-card">
+                    <div class="cert-preview" style="background: linear-gradient(135deg, #d1fae5, #6ee7b7);">
+                        <i class="fas fa-heartbeat" style="color: #059669;"></i>
+                    </div>
+                    <h4 class="cert-name">健康管理师（三级）</h4>
+                    <p class="cert-org">人力资源社会保障部</p>
+                    <div class="cert-stats">
+                        <div class="cert-stat">
+                            <div class="cert-stat-value">★★★</div>
+                            <div class="cert-stat-label">考取难度</div>
+                        </div>
+                        <div class="cert-stat">
+                            <div class="cert-stat-value">7k</div>
+                            <div class="cert-stat-label">月薪参考</div>
+                        </div>
+                    </div>
+                    <div class="cert-tags">
+                        <span class="resource-tag">健康</span>
+                        <span class="resource-tag">医疗服务</span>
+                    </div>
+                    <div class="cert-footer">
+                        <button class="btn btn-outline btn-sm">
+                            <i class="far fa-heart"></i> 感兴趣
+                        </button>
+                        <button class="btn btn-primary btn-sm">
+                            查看详情
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 1.3 能力认证 -->
+        <section id="ability" class="section">
+            <div class="section-header">
+                <div class="section-title">
+                    <div class="icon" style="background: #d1fae5; color: #059669;">
+                        <i class="fas fa-medal"></i>
+                    </div>
+                    <h2>能力认证</h2>
+                    <span class="desc">微证书公示与企业认证专区</span>
+                </div>
+                <a href="http://demo.zhiyu.com.cn:7813/html/appraisal/%E6%B5%8B%E8%AF%84%E4%B8%AD%E5%BF%83%E9%A6%96%E9%A1%B5.html#" class="section-more">
+                    查看全部 <i class="fas fa-chevron-right"></i>
+                </a>
+            </div>
+
+            <div class="ability-section">
+                <!-- 微证书公示 -->
+                <div class="ability-panel">
+                    <div class="ability-panel-header">
+                        <div class="ability-panel-title">
+                            <i class="fas fa-certificate"></i>
+                            <span>微证书公示</span>
+                        </div>
+                        <a href="http://demo.zhiyu.com.cn:7813/html/appraisal/%E6%B5%8B%E8%AF%84%E4%B8%AD%E5%BF%83%E9%A6%96%E9%A1%B5.html#" class="section-more" style="font-size: 13px;">
+                            全部项目 <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </div>
+                    <div class="ability-list">
+                        <div class="ability-item">
+                            <div class="ability-icon micro">
+                                <i class="fas fa-laptop-code"></i>
+                            </div>
+                            <div class="ability-info">
+                                <h4 class="ability-name">Web前端开发能力微证书</h4>
+                                <div class="ability-meta">
+                                    <span>理论测试 + 项目实操</span>
+                                    <span>·</span>
+                                    <span>286人已认证</span>
+                                </div>
+                            </div>
+                            <div class="ability-action">
+                                <div class="ability-progress">
+                                    <div class="ability-progress-bar" style="width: 75%;"></div>
+                                </div>
+                                <button class="btn btn-primary btn-sm">申请认证</button>
+                            </div>
+                        </div>
+
+                        <div class="ability-item">
+                            <div class="ability-icon micro">
+                                <i class="fas fa-chart-pie"></i>
+                            </div>
+                            <div class="ability-info">
+                                <h4 class="ability-name">数据分析与可视化微证书</h4>
+                                <div class="ability-meta">
+                                    <span>理论测试 + 案例分析</span>
+                                    <span>·</span>
+                                    <span>198人已认证</span>
+                                </div>
+                            </div>
+                            <div class="ability-action">
+                                <div class="ability-progress">
+                                    <div class="ability-progress-bar" style="width: 60%;"></div>
+                                </div>
+                                <button class="btn btn-primary btn-sm">申请认证</button>
+                            </div>
+                        </div>
+
+                        <div class="ability-item">
+                            <div class="ability-icon micro">
+                                <i class="fas fa-mobile-alt"></i>
+                            </div>
+                            <div class="ability-info">
+                                <h4 class="ability-name">移动应用开发微证书</h4>
+                                <div class="ability-meta">
+                                    <span>理论测试 + APP开发</span>
+                                    <span>·</span>
+                                    <span>156人已认证</span>
+                                </div>
+                            </div>
+                            <div class="ability-action">
+                                <div class="ability-progress">
+                                    <div class="ability-progress-bar" style="width: 45%;"></div>
+                                </div>
+                                <button class="btn btn-primary btn-sm">申请认证</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 企业认证专区 -->
+                <div class="ability-panel">
+                    <div class="ability-panel-header">
+                        <div class="ability-panel-title">
+                            <i class="fas fa-building"></i>
+                            <span>企业认证专区</span>
+                        </div>
+                        <a href="http://demo.zhiyu.com.cn:7813/html/appraisal/%E6%B5%8B%E8%AF%84%E4%B8%AD%E5%BF%83%E9%A6%96%E9%A1%B5.html#" class="section-more" style="font-size: 13px;">
+                            全部企业 <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </div>
+                    <div class="ability-list">
+                        <div class="ability-item">
+                            <div class="ability-icon enterprise">
+                                <i class="fas fa-car"></i>
+                            </div>
+                            <div class="ability-info">
+                                <h4 class="ability-name">比亚迪订单班结业考核</h4>
+                                <div class="ability-meta">
+                                    <span>新能源汽车技术</span>
+                                    <span>·</span>
+                                    <span>限订单班学员</span>
+                                </div>
+                            </div>
+                            <div class="ability-action">
+                                <span class="resource-tag" style="background: #d1fae5; color: #059669;">报名中</span>
+                                <button class="btn btn-outline btn-sm">查看详情</button>
+                            </div>
+                        </div>
+
+                        <div class="ability-item">
+                            <div class="ability-icon enterprise">
+                                <i class="fas fa-industry"></i>
+                            </div>
+                            <div class="ability-info">
+                                <h4 class="ability-name">华为ICT学院认证考试</h4>
+                                <div class="ability-meta">
+                                    <span>网络与通信技术</span>
+                                    <span>·</span>
+                                    <span>全校开放</span>
+                                </div>
+                            </div>
+                            <div class="ability-action">
+                                <span class="resource-tag" style="background: #fef3c7; color: #d97706;">即将开始</span>
+                                <button class="btn btn-outline btn-sm">查看详情</button>
+                            </div>
+                        </div>
+
+                        <div class="ability-item">
+                            <div class="ability-icon enterprise">
+                                <i class="fas fa-plane"></i>
+                            </div>
+                            <div class="ability-info">
+                                <h4 class="ability-name">吉利汽车技能认证</h4>
+                                <div class="ability-meta">
+                                    <span>智能制造技术</span>
+                                    <span>·</span>
+                                    <span>限合作专业</span>
+                                </div>
+                            </div>
+                            <div class="ability-action">
+                                <span class="resource-tag" style="background: #e0e7ff; color: #4f46e5;">筹备中</span>
+                                <button class="btn btn-outline btn-sm">查看详情</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 1.4 AI面试 -->
+        <section id="interview" class="section">
+            <div class="ai-interview-section">
+                <div class="ai-interview-header">
+                    <div class="ai-interview-title">
+                        <i class="fas fa-robot" style="font-size: 24px;"></i>
+                        <div>
+                            <h3>AI智能模拟面试</h3>
+                            <p>基于岗位能力模型的智能面试训练，提升求职竞争力</p>
+                        </div>
+                    </div>
+                    <button class="btn" style="background: rgba(255,255,255,0.2); color: white;">
+                        进入面试间 <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+                <div class="ai-interview-grid">
+                    <div class="ai-interview-card">
+                        <div class="ai-interview-icon">
+                            <i class="fas fa-code"></i>
+                        </div>
+                        <h4 class="ai-interview-name">软件开发工程师</h4>
+                        <div class="ai-interview-stats">
+                            <span class="hot-badge"><i class="fas fa-fire"></i> 热门</span>
+                            <span>通过率 72%</span>
+                        </div>
+                    </div>
+
+                    <div class="ai-interview-card">
+                        <div class="ai-interview-icon">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <h4 class="ai-interview-name">数据分析师</h4>
+                        <div class="ai-interview-stats">
+                            <span>2,340人练习</span>
+                            <span>通过率 68%</span>
+                        </div>
+                    </div>
+
+                    <div class="ai-interview-card">
+                        <div class="ai-interview-icon">
+                            <i class="fas fa-briefcase"></i>
+                        </div>
+                        <h4 class="ai-interview-name">产品经理</h4>
+                        <div class="ai-interview-stats">
+                            <span>1,856人练习</span>
+                            <span>通过率 65%</span>
+                        </div>
+                    </div>
+
+                    <div class="ai-interview-card">
+                        <div class="ai-interview-icon">
+                            <i class="fas fa-palette"></i>
+                        </div>
+                        <h4 class="ai-interview-name">UI设计师</h4>
+                        <div class="ai-interview-stats">
+                            <span>1,520人练习</span>
+                            <span>通过率 70%</span>
+                        </div>
+                    </div>
+
+                    <div class="ai-interview-card">
+                        <div class="ai-interview-icon">
+                            <i class="fas fa-bullhorn"></i>
+                        </div>
+                        <h4 class="ai-interview-name">市场营销</h4>
+                        <div class="ai-interview-stats">
+                            <span>1,280人练习</span>
+                            <span>通过率 75%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 1.5 画像与简历 -->
+        <section id="profile" class="section">
+            <div class="section-header">
+                <div class="section-title">
+                    <div class="icon" style="background: #e0e7ff; color: #4f46e5;">
+                        <i class="fas fa-id-card"></i>
+                    </div>
+                    <h2>画像与简历</h2>
+                    <span class="desc">基于KSA模型构建个人岗位能力画像</span>
+                </div>
+            </div>
+
+            <div class="profile-section">
+                <div class="profile-intro">
+                    <div class="profile-intro-header">
+                        <div class="profile-intro-icon">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <div class="profile-intro-content">
+                            <h3>岗位能力画像构建原理</h3>
+                            <p>基于KSA（知识Knowledge、技能Skill、能力Ability）模型，通过测评数据、学习记录、项目经历等多维度数据分析，构建个性化岗位能力画像，精准匹配职业发展方向。</p>
+                        </div>
+                    </div>
+
+                    <div class="profile-dimensions">
+                        <div class="dimension-card">
+                            <div class="dimension-icon">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <h4 class="dimension-name">知识维度 (K)</h4>
+                            <p class="dimension-desc">专业理论、行业知识、工具方法</p>
+                        </div>
+                        <div class="dimension-card">
+                            <div class="dimension-icon">
+                                <i class="fas fa-tools"></i>
+                            </div>
+                            <h4 class="dimension-name">技能维度 (S)</h4>
+                            <p class="dimension-desc">实操技能、工具应用、问题解决</p>
+                        </div>
+                        <div class="dimension-card">
+                            <div class="dimension-icon">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <h4 class="dimension-name">能力维度 (A)</h4>
+                            <p class="dimension-desc">沟通协作、学习创新、领导力</p>
+                        </div>
+                    </div>
+
+                    <div class="profile-actions">
+                        <button class="btn btn-primary btn-lg">
+                            <i class="fas fa-play"></i> 开始能力测评
+                        </button>
+                        <button class="btn btn-outline btn-lg">
+                            <i class="fas fa-info-circle"></i> 了解更多
+                        </button>
+                    </div>
+                </div>
+
+                <div class="profile-quick">
+                    <h4 style="font-size: 16px; font-weight: 600; margin-bottom: 16px;">快捷入口</h4>
+                    <div class="quick-action-item">
+                        <div class="quick-action-icon view">
+                            <i class="fas fa-chart-radar"></i>
+                        </div>
+                        <div class="quick-action-info">
+                            <h4>我的画像查询</h4>
+                            <p>查看个人能力画像分析报告</p>
+                        </div>
+                        <i class="fas fa-chevron-right" style="color: var(--text-tertiary);"></i>
+                    </div>
+                    <div class="quick-action-item">
+                        <div class="quick-action-icon gen">
+                            <i class="fas fa-file-export"></i>
+                        </div>
+                        <div class="quick-action-info">
+                            <h4>简历一键生成</h4>
+                            <p>基于画像智能生成求职简历</p>
+                        </div>
+                        <i class="fas fa-chevron-right" style="color: var(--text-tertiary);"></i>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 1.6 毕业设计 -->
+        <section id="graduation" class="section">
+            <div class="section-header">
+                <div class="section-title">
+                    <div class="icon" style="background: #fce7f3; color: #ec4899;">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h2>毕业设计</h2>
+                    <span class="desc">毕设公告、选题入口与优秀作品展示</span>
+                </div>
+                <a href="http://demo.zhiyu.com.cn:7813/html/appraisal/%E6%B5%8B%E8%AF%84%E4%B8%AD%E5%BF%83%E9%A6%96%E9%A1%B5.html#" class="section-more">
+                    进入毕设系统 <i class="fas fa-chevron-right"></i>
+                </a>
+            </div>
+
+            <div class="graduation-section">
+                <!-- 毕设公告 -->
+                <div class="graduation-notice">
+                    <div class="graduation-notice-header">
+                        <h3><i class="fas fa-bullhorn"></i> 毕设公告</h3>
+                        <a href="http://demo.zhiyu.com.cn:7813/html/appraisal/%E6%B5%8B%E8%AF%84%E4%B8%AD%E5%BF%83%E9%A6%96%E9%A1%B5.html#" style="color: white; font-size: 13px; text-decoration: none;">
+                            全部公告 <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </div>
+                    <div class="notice-scroll">
+                        <div class="notice-list">
+                            <div class="notice-item">
+                                <span class="notice-dot"></span>
+                                <div class="notice-content">
+                                    <h5 class="notice-title">2024届毕业设计选题工作正式启动</h5>
+                                    <span class="notice-date">2024-01-15</span>
+                                </div>
+                                <span class="resource-tag badge-hot">重要</span>
+                            </div>
+                            <div class="notice-item">
+                                <span class="notice-dot"></span>
+                                <div class="notice-content">
+                                    <h5 class="notice-title">关于公布2023届优秀毕业设计名单的通知</h5>
+                                    <span class="notice-date">2024-01-10</span>
+                                </div>
+                            </div>
+                            <div class="notice-item">
+                                <span class="notice-dot"></span>
+                                <div class="notice-content">
+                                    <h5 class="notice-title">毕业设计中期检查安排通知</h5>
+                                    <span class="notice-date">2024-01-08</span>
+                                </div>
+                            </div>
+                            <div class="notice-item">
+                                <span class="notice-dot"></span>
+                                <div class="notice-content">
+                                    <h5 class="notice-title">导师选题意向收集截止提醒</h5>
+                                    <span class="notice-date">2024-01-05</span>
+                                </div>
+                            </div>
+                            <div class="notice-item">
+                                <span class="notice-dot"></span>
+                                <div class="notice-content">
+                                    <h5 class="notice-title">优秀毕业设计作品展公告</h5>
+                                    <span class="notice-date">2024-01-03</span>
+                                </div>
+                            </div>
+                            <!-- 复制一份用于无限滚动 -->
+                            <div class="notice-item">
+                                <span class="notice-dot"></span>
+                                <div class="notice-content">
+                                    <h5 class="notice-title">2024届毕业设计选题工作正式启动</h5>
+                                    <span class="notice-date">2024-01-15</span>
+                                </div>
+                                <span class="resource-tag badge-hot">重要</span>
+                            </div>
+                            <div class="notice-item">
+                                <span class="notice-dot"></span>
+                                <div class="notice-content">
+                                    <h5 class="notice-title">关于公布2023届优秀毕业设计名单的通知</h5>
+                                    <span class="notice-date">2024-01-10</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 选题入口 -->
+                <div class="graduation-topics">
+                    <div class="graduation-topics-header">
+                        <h3><i class="fas fa-list-alt"></i> 选题方向</h3>
+                        <a href="http://demo.zhiyu.com.cn:7813/html/appraisal/%E6%B5%8B%E8%AF%84%E4%B8%AD%E5%BF%83%E9%A6%96%E9%A1%B5.html#" class="section-more" style="font-size: 13px;">
+                            全部方向 <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </div>
+                    <div class="topic-list">
+                        <div class="topic-item">
+                            <div class="topic-icon">
+                                <i class="fas fa-laptop-code"></i>
+                            </div>
+                            <div class="topic-info">
+                                <h4 class="topic-name">软件技术专业</h4>
+                                <div class="topic-meta">Web开发 / 移动应用 / 系统开发</div>
+                            </div>
+                            <div class="topic-count">
+                                <span style="color: var(--primary-color); font-weight: 600;">126</span> 个选题
+                            </div>
+                            <button class="btn btn-outline btn-sm">
+                                <i class="fas fa-plus"></i> 选题
+                            </button>
+                        </div>
+
+                        <div class="topic-item">
+                            <div class="topic-icon">
+                                <i class="fas fa-network-wired"></i>
+                            </div>
+                            <div class="topic-info">
+                                <h4 class="topic-name">计算机网络专业</h4>
+                                <div class="topic-meta">网络规划 / 安全运维 / 系统集成</div>
+                            </div>
+                            <div class="topic-count">
+                                <span style="color: var(--primary-color); font-weight: 600;">89</span> 个选题
+                            </div>
+                            <button class="btn btn-outline btn-sm">
+                                <i class="fas fa-plus"></i> 选题
+                            </button>
+                        </div>
+
+                        <div class="topic-item">
+                            <div class="topic-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="topic-info">
+                                <h4 class="topic-name">大数据技术专业</h4>
+                                <div class="topic-meta">数据分析 / 可视化 / 数据治理</div>
+                            </div>
+                            <div class="topic-count">
+                                <span style="color: var(--primary-color); font-weight: 600;">78</span> 个选题
+                            </div>
+                            <button class="btn btn-outline btn-sm">
+                                <i class="fas fa-plus"></i> 选题
+                            </button>
+                        </div>
+
+                        <div class="topic-item">
+                            <div class="topic-icon">
+                                <i class="fas fa-calculator"></i>
+                            </div>
+                            <div class="topic-info">
+                                <h4 class="topic-name">会计专业</h4>
+                                <div class="topic-meta">财务管理 / 成本核算 / 审计实务</div>
+                            </div>
+                            <div class="topic-count">
+                                <span style="color: var(--primary-color); font-weight: 600;">95</span> 个选题
+                            </div>
+                            <button class="btn btn-outline btn-sm">
+                                <i class="fas fa-plus"></i> 选题
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 底部 -->
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <h3><i class="fas fa-graduation-cap"></i> 能力测评认证平台</h3>
+                    <p>致力于构建产教融合、数智赋能的新型教学服务生态，为高职院校提供全方位的测评认证、能力培养与就业服务支持。</p>
+                </div>
+                <div class="footer-links">
+                    <h4>测评服务</h4>
+                    <a href="http://demo.zhiyu.com.cn:7813/html/appraisal/%E6%B5%8B%E8%AF%84%E4%B8%AD%E5%BF%83%E9%A6%96%E9%A1%B5.html#">测评资源库</a>
+                    <a href="http://demo.zhiyu.com.cn:7813/html/appraisal/%E6%B5%8B%E8%AF%84%E4%B8%AD%E5%BF%83%E9%A6%96%E9%A1%B5.html#">在线考试</a>
+                    <a href="http://demo.zhiyu.com.cn:7813/html/appraisal/%E6%B5%8B%E8%AF%84%E4%B8%AD%E5%BF%83%E9%A6%96%E9%A1%B5.html#">成绩查询</a>
+                    <a href="http://demo.zhiyu.com.cn:7813/html/appraisal/%E6%B5%8B%E8%AF%84%E4%B8%AD%E5%BF%83%E9%A6%96%E9%A1%B5.html#">证书验证</a>
+                </div>
+                <div class="footer-links">
+                    <h4>能力认证</h4>
+                    <a href="http://demo.zhiyu.com.cn:7813/html/appraisal/%E6%B5%8B%E8%AF%84%E4%B8%AD%E5%BF%83%E9%A6%96%E9%A1%B5.html#">微证书体系</a>
+                    <a href="http://demo.zhiyu.com.cn:7813/html/appraisal/%E6%B5%8B%E8%AF%84%E4%B8%AD%E5%BF%83%E9%A6%96%E9%A1%B5.html#">企业认证</a>
+                    <a href="http://demo.zhiyu.com.cn:7813/html/appraisal/%E6%B5%8B%E8%AF%84%E4%B8%AD%E5%BF%83%E9%A6%96%E9%A1%B5.html#">技能竞赛</a>
+                    <a href="http://demo.zhiyu.com.cn:7813/html/appraisal/%E6%B5%8B%E8%AF%84%E4%B8%AD%E5%BF%83%E9%A6%96%E9%A1%B5.html#">1+X证书</a>
+                </div>
+                <div class="footer-links">
+                    <h4>就业服务</h4>
+                    <a href="http://demo.zhiyu.com.cn:7813/html/appraisal/%E6%B5%8B%E8%AF%84%E4%B8%AD%E5%BF%83%E9%A6%96%E9%A1%B5.html#">AI面试</a>
+                    <a href="http://demo.zhiyu.com.cn:7813/html/appraisal/%E6%B5%8B%E8%AF%84%E4%B8%AD%E5%BF%83%E9%A6%96%E9%A1%B5.html#">能力画像</a>
+                    <a href="http://demo.zhiyu.com.cn:7813/html/appraisal/%E6%B5%8B%E8%AF%84%E4%B8%AD%E5%BF%83%E9%A6%96%E9%A1%B5.html#">简历生成</a>
+                    <a href="http://demo.zhiyu.com.cn:7813/html/appraisal/%E6%B5%8B%E8%AF%84%E4%B8%AD%E5%BF%83%E9%A6%96%E9%A1%B5.html#">岗位推荐</a>
+                </div>
+                <div class="footer-links">
+                    <h4>帮助支持</h4> 
+                    <a href="http://demo.zhiyu.com.cn:7813/html/appraisal/%E6%B5%8B%E8%AF%84%E4%B8%AD%E5%BF%83%E9%A6%96%E9%A1%B5.html#">常见问题</a>
+                    <a href="http://demo.zhiyu.com.cn:7813/html/appraisal/%E6%B5%8B%E8%AF%84%E4%B8%AD%E5%BF%83%E9%A6%96%E9%A1%B5.html#">联系我们</a>
+                    <a href="http://demo.zhiyu.com.cn:7813/html/appraisal/%E6%B5%8B%E8%AF%84%E4%B8%AD%E5%BF%83%E9%A6%96%E9%A1%B5.html#">意见反馈</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2024 能力测评认证平台 | 技术支持：教育信息化中心 | 
+                    <a href="http://demo.zhiyu.com.cn:7813/html/appraisal/%E6%B5%8B%E8%AF%84%E4%B8%AD%E5%BF%83%E9%A6%96%E9%A1%B5.html#" style="color: #8f959e;">隐私政策</a> | 
+                    <a href="http://demo.zhiyu.com.cn:7813/html/appraisal/%E6%B5%8B%E8%AF%84%E4%B8%AD%E5%BF%83%E9%A6%96%E9%A1%B5.html#" style="color: #8f959e;">服务条款</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Banner轮播
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.banner-slide');
+        const indicators = document.querySelectorAll('.indicator');
+
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                slide.classList.toggle('active', i === index);
+            });
+            indicators.forEach((indicator, i) => {
+                indicator.classList.toggle('active', i === index);
+            });
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % slides.length;
+            showSlide(currentSlide);
+        }
+
+        // 自动轮播
+        setInterval(nextSlide, 5000);
+
+        // 点击指示器
+        indicators.forEach((indicator, index) => {
+            indicator.addEventListener('click', () => {
+                currentSlide = index;
+                showSlide(currentSlide);
+            });
+        });
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // 筛选标签切换
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                this.parentElement.querySelectorAll('.filter-tab').forEach(t => {
+                    t.classList.remove('active');
+                });
+                this.classList.add('active');
+            });
+        });
+
+        // 导航栏高亮
+        window.addEventListener('scroll', function() {
+            const sections = document.querySelectorAll('section[id]');
+            const navItems = document.querySelectorAll('.nav-item');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (scrollY >= sectionTop - 100) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('href') === '#' + current) {
+                    item.classList.add('active');
+                }
+            });
+        });
+    </script>
+
+</body></html>

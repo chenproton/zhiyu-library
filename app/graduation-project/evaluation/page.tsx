@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { Search, Award, CheckCircle2, Clock, Star, TrendingUp, Eye, Pencil, Settings, Calculator, Send, BookOpen, UserCircle, Building2, Users, Lightbulb, Sparkles, ClipboardCheck, FileCheck, Bookmark } from "lucide-react"
+import { Search, Award, CheckCircle2, Clock, Star, TrendingUp, Eye, Pencil, Settings, Send, ClipboardCheck, Bookmark } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -30,7 +30,7 @@ import {
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+
 import { useData } from "@/components/providers/data-provider"
 import { useToast } from "@/hooks/use-toast"
 import type { GraduationProjectEvaluation, EvaluationGrade, EvaluationStandard } from "@/lib/types"
@@ -311,63 +311,17 @@ export default function GraduationProjectEvaluationPage() {
         </DialogContent>
       </Dialog>
 
-      {/* 评价大弹窗 - 3个tab */}
+      {/* 评价弹窗 */}
       <Dialog open={evalOpen} onOpenChange={(open) => !open && setEvalOpen(false)}>
-        <DialogContent className="sm:max-w-6xl max-h-[92vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>提交评价 — {evalItem?.topicName}</DialogTitle>
           </DialogHeader>
-          <div className="py-2">
-            <Tabs defaultValue="advisor">
-              <TabsList className="mb-4 grid w-full grid-cols-3">
-                <TabsTrigger value="advisor"><UserCircle className="mr-1 size-4" />指导教师评价</TabsTrigger>
-                <TabsTrigger value="mentor"><Building2 className="mr-1 size-4" />企业导师评价</TabsTrigger>
-                <TabsTrigger value="defense"><Users className="mr-1 size-4" />答辩组评价</TabsTrigger>
-              </TabsList>
-              <TabsContent value="advisor">
-                <ScoreTab title="指导教师" icon={<UserCircle className="size-5 text-blue-600" />} scores={advisorScores} onChange={setAdvisorScores} weight={0.4} />
-              </TabsContent>
-              <TabsContent value="mentor">
-                <ScoreTab title="企业导师" icon={<Building2 className="size-5 text-emerald-600" />} scores={mentorScores} onChange={setMentorScores} weight={0.3} />
-              </TabsContent>
-              <TabsContent value="defense">
-                <ScoreTab title="答辩组" icon={<Users className="size-5 text-purple-600" />} scores={defenseScores} onChange={setDefenseScores} weight={0.3} />
-              </TabsContent>
-            </Tabs>
-
-            {/* 综合汇总区 */}
-            <div className="mt-6 rounded-lg border bg-white p-5">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-semibold">综合评分汇总</h3>
-                <Button variant="outline" size="sm" onClick={autoCalculate}><Calculator className="mr-1 size-4" />自动计算综合等级</Button>
-              </div>
-              <div className="grid grid-cols-3 gap-4 mb-4">
-                <div className="rounded-md bg-blue-50 p-3 text-center">
-                  <div className="text-xs text-muted-foreground">指导教师（40%）</div>
-                  <div className="text-xl font-bold text-blue-600">{calcTotal(advisorScores).toFixed(1)}</div>
-                </div>
-                <div className="rounded-md bg-emerald-50 p-3 text-center">
-                  <div className="text-xs text-muted-foreground">企业导师（30%）</div>
-                  <div className="text-xl font-bold text-emerald-600">{mentorScores.finalScore > 0 ? calcTotal(mentorScores).toFixed(1) : '-'}</div>
-                </div>
-                <div className="rounded-md bg-purple-50 p-3 text-center">
-                  <div className="text-xs text-muted-foreground">答辩组（30%）</div>
-                  <div className="text-xl font-bold text-purple-600">{defenseScores.finalScore > 0 ? calcTotal(defenseScores).toFixed(1) : '-'}</div>
-                </div>
-              </div>
-              <div className="flex items-center justify-between rounded-md bg-muted p-3">
-                <div>
-                  <div className="text-sm font-medium">综合等级</div>
-                  <div className="text-xs text-muted-foreground">指导40% + 企业30% + 答辩30%</div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Select value={comprehensiveGrade} onValueChange={(v) => setComprehensiveGrade(v as EvaluationGrade)}>
-                    <SelectTrigger className="w-[140px]"><SelectValue /></SelectTrigger>
-                    <SelectContent><SelectItem value="A">A - 优秀</SelectItem><SelectItem value="B">B - 良好</SelectItem><SelectItem value="C">C - 中等</SelectItem><SelectItem value="D">D - 及格</SelectItem><SelectItem value="E">E - 不及格</SelectItem></SelectContent>
-                  </Select>
-                  {getGradeBadge(comprehensiveGrade)}
-                </div>
-              </div>
+          <div className="py-4">
+            <div className="rounded-lg border-2 border-dashed border-blue-200 bg-blue-50/50 p-8 text-center">
+              <ClipboardCheck className="mx-auto mb-3 size-10 text-blue-300" />
+              <p className="text-sm text-blue-700 font-medium">参考场景/任务中的现场评审功能，对学生提交的毕设档案进行测评</p>
+              <p className="text-xs text-blue-600 mt-2">此处将集成现场评审模块，支持对学生提交的过程性文档、成果性文档进行在线批阅与评分（待开发）</p>
             </div>
           </div>
           <DialogFooter>

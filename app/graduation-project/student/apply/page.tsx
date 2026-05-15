@@ -50,8 +50,8 @@ export default function StudentTopicApplyPage() {
       toast({ title: '请填写完整申请信息', variant: 'destructive' }); return
     }
     if (applyTopic) {
-      createTopicApplication({ topicId: applyTopic.id, topicName: applyTopic.name, studentId: applyForm.studentId, studentName: applyForm.studentName, className: applyForm.className, applyReason: applyForm.applyReason })
-      toast({ title: '选题申请已提交，等待教师审核' }); setApplyTopic(null)
+      createTopicApplication({ topicId: applyTopic.id, topicName: applyTopic.name, studentId: applyForm.studentId, studentName: applyForm.studentName, className: applyForm.className, applyReason: applyForm.applyReason, status: 'allocated', allocatedAdvisorName: applyTopic.advisorName })
+      toast({ title: '选题申请已成功，已分配指导教师' }); setApplyTopic(null)
     }
   }
 
@@ -192,6 +192,16 @@ export default function StudentTopicApplyPage() {
                     {viewDetailTopic.enterpriseMentorName && (
                       <div className="flex items-center gap-2"><div className="size-6 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 font-bold">企</div><div><div className="font-medium">{viewDetailTopic.enterpriseMentorName}</div><div className="text-muted-foreground">企业导师</div></div></div>
                     )}
+                  </div>
+                </div>
+                <div className="rounded-lg border p-4">
+                  <div className="mb-3 text-sm font-semibold">当前负责教师</div>
+                  <div className="flex items-center gap-2">
+                    <div className="size-6 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 font-bold">责</div>
+                    <div className="text-xs">
+                      <div className="font-medium">{viewDetailTopic.advisorName}</div>
+                      <div className="text-muted-foreground">主要负责指导与答疑</div>
+                    </div>
                   </div>
                 </div>
                 <div className="rounded-lg border p-4">

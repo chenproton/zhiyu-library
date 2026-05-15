@@ -44,11 +44,11 @@ export const evaluationNavigationConfig: PlatformNavigationConfig = {
     },
     {
       id: "scene-task",
-      label: "场景任务测评管理",
+      label: "测评方式库",
       icon: "layers3",
       children: [
-        { id: "scene-task-methods", label: "场景任务测评方式管理", href: "/evaluation-methods", matchers: ["/evaluation-methods"] },
-        { id: "scene-task-results", label: "场景任务测评结果", href: "/scene-task-results", matchers: ["/scene-task-results"] },
+        { id: "scene-task-methods", label: "测评方式管理", href: "/evaluation-methods", matchers: ["/evaluation-methods"] },
+        { id: "scene-task-results", label: "测评结果管理", href: "/scene-task-results", matchers: ["/scene-task-results"] },
       ],
     },
     {

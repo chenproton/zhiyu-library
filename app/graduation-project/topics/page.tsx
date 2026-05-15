@@ -71,9 +71,11 @@ export default function GraduationProjectTopicsPage() {
   const { graduationProjectTopics, positionsList, topicApplications, createGraduationProjectTopic, updateGraduationProjectTopic, deleteGraduationProjectTopic, updateTopicApplication } = useData()
   const { toast } = useToast()
 
+  const COLLEGES = ['全部学院', '计算机学院', '软件学院', '信息工程学院', '人工智能学院', '数字媒体学院']
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [sourceFilter, setSourceFilter] = useState<string>("all")
+  const [collegeFilter, setCollegeFilter] = useState<string>("全部学院")
 
   const [formOpen, setFormOpen] = useState(false)
   const [editingTopic, setEditingTopic] = useState<GraduationProjectTopic | null>(null)
@@ -88,8 +90,9 @@ export default function GraduationProjectTopicsPage() {
   const [mentorSearchQuery, setMentorSearchQuery] = useState('')
 
   const [formData, setFormData] = useState({
-    name: '', positionId: '', sceneId: '', sceneName: '', source: 'enterprise' as 'scene' | 'enterprise',
+    name: '', positionId: '', college: '计算机学院', source: 'enterprise' as 'scene' | 'enterprise',
     capacity: 1, advisorNames: [] as string[], mentorNames: [] as string[], startDate: '', endDate: '', description: '',
+    sceneId: '', sceneName: '',
   })
 
   const [allocateAdvisorId, setAllocateAdvisorId] = useState('')
@@ -99,12 +102,13 @@ export default function GraduationProjectTopicsPage() {
     let list = [...graduationProjectTopics]
     if (statusFilter !== "all") list = list.filter((t) => t.status === statusFilter)
     if (sourceFilter !== "all") list = list.filter((t) => t.source === sourceFilter)
+    if (collegeFilter !== "全部学院") list = list.filter((t) => t.college === collegeFilter)
     if (search.trim()) {
       const q = search.toLowerCase()
       list = list.filter((t) => t.name.toLowerCase().includes(q) || t.positionName.toLowerCase().includes(q) || t.advisorName.toLowerCase().includes(q))
     }
     return list.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-  }, [graduationProjectTopics, statusFilter, sourceFilter, search])
+  }, [graduationProjectTopics, statusFilter, sourceFilter, collegeFilter, search])
 
   const stats = useMemo(() => {
     const total = graduationProjectTopics.length
@@ -118,7 +122,7 @@ export default function GraduationProjectTopicsPage() {
   const topicApps = useMemo(() => (topicId: string) => topicApplications.filter((a) => a.topicId === topicId), [topicApplications])
 
   const resetForm = () => {
-    setFormData({ name: '', positionId: '', sceneId: '', sceneName: '', source: 'enterprise', capacity: 1, advisorNames: [], mentorNames: [], startDate: '', endDate: '', description: '' })
+    setFormData({ name: '', positionId: '', college: '计算机学院', source: 'enterprise', capacity: 1, advisorNames: [], mentorNames: [], startDate: '', endDate: '', description: '', sceneId: '', sceneName: '' })
     setEditingTopic(null)
   }
   const openCreate = () => { resetForm(); setFormOpen(true) }
@@ -126,11 +130,11 @@ export default function GraduationProjectTopicsPage() {
     setEditingTopic(topic)
     const advisorArr = topic.advisorName ? topic.advisorName.split(/[,，]/).map(s => s.trim()).filter(Boolean) : []
     const mentorArr = topic.enterpriseMentorName ? topic.enterpriseMentorName.split(/[,，]/).map(s => s.trim()).filter(Boolean) : []
-    const sceneOpt = SCENE_OPTIONS.find(s => s.name === topic.sceneName)
     setFormData({
-      name: topic.name, positionId: topic.positionId, sceneId: sceneOpt?.id || '', sceneName: topic.sceneName || '',
+      name: topic.name, positionId: topic.positionId, college: topic.college || '计算机学院',
       source: topic.source, capacity: topic.capacity, advisorNames: advisorArr, mentorNames: mentorArr,
       startDate: topic.startDate.toISOString().split('T')[0], endDate: topic.endDate.toISOString().split('T')[0], description: topic.description || '',
+      sceneId: '', sceneName: '',
     })
     setFormOpen(true)
   }
@@ -139,11 +143,9 @@ export default function GraduationProjectTopicsPage() {
       toast({ title: '请填写必填项', variant: 'destructive' }); return
     }
     const position = positionsList.find((p) => p.id === formData.positionId)
-    const sceneOpt = SCENE_OPTIONS.find(s => s.id === formData.sceneId)
     const payload = {
       ...formData,
       positionName: position?.name || formData.positionId,
-      sceneName: formData.source === 'scene' ? (sceneOpt?.name || formData.sceneName) : undefined,
       advisorName: formData.advisorNames.join('，'),
       enterpriseMentorName: formData.mentorNames.length ? formData.mentorNames.join('，') : undefined,
     }
@@ -252,6 +254,21 @@ export default function GraduationProjectTopicsPage() {
         </div>
       </div>
 
+      {/* 学院 Tab 切换 */}
+      <div className="mb-4 flex flex-wrap gap-2">
+        {COLLEGES.map((college) => (
+          <Button
+            key={college}
+            variant={collegeFilter === college ? 'default' : 'outline'}
+            size="sm"
+            className="h-8 text-xs"
+            onClick={() => setCollegeFilter(college)}
+          >
+            {college}
+          </Button>
+        ))}
+      </div>
+
       <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center">
         <div className="relative flex-1 sm:max-w-xs">
           <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -278,26 +295,28 @@ export default function GraduationProjectTopicsPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[260px]">选题名称</TableHead>
-                <TableHead className="w-[110px]"><div className="flex items-center gap-1"><Briefcase className="size-3.5" />关联岗位</div></TableHead>
-                <TableHead className="w-[100px]">来源</TableHead>
-                <TableHead className="w-[90px]">状态</TableHead>
-                <TableHead className="w-[80px]">容量</TableHead>
-                <TableHead className="w-[100px]">指导教师</TableHead>
-                <TableHead className="w-[100px]">企业导师</TableHead>
-                <TableHead className="w-[150px]">起止时间</TableHead>
-                <TableHead className="sticky right-0 w-[220px] bg-white text-right">操作</TableHead>
+                <TableHead className="w-[240px]">选题名称</TableHead>
+                <TableHead className="w-[100px]">所属学院</TableHead>
+                <TableHead className="w-[100px]"><div className="flex items-center gap-1"><Briefcase className="size-3.5" />关联岗位</div></TableHead>
+                <TableHead className="w-[80px]">来源</TableHead>
+                <TableHead className="w-[80px]">状态</TableHead>
+                <TableHead className="w-[70px]">容量</TableHead>
+                <TableHead className="w-[90px]">指导教师</TableHead>
+                <TableHead className="w-[90px]">企业导师</TableHead>
+                <TableHead className="w-[140px]">起止时间</TableHead>
+                <TableHead className="sticky right-0 w-[200px] bg-white text-right">操作</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredTopics.length === 0 ? (
-                <TableRow><TableCell colSpan={9} className="h-24 text-center text-muted-foreground">暂无选题记录</TableCell></TableRow>
+                <TableRow><TableCell colSpan={10} className="h-24 text-center text-muted-foreground">暂无选题记录</TableCell></TableRow>
               ) : (filteredTopics.map((topic) => (
                 <TableRow key={topic.id}>
                   <TableCell>
                     <div className="text-sm font-medium">{topic.name}</div>
                     <div className="text-xs text-muted-foreground line-clamp-1">{topic.description || '-'}</div>
                   </TableCell>
+                  <TableCell><span className="text-sm">{topic.college}</span></TableCell>
                   <TableCell><div className="flex items-center gap-1.5"><Briefcase className="size-3.5 text-blue-500" /><span className="text-sm">{topic.positionName}</span></div></TableCell>
                   <TableCell><Badge variant="outline" className="text-xs font-normal">{topic.source === 'scene' ? '场景库' : '企业需求'}</Badge></TableCell>
                   <TableCell>{getStatusBadge(topic.status)}</TableCell>
@@ -362,13 +381,16 @@ export default function GraduationProjectTopicsPage() {
         <DialogContent className="sm:max-w-5xl max-h-[90vh] overflow-y-auto">
           <DialogHeader><DialogTitle>{editingTopic ? '编辑选题' : '发布选题'}</DialogTitle><DialogDescription>配置选题基础信息、关联场景/能力模型、指导团队</DialogDescription></DialogHeader>
           <div className="grid grid-cols-12 gap-6 py-4">
-            {/* 左侧基础信息 */}
+            {/* 左侧：选题来源配置 + 关联岗位 + 能力要求 */}
             <div className="col-span-7 space-y-4">
               <div className="grid gap-2"><Label>选题名称 *</Label><Input value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="请输入选题名称" /></div>
               <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2"><Label>关联岗位</Label><Select value={formData.positionId} onValueChange={(v) => setFormData({ ...formData, positionId: v })}><SelectTrigger><SelectValue placeholder="选择岗位" /></SelectTrigger><SelectContent>{positionsList.map((pos) => (<SelectItem key={pos.id} value={pos.id}>{pos.name}</SelectItem>))}</SelectContent></Select></div>
-                <div className="grid gap-2"><Label>选题来源</Label><Select value={formData.source} onValueChange={(v) => setFormData({ ...formData, source: v as 'scene' | 'enterprise', sceneId: '', sceneName: '' })}><SelectTrigger><SelectValue placeholder="选择来源" /></SelectTrigger><SelectContent><SelectItem value="scene">场景库</SelectItem><SelectItem value="enterprise">企业需求</SelectItem></SelectContent></Select></div>
+                <div className="grid gap-2"><Label>所属二级学院 *</Label><Select value={formData.college} onValueChange={(v) => setFormData({ ...formData, college: v })}><SelectTrigger><SelectValue placeholder="选择学院" /></SelectTrigger><SelectContent>{COLLEGES.filter(c => c !== '全部学院').map((c) => (<SelectItem key={c} value={c}>{c}</SelectItem>))}</SelectContent></Select></div>
+                <div className="grid gap-2"><Label>选题来源</Label><Select value={formData.source} onValueChange={(v) => setFormData({ ...formData, source: v as 'scene' | 'enterprise' })}><SelectTrigger><SelectValue placeholder="选择来源" /></SelectTrigger><SelectContent><SelectItem value="scene">场景库</SelectItem><SelectItem value="enterprise">企业需求</SelectItem></SelectContent></Select></div>
               </div>
+
+              {/* 关联岗位（与能力要求联动） */}
+              <div className="grid gap-2"><Label>关联岗位</Label><Select value={formData.positionId} onValueChange={(v) => setFormData({ ...formData, positionId: v })}><SelectTrigger><SelectValue placeholder="选择岗位" /></SelectTrigger><SelectContent>{positionsList.map((pos) => (<SelectItem key={pos.id} value={pos.id}>{pos.name}</SelectItem>))}</SelectContent></Select></div>
 
               {/* 场景库：关联场景下拉 + 场景卡片 */}
               {formData.source === 'scene' && (
@@ -414,20 +436,21 @@ export default function GraduationProjectTopicsPage() {
                   <p className="text-xs text-amber-600 mt-1">此处将配置学生完成该选题所需的能力要求、知识储备和技能等级（待开发）</p>
                 </div>
               </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2"><Label>学生容量</Label><Input type="number" min={1} value={formData.capacity} onChange={(e) => setFormData({ ...formData, capacity: Number(e.target.value) })} /></div>
-                <div className="grid gap-2"><Label>关联场景名称</Label><Input value={formData.sceneName} onChange={(e) => setFormData({ ...formData, sceneName: e.target.value })} placeholder="手动输入或自动填充" readOnly={!!selectedScene} /></div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="grid gap-2"><Label>开始日期 *</Label><Input type="date" value={formData.startDate} onChange={(e) => setFormData({ ...formData, startDate: e.target.value })} /></div>
-                <div className="grid gap-2"><Label>结束日期 *</Label><Input type="date" value={formData.endDate} onChange={(e) => setFormData({ ...formData, endDate: e.target.value })} /></div>
-              </div>
-              <div className="grid gap-2"><Label>选题描述</Label><Textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="请输入选题描述" rows={2} /></div>
             </div>
 
-            {/* 右侧指导团队 */}
+            {/* 右侧：容量/日期/描述 + 指导团队 */}
             <div className="col-span-5 space-y-4">
+              <div className="rounded-lg border p-4 space-y-3">
+                <Label className="text-base font-semibold">基本信息</Label>
+                <div className="grid gap-2"><Label>学生容量</Label><Input type="number" min={1} value={formData.capacity} onChange={(e) => setFormData({ ...formData, capacity: Number(e.target.value) })} /></div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="grid gap-2"><Label>开始日期 *</Label><Input type="date" value={formData.startDate} onChange={(e) => setFormData({ ...formData, startDate: e.target.value })} /></div>
+                  <div className="grid gap-2"><Label>结束日期 *</Label><Input type="date" value={formData.endDate} onChange={(e) => setFormData({ ...formData, endDate: e.target.value })} /></div>
+                </div>
+                <div className="grid gap-2"><Label>选题描述</Label><Textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="请输入选题描述" rows={3} /></div>
+              </div>
+
+              {/* 指导团队 */}
               {/* 指导教师 */}
               <div className="rounded-lg border p-4 space-y-3">
                 <div className="flex items-center justify-between"><Label className="text-base font-semibold">指导教师 *</Label><Button variant="outline" size="sm" onClick={() => setAdvisorSearchOpen(true)}><UserCircle className="mr-1 size-3" />选择教师</Button></div>
@@ -577,40 +600,15 @@ export default function GraduationProjectTopicsPage() {
             ) : (
               <div className="rounded-lg border overflow-x-auto">
                 <Table>
-                  <TableHeader><TableRow><TableHead className="w-[90px]">学生</TableHead><TableHead className="w-[120px]">班级</TableHead><TableHead className="w-[180px]">申请理由</TableHead><TableHead className="w-[80px]">状态</TableHead><TableHead className="w-[240px]">操作</TableHead></TableRow></TableHeader>
+                  <TableHeader><TableRow><TableHead className="w-[90px]">学生</TableHead><TableHead className="w-[120px]">班级</TableHead><TableHead className="w-[180px]">申请理由</TableHead><TableHead className="w-[100px]">负责教师</TableHead><TableHead className="w-[120px]">申请时间</TableHead></TableRow></TableHeader>
                   <TableBody>
                     {viewApplications && topicApps(viewApplications.id).map((app) => (
                       <TableRow key={app.id}>
                         <TableCell><span className="text-sm font-medium">{app.studentName}</span><div className="text-xs text-muted-foreground">{app.studentId}</div></TableCell>
                         <TableCell><span className="text-sm">{app.className}</span></TableCell>
                         <TableCell><span className="block max-w-[180px] truncate text-sm text-muted-foreground" title={app.applyReason}>{app.applyReason}</span></TableCell>
-                        <TableCell>
-                          {app.status === 'pending' && <Badge variant="secondary">待审核</Badge>}
-                          {app.status === 'approved' && <Badge variant="default" className="bg-blue-500">已通过</Badge>}
-                          {app.status === 'allocated' && <Badge variant="default" className="bg-emerald-500">已分配</Badge>}
-                          {app.status === 'rejected' && <Badge variant="destructive">已驳回</Badge>}
-                        </TableCell>
-                        <TableCell>
-                          {app.status === 'pending' && (
-                            <div className="flex items-center gap-1">
-                              <Select value={allocateAdvisorId} onValueChange={setAllocateAdvisorId}>
-                                <SelectTrigger className="h-8 w-[110px] text-xs"><SelectValue placeholder="选择导师" /></SelectTrigger>
-                                <SelectContent>{TEACHERS.map((t) => (<SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>))}</SelectContent>
-                              </Select>
-                              <Button size="sm" className="h-8 text-xs" onClick={() => { setAllocateApp(app); handleAllocateConfirm() }}><UserCheck className="mr-1 size-3" />分配</Button>
-                              <Button variant="ghost" size="sm" className="h-8 text-xs text-destructive" onClick={() => { updateTopicApplication(app.id, { status: 'rejected' }); toast({ title: '已驳回申请' }) }}><XCircle className="size-3" /></Button>
-                            </div>
-                          )}
-                          {app.status === 'allocated' && (
-                            <div className="flex items-center gap-1.5 text-xs text-emerald-600">
-                              <UserCheck className="size-3.5" />
-                              <span>指导教师：{app.allocatedAdvisorName || app.allocatedAdvisorId || '—'}</span>
-                            </div>
-                          )}
-                          {app.status === 'rejected' && (
-                            <div className="text-xs text-destructive">已驳回</div>
-                          )}
-                        </TableCell>
+                        <TableCell><span className="text-sm">{app.allocatedAdvisorName || '—'}</span></TableCell>
+                        <TableCell><span className="text-xs text-muted-foreground">{new Intl.DateTimeFormat("zh-CN", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }).format(app.appliedAt)}</span></TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

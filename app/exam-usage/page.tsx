@@ -53,7 +53,7 @@ export interface ExamUsage {
   id: string
   examId: string
   examName: string
-  displayType: '场景' | '课程' | '在线考试'
+  displayType: '场景' | '课程' | '教学考试'
   sceneName: string
   usageType: UsageType
   description?: string
@@ -113,7 +113,7 @@ export const mockUsages: ExamUsage[] = [
     id: 'usage-3',
     examId: 'exam-2',
     examName: 'TypeScript 能力测试',
-    displayType: '在线考试',
+    displayType: '教学考试',
     sceneName: 'TypeScript高级教程',
     usageType: 'quiz',
     description: 'TypeScript类型系统与高级特性测验',
@@ -143,7 +143,7 @@ export const mockUsages: ExamUsage[] = [
     id: 'usage-5',
     examId: 'exam-3',
     examName: 'React 进阶考核',
-    displayType: '在线考试',
+    displayType: '教学考试',
     sceneName: 'React实战开发',
     usageType: 'exam',
     description: 'React Hooks与性能优化专项考核',
@@ -173,7 +173,7 @@ export const mockUsages: ExamUsage[] = [
 
 const USAGE_TYPE_LABELS: Record<UsageType, string> = {
   quiz: '随堂测',
-  exam: '在线考试',
+  exam: '教学考试',
 }
 
 const SCENE_TYPE_LABELS: Record<SceneType, string> = {
@@ -223,7 +223,7 @@ export default function ExamUsagePage() {
   const stats = useMemo(() => {
     const courseCount = mockUsages.filter((u) => u.displayType === '课程').length
     const sceneCount = mockUsages.filter((u) => u.displayType === '场景').length
-    const onlineExamCount = mockUsages.filter((u) => u.displayType === '在线考试').length
+    const onlineExamCount = mockUsages.filter((u) => u.displayType === '教学考试').length
     const pendingCount = mockUsages.filter((u) => u.status === 'pending').length
     const activeCount = mockUsages.filter((u) => u.status === 'active').length
     const endedCount = mockUsages.filter((u) => u.status === 'ended').length
@@ -265,7 +265,7 @@ export default function ExamUsagePage() {
         return <BookOpen className="size-4" />
       case '课程':
         return <Video className="size-4" />
-      case '在线考试':
+      case '教学考试':
         return <GraduationCap className="size-4" />
     }
   }
@@ -288,13 +288,7 @@ export default function ExamUsagePage() {
       <div className="mb-4 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">考试管理</h1>
-          <p className="text-muted-foreground">查看试卷在各模块的使用情况，创建在线考试</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button onClick={() => setCreateDialogOpen(true)}>
-            <Plus className="mr-2 size-4" />
-            创建在线考试
-          </Button>
+          <p className="text-muted-foreground">查看试卷在各模块的使用情况</p>
         </div>
       </div>
 
@@ -311,7 +305,7 @@ export default function ExamUsagePage() {
               <span className="text-gray-300">|</span>
               <span>场景 <strong className="text-foreground">{stats.sceneCount}</strong></span>
               <span className="text-gray-300">|</span>
-              <span>在线考试 <strong className="text-emerald-600">{stats.onlineExamCount}</strong></span>
+              <span>教学考试 <strong className="text-emerald-600">{stats.onlineExamCount}</strong></span>
             </div>
           </div>
         </div>
@@ -363,7 +357,7 @@ export default function ExamUsagePage() {
             <SelectGroup>
               <SelectItem value="all">全部类型</SelectItem>
               <SelectItem value="quiz">随堂测</SelectItem>
-              <SelectItem value="exam">在线考试</SelectItem>
+              <SelectItem value="exam">教学考试</SelectItem>
             </SelectGroup>
           </SelectContent>
         </Select>
@@ -376,7 +370,7 @@ export default function ExamUsagePage() {
             <TableHeader>
               <TableRow>
                 <TableHead className="w-[160px]">试卷名称</TableHead>
-                <TableHead className="w-[120px]">使用类型</TableHead>
+                <TableHead className="w-[120px]">使用场景</TableHead>
                 <TableHead className="w-[160px]">考试描述</TableHead>
                 <TableHead className="w-[90px]">考试时长</TableHead>
                 <TableHead className="w-[90px]">参考人数</TableHead>
@@ -429,40 +423,12 @@ export default function ExamUsagePage() {
                     </TableCell>
                     <TableCell>{getStatusBadge(usage.status)}</TableCell>
                     <TableCell className="sticky right-0 bg-white text-right">
-                      {usage.status === 'active' ? (
-                        <span className="text-xs text-muted-foreground">-</span>
+                      {usage.status === 'ended' ? (
+                        <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs text-blue-600" onClick={() => router.push(`/exam-usage/results?usageId=${usage.id}`)}>
+                          <Eye className="size-3" />查看考试结果
+                        </Button>
                       ) : (
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="size-8">
-                              <MoreHorizontal className="size-4" />
-                              <span className="sr-only">操作菜单</span>
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            {usage.status === 'ended' && (
-                              <DropdownMenuItem onClick={() => router.push(`/exam-usage/results?usageId=${usage.id}`)}>
-                                <Eye className="mr-2 size-4" />
-                                查看考试结果
-                              </DropdownMenuItem>
-                            )}
-                            {usage.status === 'pending' && usage.usageType === 'exam' && (
-                              <>
-                                <DropdownMenuItem onClick={() => {/* TODO: 编辑考试信息 */}}>
-                                  <Pencil className="mr-2 size-4" />
-                                  编辑考试信息
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  onClick={() => {/* TODO: 取消考试 */}}
-                                  className="text-destructive focus:text-destructive"
-                                >
-                                  <Trash2 className="mr-2 size-4" />
-                                  取消考试
-                                </DropdownMenuItem>
-                              </>
-                            )}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                        <span className="text-xs text-muted-foreground">-</span>
                       )}
                     </TableCell>
                   </TableRow>

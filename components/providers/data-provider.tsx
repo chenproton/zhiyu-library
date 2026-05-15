@@ -526,7 +526,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         name: data.name,
         positionId: data.positionId || 'pos-1',
         positionName: data.positionName || '全栈开发工程师',
-        sceneName: data.sceneName,
+        college: data.college || '计算机学院',
         source: data.source || 'enterprise',
         status: 'published',
         capacity: Number(data.capacity) || 1,
@@ -614,9 +614,11 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         studentId: data.studentId,
         studentName: data.studentName,
         className: data.className,
-        status: 'pending',
+        status: data.status || 'pending',
         applyReason: data.applyReason,
         appliedAt: new Date(),
+        allocatedAdvisorId: data.allocatedAdvisorId,
+        allocatedAdvisorName: data.allocatedAdvisorName,
       }
       setTopicApplications((prev) => [...prev, newApp])
       return newApp

@@ -21,6 +21,8 @@ interface LevelMappingDialogProps {
   onSave: (mapping: LevelMapping[]) => void
   title?: string
   description?: string
+  onOverride?: () => void
+  overrideLabel?: string
 }
 
 export function LevelMappingDialog({
@@ -30,6 +32,8 @@ export function LevelMappingDialog({
   onSave,
   title = '编辑等级映射表',
   description = '设置各等级的分数区间，区间需连续且不重叠',
+  onOverride,
+  overrideLabel = '覆盖当前岗位所有能力点配置',
 }: LevelMappingDialogProps) {
   const [localMapping, setLocalMapping] = useState<LevelMapping[]>(mapping)
   const [errors, setErrors] = useState<string[]>([])
@@ -133,7 +137,12 @@ export function LevelMappingDialog({
           )}
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="gap-2">
+          {onOverride && (
+            <Button variant="outline" className="text-amber-600 hover:text-amber-600" onClick={onOverride}>
+              {overrideLabel}
+            </Button>
+          )}
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             取消
           </Button>

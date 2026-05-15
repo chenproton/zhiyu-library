@@ -1,22 +1,38 @@
 "use client"
 
-import { useState, useMemo, useEffect } from "react"
-import { Plus, Search, Settings, FolderTree, Upload, FileText, CheckCircle } from "lucide-react"
+import { useState, useMemo } from "react"
+import { useRouter } from "next/navigation"
+import { Plus, Search, FileText, CheckCircle, Pencil, Trash2, Eye, FolderOpen, Settings, FolderTree, Upload, List, LayoutGrid } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ScrollArea } from "@/components/ui/scroll-area"
-
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { StatusBadge } from "@/components/shared/status-badge"
 import { BankFormDialog } from "@/components/question-banks/bank-form-dialog"
-import { QuestionListPanel } from "@/components/question-banks/question-list-panel"
-import { InviteCollaboratorDialog } from "@/components/shared/invite-collaborator-dialog"
 import { useData } from "@/components/providers/data-provider"
 import type { QuestionBank, QuestionBankFormData } from "@/lib/types"
 
 type OwnerTab = 'mine' | 'collaborate' | 'public'
+type ViewMode = 'list' | 'batch'
 
 export default function QuestionBanksPage() {
+  const router = useRouter()
   const {
     questionBanks,
     questions,
@@ -26,61 +42,42 @@ export default function QuestionBanksPage() {
   } = useData()
 
   const [search, setSearch] = useState("")
+  const [statusFilter, setStatusFilter] = useState<string>("all")
   const [formOpen, setFormOpen] = useState(false)
   const [editingBank, setEditingBank] = useState<QuestionBank | null>(null)
-  const [inviteOpen, setInviteOpen] = useState(false)
-  const [invitingBank, setInvitingBank] = useState<QuestionBank | null>(null)
   const [ownerTab, setOwnerTab] = useState<OwnerTab>('mine')
-  const [selectedBankId, setSelectedBankId] = useState<string | null>(null)
-
-  // 题库指标
-  const bankDraft = questionBanks.filter((b) => ['draft', 'unsubmitted'].includes(b.status)).length
-  const bankPending = questionBanks.filter((b) => b.status === 'pending').length
-  const bankPublished = questionBanks.filter((b) => b.status === 'published').length
-
-  // 题目指标
-  const qDraft = questions.filter((q) => ['draft', 'unsubmitted'].includes(q.status)).length
-  const qPending = questions.filter((q) => q.status === 'pending').length
-  const qPublished = questions.filter((q) => q.status === 'published').length
+  const [viewMode, setViewMode] = useState<ViewMode>('list')
 
   const filteredBanks = useMemo(() => {
-    const q = search.toLowerCase().trim()
-    const banks = questionBanks
+    return questionBanks
       .filter((bank) => {
+        const q = search.toLowerCase().trim()
+        const matchSearch = !q || bank.name.toLowerCase().includes(q)
         const matchOwner = bank.ownerType === ownerTab
-        if (!q) return matchOwner
-        // 搜索题库名称或题目内容
-        const matchBankName = bank.name.toLowerCase().includes(q)
-        const matchQuestion = questions.some(
-          (question) =>
-            question.bankId === bank.id && question.content.toLowerCase().includes(q)
-        )
-        return matchOwner && (matchBankName || matchQuestion)
+        const matchStatus = statusFilter === "all" || bank.status === statusFilter
+        return matchSearch && matchOwner && matchStatus
       })
-    const draftPool = banks.filter((b) => b.isDraftPool)
-    const others = banks.filter((b) => !b.isDraftPool).sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
-    return [...draftPool, ...others]
-  }, [questionBanks, questions, search, ownerTab])
+      .sort((a, b) => {
+        // 草稿库始终置顶
+        if (a.isDraftPool && !b.isDraftPool) return -1
+        if (!a.isDraftPool && b.isDraftPool) return 1
+        return b.updatedAt.getTime() - a.updatedAt.getTime()
+      })
+  }, [questionBanks, search, statusFilter, ownerTab])
 
-  // 默认选中第一个题库
-  useEffect(() => {
-    if (filteredBanks.length > 0 && !selectedBankId) {
-      setSelectedBankId(filteredBanks[0].id)
-    }
-    if (selectedBankId && filteredBanks.length > 0 && !filteredBanks.find((b) => b.id === selectedBankId)) {
-      setSelectedBankId(filteredBanks[0].id)
-    }
-    if (filteredBanks.length === 0) {
-      setSelectedBankId(null)
-    }
-  }, [filteredBanks, selectedBankId])
+  const stats = useMemo(() => {
+    const total = questionBanks.length
+    const draft = questionBanks.filter((b) => b.status === 'draft').length
+    const published = questionBanks.filter((b) => b.status === 'published').length
+    return { total, draft, published }
+  }, [questionBanks])
 
   const handleFormSubmit = (data: QuestionBankFormData) => {
     if (editingBank) {
       updateQuestionBank(editingBank.id, data)
     } else {
       const newBank = createQuestionBank(data)
-      setSelectedBankId(newBank.id)
+      router.push(`/question-banks/${newBank.id}`)
     }
     setEditingBank(null)
   }
@@ -90,14 +87,14 @@ export default function QuestionBanksPage() {
     setFormOpen(true)
   }
 
-  const handleInvite = (bank: QuestionBank) => {
-    setInvitingBank(bank)
-    setInviteOpen(true)
-  }
-
-  const handleInviteSubmit = (users: { userId: string; role: 'editor' | 'viewer' }[]) => {
-    console.log('邀请用户:', users, '到题库:', invitingBank?.name)
-    setInvitingBank(null)
+  const handleDelete = (bank: QuestionBank) => {
+    if (bank.isDraftPool) {
+      alert('我的草稿库不可删除')
+      return
+    }
+    if (confirm(`确定要删除题库「${bank.name}」吗？题库中的所有题目也会被删除。`)) {
+      deleteQuestionBank(bank.id)
+    }
   }
 
   const formatDate = (date: Date) => {
@@ -109,156 +106,201 @@ export default function QuestionBanksPage() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-3.5rem)] flex-col">
-      {/* 页面标题 */}
-      <div className="px-8 py-6">
-        <div className="mb-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">题库管理</h1>
-            <p className="text-muted-foreground">管理所有题库，添加和编辑题目</p>
+    <div className="px-8 py-6">
+      <div className="mb-4 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">题库管理</h1>
+          <p className="text-muted-foreground">管理所有题库，点击进入题目列表进行管理</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button variant="outline">
+            <Settings className="mr-2 size-4" />
+            配置审批流程
+          </Button>
+          <Button variant="outline">
+            <FolderTree className="mr-2 size-4" />
+            配置批次分组
+          </Button>
+          <Button variant="outline">
+            <Upload className="mr-2 size-4" />
+            导入题库
+          </Button>
+          <Button onClick={() => { setEditingBank(null); setFormOpen(true) }}>
+            <Plus className="mr-2 size-4" />
+            新建题库
+          </Button>
+        </div>
+      </div>
+
+      {/* 统计卡片 */}
+      <div className="mb-4 flex gap-3">
+        <div className="flex flex-1 items-center gap-3 rounded-lg border bg-white px-4 py-3">
+          <div className="flex size-8 items-center justify-center rounded-md bg-blue-50">
+            <FileText className="size-4 text-blue-600" />
           </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline">
-              <Settings className="mr-2 size-4" />
-              配置审批流程
-            </Button>
-            <Button variant="outline">
-              <FolderTree className="mr-2 size-4" />
-              配置批次分组
-            </Button>
-            <Button variant="outline">
-              <Upload className="mr-2 size-4" />
-              导入题库
-            </Button>
-            <Button onClick={() => { setEditingBank(null); setFormOpen(true) }}>
-              <Plus className="mr-2 size-4" />
-              新建题库
-            </Button>
+          <div className="min-w-0 flex-1">
+            <div className="text-xs text-muted-foreground">题库总数</div>
+            <div className="flex items-center gap-2 text-xs">
+              <span>全部 <strong className="text-foreground">{stats.total}</strong></span>
+              <span className="text-gray-300">|</span>
+              <span>草稿 <strong className="text-muted-foreground">{stats.draft}</strong></span>
+              <span className="text-gray-300">|</span>
+              <span>已发布 <strong className="text-emerald-600">{stats.published}</strong></span>
+            </div>
           </div>
         </div>
-
-        {/* 精简统计卡片 */}
-        <div className="mb-4 flex gap-3">
-          <div className="flex flex-1 items-center gap-3 rounded-lg border bg-white px-4 py-3">
-            <div className="flex size-8 items-center justify-center rounded-md bg-blue-50">
-              <FileText className="size-4 text-blue-600" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="text-xs text-muted-foreground">题库指标</div>
-              <div className="flex items-center gap-2 text-xs">
-                <span>编辑中 <strong className="text-foreground">{bankDraft}</strong></span>
-                <span className="text-gray-300">|</span>
-                <span>审核中 <strong className="text-foreground">{bankPending}</strong></span>
-                <span className="text-gray-300">|</span>
-                <span>已发布 <strong className="text-emerald-600">{bankPublished}</strong></span>
-              </div>
-            </div>
+        <div className="flex flex-1 items-center gap-3 rounded-lg border bg-white px-4 py-3">
+          <div className="flex size-8 items-center justify-center rounded-md bg-emerald-50">
+            <CheckCircle className="size-4 text-emerald-600" />
           </div>
-          <div className="flex flex-1 items-center gap-3 rounded-lg border bg-white px-4 py-3">
-            <div className="flex size-8 items-center justify-center rounded-md bg-emerald-50">
-              <CheckCircle className="size-4 text-emerald-600" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="text-xs text-muted-foreground">题目指标</div>
-              <div className="flex items-center gap-2 text-xs">
-                <span>编辑中 <strong className="text-foreground">{qDraft}</strong></span>
-                <span className="text-gray-300">|</span>
-                <span>审核中 <strong className="text-foreground">{qPending}</strong></span>
-                <span className="text-gray-300">|</span>
-                <span>已发布 <strong className="text-emerald-600">{qPublished}</strong></span>
-              </div>
+          <div className="min-w-0 flex-1">
+            <div className="text-xs text-muted-foreground">题目总数</div>
+            <div className="flex items-center gap-2 text-xs">
+              <span>全部 <strong className="text-foreground">{questions.length}</strong></span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* 下方左右布局 */}
-      <div className="flex flex-1 overflow-hidden px-8 pb-6">
-        {/* 左侧题库列表 */}
-        <div className="flex w-64 flex-col rounded-l-lg border-y border-l bg-white">
-          {/* Tab 切换与搜索 */}
-          <div className="space-y-3 border-b p-4">
-            <Tabs value={ownerTab} onValueChange={(v) => setOwnerTab(v as OwnerTab)}>
-              <TabsList className="grid h-8 w-full grid-cols-3">
-                <TabsTrigger value="mine" className="text-xs">我的</TabsTrigger>
-                <TabsTrigger value="collaborate" className="text-xs">共建</TabsTrigger>
-                <TabsTrigger value="public" className="text-xs">公共</TabsTrigger>
-              </TabsList>
-            </Tabs>
+      {/* Tab 切换与视图切换 */}
+      <div className="mb-4 flex items-center justify-between">
+        <Tabs value={ownerTab} onValueChange={(v) => setOwnerTab(v as OwnerTab)}>
+          <TabsList>
+            <TabsTrigger value="mine">我的题库</TabsTrigger>
+            <TabsTrigger value="collaborate">共建题库</TabsTrigger>
+            <TabsTrigger value="public">公共题库</TabsTrigger>
+          </TabsList>
+        </Tabs>
+        <ToggleGroup type="single" value={viewMode} onValueChange={(v) => v && setViewMode(v as ViewMode)}>
+          <ToggleGroupItem value="list" aria-label="资源列表">
+            <List className="size-4" />
+            <span className="ml-1.5">资源列表</span>
+          </ToggleGroupItem>
+          <ToggleGroupItem value="batch" aria-label="批次分组">
+            <LayoutGrid className="size-4" />
+            <span className="ml-1.5">批次分组</span>
+          </ToggleGroupItem>
+        </ToggleGroup>
+      </div>
 
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="搜索题库与题目名称..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="h-8 pl-9 text-sm"
-              />
-            </div>
-          </div>
-
-          {/* 题库名称列表 */}
-          <ScrollArea className="flex-1">
-            <div className="p-2">
-              {filteredBanks.length === 0 ? (
-                <div className="py-8 text-center text-sm text-muted-foreground">
-                  {questionBanks.length === 0 ? "暂无题库" : "没有找到匹配的题库"}
-                </div>
-              ) : (
-                filteredBanks.map((bank) => {
-                  const isDraft = bank.isDraftPool === true
-                  return (
-                    <button
-                      key={bank.id}
-                      onClick={() => setSelectedBankId(bank.id)}
-                      className={`group flex w-full flex-col rounded-lg px-3 py-2.5 text-left text-sm transition-colors ${
-                        selectedBankId === bank.id
-                          ? "bg-primary/10 font-medium text-primary"
-                          : isDraft
-                            ? "bg-amber-50/60 text-gray-700 hover:bg-amber-100/60"
-                            : "text-gray-700 hover:bg-gray-50"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="truncate">{bank.name}</span>
-                        <span className="shrink-0 text-xs text-muted-foreground">
-                          {bank.questionCount} 题
-                        </span>
-                      </div>
-                      {/* 草稿库：显示创建/更新时间 */}
-                      {isDraft ? (
-                        <div className="mt-1 flex items-center gap-2 text-[11px] text-muted-foreground">
-                          <span>创建于 {formatDate(bank.createdAt)}</span>
-                          <span className="text-gray-200">|</span>
-                          <span>更新于 {formatDate(bank.updatedAt)}</span>
-                        </div>
-                      ) : (
-                        <div className="mt-1 flex items-center justify-between">
-                          <StatusBadge status={bank.status} className="text-xs" />
-                          <span className="text-[11px] text-muted-foreground">
-                            更新于 {formatDate(bank.updatedAt)}
-                          </span>
-                        </div>
-                      )}
-                    </button>
-                  )
-                })
-              )}
-            </div>
-          </ScrollArea>
+      {/* 筛选栏 */}
+      <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center">
+        <div className="relative flex-1 sm:max-w-xs">
+          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="搜索题库名称..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-9"
+          />
         </div>
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-[140px]">
+            <SelectValue placeholder="全部状态" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectItem value="all">全部状态</SelectItem>
+              <SelectItem value="draft">草稿</SelectItem>
+              <SelectItem value="published">已发布</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </div>
 
-        {/* 右侧题目列表 */}
-        <div className="flex-1 overflow-auto rounded-r-lg border-y border-r bg-white p-4">
-          {selectedBankId ? (
-            <QuestionListPanel bankId={selectedBankId} />
-          ) : (
-            <div className="flex h-full items-center justify-center">
-              <div className="text-center text-muted-foreground">
-                <p>请选择一个题库查看题目</p>
-              </div>
-            </div>
-          )}
+      {/* 题库列表 */}
+      <div className="rounded-lg border bg-white px-4 py-3">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[300px]">题库名称</TableHead>
+                <TableHead className="w-[100px]">题目数量</TableHead>
+                <TableHead className="w-[100px]">来源</TableHead>
+                <TableHead className="w-[100px]">状态</TableHead>
+                <TableHead className="w-[120px]">创建时间</TableHead>
+                <TableHead className="w-[120px]">更新时间</TableHead>
+                <TableHead className="sticky right-0 w-[200px] bg-white text-right">操作</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredBanks.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
+                    暂无题库记录
+                  </TableCell>
+                </TableRow>
+              ) : (
+                filteredBanks.map((bank) => (
+                  <TableRow
+                    key={bank.id}
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() => router.push(`/question-banks/${bank.id}`)}
+                  >
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        {bank.isDraftPool && (
+                          <span className="shrink-0 rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-700">
+                            草稿库
+                          </span>
+                        )}
+                        <span className="text-sm font-medium">{bank.name}</span>
+                      </div>
+                      <div className="text-xs text-muted-foreground line-clamp-1">{bank.description || '-'}</div>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm">{bank.questionCount} 题</span>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm text-muted-foreground">
+                        {bank.ownerType === 'mine' ? '我的' : bank.ownerType === 'collaborate' ? '共建' : '公共'}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <StatusBadge status={bank.status} />
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm text-muted-foreground">{formatDate(bank.createdAt)}</span>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm text-muted-foreground">{formatDate(bank.updatedAt)}</span>
+                    </TableCell>
+                    <TableCell className="sticky right-0 bg-white text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 gap-1 text-xs text-blue-600"
+                          onClick={(e) => { e.stopPropagation(); router.push(`/question-banks/${bank.id}`) }}
+                        >
+                          <FolderOpen className="size-3" />
+                          管理题目
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="size-7"
+                          onClick={(e) => { e.stopPropagation(); handleEdit(bank) }}
+                        >
+                          <Pencil className="size-3.5" />
+                        </Button>
+                        {!bank.isDraftPool && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="size-7 text-destructive"
+                            onClick={(e) => { e.stopPropagation(); handleDelete(bank) }}
+                          >
+                            <Trash2 className="size-3.5" />
+                          </Button>
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
         </div>
       </div>
 
@@ -268,15 +310,6 @@ export default function QuestionBanksPage() {
         onOpenChange={setFormOpen}
         bank={editingBank}
         onSubmit={handleFormSubmit}
-      />
-
-      {/* 邀请共建弹窗 */}
-      <InviteCollaboratorDialog
-        open={inviteOpen}
-        onOpenChange={setInviteOpen}
-        title={`邀请共建「${invitingBank?.name || ''}」`}
-        description="邀请其他用户一起维护此题库"
-        onInvite={handleInviteSubmit}
       />
     </div>
   )

@@ -112,6 +112,7 @@ export function CertificationRulePage({
     taskName: string
     mapping: LevelMapping[]
   } | null>(null)
+  const [overrideConfirmOpen, setOverrideConfirmOpen] = useState(false)
 
   // 判断是否为只读状态
   const isReadOnly = rule.status === 'reviewing'
@@ -497,22 +498,7 @@ export function CertificationRulePage({
                   <TableHead className="w-[130px] font-medium">能力点</TableHead>
                   <TableHead className="w-[150px] font-medium">关联任务</TableHead>
                   <TableHead className="w-[80px] text-center font-medium">权重</TableHead>
-                  <TableHead className="w-[140px] font-medium">
-                    <div className="flex items-center gap-1">
-                      操作
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-5 w-5">
-                            <Info className="h-3.5 w-3.5 text-muted-foreground" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent side="bottom" className="max-w-xs">
-                          <p className="text-xs">{scoreCalculationTip}</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </div>
-                  </TableHead>
-                  <TableHead className="w-[140px] font-medium">
+                  <TableHead className="w-[180px] font-medium">
                     <div className="flex items-center gap-1">
                       任务能力掌握度
                       <Tooltip>
@@ -614,62 +600,29 @@ export function CertificationRulePage({
                     {row.isFirstOfAbilityPoint && (
                       <TableCell
                         rowSpan={row.abilityPointRowSpan}
-                        className="align-top border-r border-border"
+                        className="text-sm text-muted-foreground align-top border-r border-border"
                       >
-                        <Select
-                          value={row.mappingType}
-                          onValueChange={(value: 'inherit' | 'custom') =>
-                            handleToggleMappingType(
-                              row.abilityItemId,
-                              row.abilityPointId,
-                              value,
-                            )
-                          }
-                          disabled={isReadOnly}
-                        >
-                          <SelectTrigger className="w-full h-8 text-xs">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="inherit">使用全局映射</SelectItem>
-                            <SelectItem value="custom">自定义映射</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </TableCell>
-                    )}
-                    {row.isFirstOfAbilityPoint && (
-                      <TableCell
-                        rowSpan={row.abilityPointRowSpan}
-                        className="text-sm text-muted-foreground align-top"
-                      >
-                        {row.mappingType === 'custom' ? (
-                          <div className="flex items-center gap-2">
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <span className="max-w-[100px] truncate cursor-default">
-                                  {row.levelMapping}
-                                </span>
-                              </TooltipTrigger>
-                              <TooltipContent side="bottom" className="max-w-xs">
-                                <p className="text-xs">{row.levelMapping}</p>
-                              </TooltipContent>
-                            </Tooltip>
-                            {row.taskId && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-6 px-2 text-xs shrink-0"
-                                onClick={() => handleOpenEditMapping(row)}
-                                disabled={isReadOnly}
-                              >
-                                <Edit2 className="h-3 w-3 mr-1" />
-                                修改
-                              </Button>
-                            )}
-                          </div>
-                        ) : (
-                          <span className="text-muted-foreground">--</span>
-                        )}
+                        <div className="flex items-center gap-2">
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span className="max-w-[120px] truncate cursor-default">
+                                {row.levelMapping}
+                              </span>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom" className="max-w-xs">
+                              <p className="text-xs">{row.levelMapping}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 px-2 text-xs shrink-0"
+                            onClick={() => handleOpenEditMapping(row)}
+                          >
+                            <Edit2 className="h-3 w-3 mr-1" />
+                            修改
+                          </Button>
+                        </div>
                       </TableCell>
                     )}
                     {row.isFirstOfAbilityPoint && (
@@ -770,7 +723,38 @@ export function CertificationRulePage({
           onSave={setGlobalMapping}
           title="配置全局等级映射"
           description="配置全局等级映射规则，所有岗位默认继承此配置"
+          onOverride={() => setOverrideConfirmOpen(true)}
         />
+
+        {/* 覆盖确认弹窗 */}
+        <Dialog open={overrideConfirmOpen} onOpenChange={(open) => !open && setOverrideConfirmOpen(false)}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>确认覆盖</DialogTitle>
+              <DialogDescription>
+                确定要用当前全局等级映射覆盖该岗位下所有能力点的自定义配置吗？此操作不可撤销。
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setOverrideConfirmOpen(false)}>取消</Button>
+              <Button onClick={() => {
+                setRule((prev) => ({
+                  ...prev,
+                  abilityItems: prev.abilityItems.map((item) => ({
+                    ...item,
+                    abilityPoints: item.abilityPoints.map((point) => ({
+                      ...point,
+                      mappingType: 'inherit' as const,
+                      customMapping: undefined,
+                    })),
+                  })),
+                }))
+                toast({ title: '已覆盖', description: '当前岗位所有能力点已恢复使用全局等级映射' })
+                setOverrideConfirmOpen(false)
+              }}>确定覆盖</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         <Toaster />
       </div>

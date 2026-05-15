@@ -471,7 +471,7 @@ export interface GraduationProjectTopic {
   name: string
   positionId: string
   positionName: string
-  sceneName?: string
+  college: string
   source: TopicSource
   status: TopicStatus
   capacity: number
@@ -485,7 +485,7 @@ export interface GraduationProjectTopic {
 }
 
 export type ArchivePhase = 'proposal' | 'midterm' | 'process' | 'final'
-export type ArchiveDocStatus = 'pending' | 'submitted' | 'reviewed' | 'returned'
+export type ArchiveDocStatus = 'making' | 'reviewing' | 'returned' | 'passed'
 
 export interface GraduationProjectArchive {
   id: string
@@ -617,7 +617,7 @@ export interface StudentAbilityPortrait {
 export interface GraduationProjectTopicFormData {
   name: string
   positionId: string
-  sceneName?: string
+  college: string
   source: TopicSource
   capacity: number
   advisorName: string

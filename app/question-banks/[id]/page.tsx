@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react"
 import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, Plus, Search, Edit, Trash2, Eye, Upload, Copy, Users, Building2, ImageIcon } from "lucide-react"
+import { ArrowLeft, Plus, Search, Edit, Trash2, Eye, Upload, Copy, Users, Building2, ImageIcon, List, LayoutGrid } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -25,10 +25,9 @@ import {
 } from "@/components/ui/table"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { StatusBadge } from "@/components/shared/status-badge"
 import { ConfirmDialog } from "@/components/shared/confirm-dialog"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { BankFormDialog } from "@/components/question-banks/bank-form-dialog"
-import { BankStatusActions } from "@/components/question-banks/bank-status-actions"
 import { QuestionFormDialog } from "@/components/questions/question-form-dialog"
 import { QuestionPreview } from "@/components/questions/question-preview"
 import { useData } from "@/components/providers/data-provider"
@@ -45,7 +44,6 @@ export default function QuestionBankDetailPage() {
     getQuestionBank,
     updateQuestionBank,
     deleteQuestionBank,
-    updateQuestionBankStatus,
     getQuestionsByBank,
     createQuestion,
     updateQuestion,
@@ -101,7 +99,8 @@ export default function QuestionBankDetailPage() {
     )
   }
 
-  const canEdit = ['draft', 'unsubmitted', 'rejected'].includes(bank.status)
+  const isDraftPool = bank.isDraftPool === true
+  const canEdit = true // 所有题库均可编辑题目
 
   const handleBankUpdate = (data: QuestionBankFormData) => {
     updateQuestionBank(bankId, data)
@@ -243,7 +242,11 @@ export default function QuestionBankDetailPage() {
               <div className="flex-1">
                 <div className="flex items-center gap-3">
                   <CardTitle className="text-xl">{bank.name}</CardTitle>
-                  <StatusBadge status={bank.status} />
+                  {isDraftPool && (
+                    <span className="shrink-0 rounded bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">
+                      草稿库
+                    </span>
+                  )}
                   <Badge variant="outline">{bank.version}</Badge>
                 </div>
                 <CardDescription className="mt-2">
@@ -251,12 +254,7 @@ export default function QuestionBankDetailPage() {
                 </CardDescription>
               </div>
             </div>
-            <BankStatusActions
-              status={bank.status}
-              onEdit={() => setBankFormOpen(true)}
-              onDelete={handleBankDelete}
-              onStatusChange={(action) => updateQuestionBankStatus(bankId, action)}
-            />
+            {/* 题库操作已移至列表页 */}
           </div>
         </CardHeader>
         <CardContent>
@@ -308,26 +306,31 @@ export default function QuestionBankDetailPage() {
         </CardContent>
       </Card>
 
-      {/* 题目管理 */}
+      {/* 题目管理标题 + Tab + 按钮 */}
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-lg font-semibold">题目列表</h2>
-        {canEdit && (
-          <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={() => alert("导入功能开发中")}>
-              <Upload className="mr-2 size-4" />
-              导入题目
-            </Button>
-            <Button
-              onClick={() => {
-                setEditingQuestion(null)
-                setQuestionFormOpen(true)
-              }}
-            >
-              <Plus className="mr-2 size-4" />
-              添加题目
-            </Button>
-          </div>
-        )}
+        <div className="flex items-center gap-4">
+          <h2 className="text-lg font-semibold">题目列表</h2>
+          <Tabs value={typeFilter} onValueChange={(v) => setTypeFilter(v as QuestionType | "all")}>
+            <TabsList className="h-8">
+              <TabsTrigger value="all" className="text-xs">全部</TabsTrigger>
+              {(Object.keys(QUESTION_TYPE_LABELS) as QuestionType[]).map((type) => (
+                <TabsTrigger key={type} value={type} className="text-xs">
+                  {QUESTION_TYPE_LABELS[type]}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={() => alert("导入功能开发中")}>
+            <Upload className="mr-1 size-3.5" />
+            导入题目
+          </Button>
+          <Button size="sm" onClick={() => { setEditingQuestion(null); setQuestionFormOpen(true) }}>
+            <Plus className="mr-1 size-3.5" />
+            添加题目
+          </Button>
+        </div>
       </div>
 
       {/* 批量操作栏 */}
@@ -352,8 +355,8 @@ export default function QuestionBankDetailPage() {
         </div>
       )}
 
-      {/* 筛选栏 */}
-      <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center">
+      {/* 搜索 + 创建人筛选 */}
+      <div className="mb-4 flex items-center gap-2">
         <div className="relative flex-1 sm:max-w-xs">
           <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -363,24 +366,9 @@ export default function QuestionBankDetailPage() {
             className="pl-9"
           />
         </div>
-        <Select value={typeFilter} onValueChange={(v) => setTypeFilter(v as QuestionType | "all")}>
-          <SelectTrigger className="w-[140px]">
-            <SelectValue placeholder="全部类型" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectItem value="all">全部类型</SelectItem>
-              {(Object.keys(QUESTION_TYPE_LABELS) as QuestionType[]).map((type) => (
-                <SelectItem key={type} value={type}>
-                  {QUESTION_TYPE_LABELS[type]}
-                </SelectItem>
-              ))}
-            </SelectGroup>
-          </SelectContent>
-        </Select>
         {creators.length > 0 && (
           <Select value={creatorFilter} onValueChange={setCreatorFilter}>
-            <SelectTrigger className="w-[140px]">
+            <SelectTrigger className="h-9 w-[140px]">
               <SelectValue placeholder="全部创建人" />
             </SelectTrigger>
             <SelectContent>

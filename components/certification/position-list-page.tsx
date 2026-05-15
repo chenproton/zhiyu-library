@@ -62,7 +62,6 @@ export function PositionListPage() {
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [professionalDirectionFilter, setProfessionalDirectionFilter] = useState<string>("all")
-  const [statusFilter, setStatusFilter] = useState<string>("all")
   const [globalMapping, setGlobalMapping] = useState<LevelMapping[]>(defaultLevelMapping)
   
   const [globalConfigDialogOpen, setGlobalConfigDialogOpen] = useState(false)
@@ -83,11 +82,9 @@ export function PositionListPage() {
     const matchesSearch =
       position.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       position.positionCode.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesStatus =
-      statusFilter === "all" || position.ruleStatus === statusFilter
     const matchesProfessionalDirection =
       professionalDirectionFilter === "all" || position.professionalDirection === professionalDirectionFilter
-    return matchesSearch && matchesStatus && matchesProfessionalDirection
+    return matchesSearch && matchesProfessionalDirection
   })
 
   // 选中状态处理
@@ -234,9 +231,7 @@ export function PositionListPage() {
               <div className="flex items-center gap-2 text-xs">
                 <span>总数 <strong className="text-foreground">{stats.total}</strong></span>
                 <span className="text-gray-300">|</span>
-                <span>未提交 <strong className="text-foreground">{stats.notSubmitted}</strong></span>
-                <span className="text-gray-300">|</span>
-                <span>审批中 <strong className="text-amber-600">{stats.reviewing}</strong></span>
+                <span>已配置 <strong className="text-emerald-600">{stats.published}</strong></span>
               </div>
             </div>
           </div>
@@ -247,9 +242,7 @@ export function PositionListPage() {
             <div className="min-w-0 flex-1">
               <div className="text-xs text-muted-foreground">审批结果</div>
               <div className="flex items-center gap-2 text-xs">
-                <span>已驳回 <strong className="text-red-600">{stats.rejected}</strong></span>
-                <span className="text-gray-300">|</span>
-                <span>已发布 <strong className="text-emerald-600">{stats.published}</strong></span>
+                <span>待配置 <strong className="text-amber-600">{stats.total - stats.published}</strong></span>
               </div>
             </div>
           </div>
@@ -268,26 +261,13 @@ export function PositionListPage() {
           </div>
           <Select value={professionalDirectionFilter} onValueChange={setProfessionalDirectionFilter}>
             <SelectTrigger className="w-36">
-              <SelectValue placeholder="专业方向" />
+              <SelectValue placeholder="所属行业" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">全部方向</SelectItem>
+              <SelectItem value="all">全部行业</SelectItem>
               {professionalDirections.map((direction) => (
                 <SelectItem key={direction} value={direction}>
                   {direction}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-32">
-              <SelectValue placeholder="全部状态" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">全部状态</SelectItem>
-              {Object.entries(statusConfig).map(([key, config]) => (
-                <SelectItem key={key} value={key}>
-                  {config.label}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -326,9 +306,8 @@ export function PositionListPage() {
                 </TableHead>
                 <TableHead>岗位名称</TableHead>
                 <TableHead>岗位编码</TableHead>
-                <TableHead>专业方向</TableHead>
+                <TableHead>所属行业</TableHead>
                 <TableHead className="text-center">关联能力数</TableHead>
-                <TableHead>状态</TableHead>
                 <TableHead>更新时间</TableHead>
                 <TableHead className="text-right">操作</TableHead>
               </TableRow>
@@ -336,7 +315,7 @@ export function PositionListPage() {
             <TableBody>
               {filteredPositions.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="h-32 text-center">
+                  <TableCell colSpan={6} className="h-32 text-center">
                     <p className="text-muted-foreground">暂无数据</p>
                   </TableCell>
                 </TableRow>
@@ -363,64 +342,14 @@ export function PositionListPage() {
                     <TableCell className="text-center">
                       {position.relatedAbilityCount}
                     </TableCell>
-                    <TableCell>
-                      <StatusBadge status={position.ruleStatus} />
-                    </TableCell>
                     <TableCell className="text-muted-foreground">
                       {position.lastUpdated}
                     </TableCell>
                     <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          {shouldShowAction("config", position.ruleStatus) && (
-                            <DropdownMenuItem
-                              onClick={() => handleConfig(position)}
-                            >
-                              <Settings2 className="mr-2 h-4 w-4" />
-                              配置规则
-                            </DropdownMenuItem>
-                          )}
-                          {(shouldShowAction("cancelApproval", position.ruleStatus) ||
-                            shouldShowAction("publish", position.ruleStatus) ||
-                            shouldShowAction("unpublish", position.ruleStatus)) && (
-                            <DropdownMenuSeparator />
-                          )}
-                          {shouldShowAction(
-                            "cancelApproval",
-                            position.ruleStatus
-                          ) && (
-                            <DropdownMenuItem
-                              onClick={() => handleCancelApproval(position)}
-                              className="text-destructive focus:text-destructive"
-                            >
-                              <X className="mr-2 h-4 w-4" />
-                              取消审批
-                            </DropdownMenuItem>
-                          )}
-                          {shouldShowAction("publish", position.ruleStatus) && (
-                            <DropdownMenuItem
-                              onClick={() => handlePublish(position)}
-                            >
-                              <Upload className="mr-2 h-4 w-4" />
-                              发布
-                            </DropdownMenuItem>
-                          )}
-                          {shouldShowAction("unpublish", position.ruleStatus) && (
-                            <DropdownMenuItem
-                              onClick={() => handleUnpublish(position)}
-                              className="text-destructive focus:text-destructive"
-                            >
-                              <X className="mr-2 h-4 w-4" />
-                              取消发布
-                            </DropdownMenuItem>
-                          )}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      <Button variant="outline" size="sm" onClick={() => handleConfig(position)}>
+                        <Settings2 className="mr-1 h-3.5 w-3.5" />
+                        配置规则
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))

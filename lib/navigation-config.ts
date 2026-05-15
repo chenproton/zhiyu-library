@@ -51,5 +51,25 @@ export const evaluationNavigationConfig: PlatformNavigationConfig = {
         { id: "scene-task-results", label: "场景任务测评结果", href: "/scene-task-results", matchers: ["/scene-task-results"] },
       ],
     },
+    {
+      id: "graduation-project",
+      label: "毕业设计管理",
+      icon: "graduationCap",
+      children: [
+        { id: "gp-topics", label: "毕业设计选题管理", href: "/graduation-project/topics", matchers: ["/graduation-project/topics"] },
+        { id: "gp-archives", label: "毕设档案管理", href: "/graduation-project/archives", matchers: ["/graduation-project/archives"] },
+        { id: "gp-evaluation", label: "毕设评价管理", href: "/graduation-project/evaluation", matchers: ["/graduation-project/evaluation"] },
+        { id: "gp-query", label: "毕业查询管理", href: "/graduation-project/query", matchers: ["/graduation-project/query"] },
+      ],
+    },
+    {
+      id: "student-portrait",
+      label: "学生能力画像管理",
+      icon: "userCircle",
+      children: [
+        { id: "sp-archives", label: "学生能力档案管理", href: "/student-portrait/archives", matchers: ["/student-portrait/archives"] },
+        { id: "sp-portraits", label: "学生能力画像管理", href: "/student-portrait/portraits", matchers: ["/student-portrait/portraits"] },
+      ],
+    },
   ],
 }

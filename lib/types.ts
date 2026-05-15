@@ -460,3 +460,274 @@ export interface ApprovalItem {
   status: ApprovalStatus
   remark?: string
 }
+
+// ==================== 毕业设计管理相关 ====================
+
+export type TopicSource = 'scene' | 'enterprise'
+export type TopicStatus = 'draft' | 'pending' | 'published' | 'locked'
+
+export interface GraduationProjectTopic {
+  id: string
+  name: string
+  positionId: string
+  positionName: string
+  sceneName?: string
+  source: TopicSource
+  status: TopicStatus
+  capacity: number
+  appliedCount: number
+  advisorName: string
+  enterpriseMentorName?: string
+  startDate: Date
+  endDate: Date
+  description?: string
+  createdAt: Date
+}
+
+export type ArchivePhase = 'proposal' | 'midterm' | 'process' | 'final'
+export type ArchiveDocStatus = 'pending' | 'submitted' | 'reviewed' | 'returned'
+
+export interface GraduationProjectArchive {
+  id: string
+  topicId: string
+  topicName: string
+  studentName: string
+  studentId: string
+  advisorName: string
+  enterpriseMentorName?: string
+  positionName: string
+  phase: ArchivePhase
+  docStatus: ArchiveDocStatus
+  docCount: number
+  lastUpdated: Date
+  hasRectification: boolean
+}
+
+export type EvaluationGrade = 'A' | 'B' | 'C' | 'D' | 'E'
+
+export interface GraduationProjectEvaluation {
+  id: string
+  topicId: string
+  topicName: string
+  studentName: string
+  studentId: string
+  advisorScore: number
+  enterpriseScore?: number
+  defenseScore?: number
+  comprehensiveGrade: EvaluationGrade
+  isExcellent: boolean
+  evaluationTime: Date
+  status: 'pending' | 'completed'
+}
+
+export interface GraduationQueryResult {
+  id: string
+  studentName: string
+  studentId: string
+  className: string
+  majorName: string
+  creditCompleted: number
+  creditRequired: number
+  scenePassed: number
+  sceneRequired: number
+  projectGrade: EvaluationGrade | null
+  graduationStatus: 'qualified' | 'unqualified' | 'pending'
+  abilityCertStatus: 'certified' | 'uncertified' | 'pending'
+  rectificationCount: number
+}
+
+// ==================== 学生能力画像管理相关 ====================
+
+export type ArchiveMaterialType = 'certificate' | 'competition' | 'activity' | 'internship' | 'skill'
+export type ArchiveAuditStatus = 'pending' | 'approved' | 'rejected'
+export type ArchiveDirection = 'positive' | 'negative'
+
+export interface StudentAbilityArchive {
+  id: string
+  studentName: string
+  studentId: string
+  className: string
+  materialType: ArchiveMaterialType
+  materialName: string
+  issuingOrg: string
+  obtainDate: Date
+  auditStatus: ArchiveAuditStatus
+  auditRemark?: string
+  convertedCredit: number
+  direction: ArchiveDirection
+  isVisible: boolean
+  createdAt: Date
+  level?: string
+}
+
+export type AbilityDomain = 'industry' | 'professional' | 'skill' | 'general' | 'quality'
+
+export interface AbilityDomainScore {
+  domain: AbilityDomain
+  domainLabel: string
+  score: number
+  level: string
+}
+
+export interface CourseRecord {
+  courseName: string
+  credit: number
+  grade: EvaluationGrade
+  finalScore: number
+}
+
+export interface StudentAbilityPortrait {
+  id: string
+  studentName: string
+  studentId: string
+  className: string
+  majorName: string
+  positionName: string
+  overallGrade: EvaluationGrade
+  domainScores: AbilityDomainScore[]
+  classRank: number
+  classTotal: number
+  majorRank: number
+  majorTotal: number
+  recommendPositions: { positionName: string; matchRate: number }[]
+  updatedAt: Date
+  // 基础档案扩展
+  gender: string
+  gradeYear: string
+  avatarUrl?: string
+  courses: string[]
+  scenes: string[]
+  completedCourses: number
+  completedScenes: number
+  totalCredits: number
+  archiveCount: number
+  // 学历评价
+  courseRecords: CourseRecord[]
+  graduationQualified: boolean
+  attendanceRate: number
+  diplomaBadge: string
+  // 能力评价扩展
+  yearRank: number
+  yearTotal: number
+  dualBadge: string
+}
+
+// ==================== 表单数据类型 ====================
+
+export interface GraduationProjectTopicFormData {
+  name: string
+  positionId: string
+  sceneName?: string
+  source: TopicSource
+  capacity: number
+  advisorName: string
+  enterpriseMentorName?: string
+  startDate: string
+  endDate: string
+  description?: string
+}
+
+export interface GraduationProjectEvaluationFormData {
+  advisorScore: number
+  enterpriseScore?: number
+  defenseScore?: number
+  comprehensiveGrade: EvaluationGrade
+  isExcellent: boolean
+}
+
+export interface StudentAbilityArchiveFormData {
+  studentName: string
+  studentId: string
+  className: string
+  materialType: ArchiveMaterialType
+  materialName: string
+  issuingOrg: string
+  obtainDate: string
+  direction: ArchiveDirection
+}
+
+export interface ArchiveAuditFormData {
+  auditStatus: ArchiveAuditStatus
+  auditRemark?: string
+  convertedCredit: number
+}
+
+// ==================== 演示用扩展类型 ====================
+
+export interface ProcessEvaluation {
+  id: string
+  archiveId: string
+  studentName: string
+  topicName: string
+  phase: 'proposal' | 'midterm' | 'process'
+  advisorScore: number
+  comment: string
+  evaluatedAt: Date
+}
+
+export interface RectificationDetail {
+  id: string
+  archiveId: string
+  studentId: string
+  studentName: string
+  topicName: string
+  requirement: string
+  deadline: Date
+  status: 'pending' | 'submitted' | 'approved'
+  studentResponse?: string
+  submittedAt?: Date
+}
+
+export interface AppealRecord {
+  id: string
+  studentId: string
+  studentName: string
+  type: 'grade' | 'graduation' | 'ability'
+  reason: string
+  status: 'pending' | 'processing' | 'resolved' | 'rejected'
+  createdAt: Date
+}
+
+export interface CreditConversionRule {
+  id: string
+  materialType: ArchiveMaterialType
+  level: string
+  credit: number
+}
+
+export interface ArchiveVersion {
+  id: string
+  archiveId: string
+  version: number
+  changedBy: string
+  changeSummary: string
+  createdAt: Date
+}
+
+export interface EvaluationStandard {
+  id: string
+  positionId: string
+  positionName: string
+  dimensions: { name: string; weight: number; maxScore: number }[]
+}
+
+export interface PortraitUpdateConfig {
+  updateCycle: 'realtime' | 'daily' | 'weekly'
+  queryLimit: number
+  queryTimeStart: string
+  queryTimeEnd: string
+}
+
+export interface TopicApplication {
+  id: string
+  topicId: string
+  topicName: string
+  studentId: string
+  studentName: string
+  className: string
+  status: 'pending' | 'approved' | 'rejected' | 'allocated'
+  applyReason: string
+  appliedAt: Date
+  allocatedAdvisorId?: string
+  allocatedAdvisorName?: string
+}

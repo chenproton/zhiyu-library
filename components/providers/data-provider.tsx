@@ -18,6 +18,20 @@ import type {
   JobAbilityResult,
   Position,
   ApprovalItem,
+  GraduationProjectTopic,
+  GraduationProjectArchive,
+  GraduationProjectEvaluation,
+  GraduationQueryResult,
+  StudentAbilityArchive,
+  StudentAbilityPortrait,
+  ProcessEvaluation,
+  RectificationDetail,
+  AppealRecord,
+  CreditConversionRule,
+  ArchiveVersion,
+  EvaluationStandard,
+  PortraitUpdateConfig,
+  TopicApplication,
 } from '@/lib/types'
 import { getNextStatus, canPerformAction } from '@/lib/types'
 import {
@@ -31,6 +45,19 @@ import {
   mockJobAbilityResults,
   positionsList,
   mockApprovalItems,
+  mockGraduationProjectTopics,
+  mockGraduationProjectArchives,
+  mockGraduationProjectEvaluations,
+  mockGraduationQueryResults,
+  mockStudentAbilityArchives,
+  mockStudentAbilityPortraits,
+  mockProcessEvaluations,
+  mockRectificationDetails,
+  mockAppealRecords,
+  mockCreditConversionRules,
+  mockArchiveVersions,
+  mockEvaluationStandards,
+  mockTopicApplications,
 } from '@/lib/mock-data'
 
 interface DataContextValue {
@@ -80,6 +107,47 @@ interface DataContextValue {
   approvalItems: ApprovalItem[]
   approveItem: (id: string, remark?: string) => void
   rejectItem: (id: string, remark?: string) => void
+
+  // 毕业设计管理
+  graduationProjectTopics: GraduationProjectTopic[]
+  graduationProjectArchives: GraduationProjectArchive[]
+  graduationProjectEvaluations: GraduationProjectEvaluation[]
+  graduationQueryResults: GraduationQueryResult[]
+  processEvaluations: ProcessEvaluation[]
+  rectificationDetails: RectificationDetail[]
+  appealRecords: AppealRecord[]
+  evaluationStandards: EvaluationStandard[]
+  topicApplications: TopicApplication[]
+  createTopicApplication: (data: any) => TopicApplication
+  updateTopicApplication: (id: string, data: Partial<TopicApplication>) => void
+  createProcessEvaluation: (data: any) => ProcessEvaluation
+  createRectificationDetail: (data: any) => RectificationDetail
+  updateRectificationDetail: (id: string, data: Partial<RectificationDetail>) => void
+  createAppealRecord: (data: any) => AppealRecord
+  updateAppealRecord: (id: string, data: Partial<AppealRecord>) => void
+  updateEvaluationStandard: (id: string, data: Partial<EvaluationStandard>) => void
+
+  // 学生能力画像管理
+  studentAbilityArchives: StudentAbilityArchive[]
+  studentAbilityPortraits: StudentAbilityPortrait[]
+  creditConversionRules: CreditConversionRule[]
+  archiveVersions: ArchiveVersion[]
+  portraitUpdateConfig: PortraitUpdateConfig
+
+  // 毕业设计管理操作
+  createGraduationProjectTopic: (data: any) => GraduationProjectTopic
+  updateGraduationProjectTopic: (id: string, data: any) => void
+  deleteGraduationProjectTopic: (id: string) => void
+  updateGraduationProjectArchive: (id: string, data: Partial<GraduationProjectArchive>) => void
+  updateGraduationProjectEvaluation: (id: string, data: Partial<GraduationProjectEvaluation>) => void
+
+  // 学生能力画像管理操作
+  createStudentAbilityArchive: (data: any) => StudentAbilityArchive
+  updateStudentAbilityArchive: (id: string, data: Partial<StudentAbilityArchive>) => void
+  deleteStudentAbilityArchive: (id: string) => void
+  updateStudentAbilityPortrait: (id: string, data: Partial<StudentAbilityPortrait>) => void
+  updateCreditConversionRules: (rules: CreditConversionRule[]) => void
+  updatePortraitUpdateConfig: (config: Partial<PortraitUpdateConfig>) => void
 }
 
 const DataContext = createContext<DataContextValue | null>(null)
@@ -97,6 +165,29 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const [jobAbilityResults] = useState<JobAbilityResult[]>(mockJobAbilityResults)
   const [positionsListState] = useState<Position[]>(positionsList)
   const [approvalItems, setApprovalItems] = useState<ApprovalItem[]>(mockApprovalItems)
+
+  // 毕业设计管理状态
+  const [graduationProjectTopics, setGraduationProjectTopics] = useState<GraduationProjectTopic[]>(mockGraduationProjectTopics)
+  const [graduationProjectArchives, setGraduationProjectArchives] = useState<GraduationProjectArchive[]>(mockGraduationProjectArchives)
+  const [graduationProjectEvaluations, setGraduationProjectEvaluations] = useState<GraduationProjectEvaluation[]>(mockGraduationProjectEvaluations)
+  const [graduationQueryResults] = useState<GraduationQueryResult[]>(mockGraduationQueryResults)
+  const [processEvaluations, setProcessEvaluations] = useState<ProcessEvaluation[]>(mockProcessEvaluations)
+  const [rectificationDetails, setRectificationDetails] = useState<RectificationDetail[]>(mockRectificationDetails)
+  const [appealRecords, setAppealRecords] = useState<AppealRecord[]>(mockAppealRecords)
+  const [evaluationStandards, setEvaluationStandards] = useState<EvaluationStandard[]>(mockEvaluationStandards)
+  const [topicApplications, setTopicApplications] = useState<TopicApplication[]>(mockTopicApplications)
+
+  // 学生能力画像管理状态
+  const [studentAbilityArchives, setStudentAbilityArchives] = useState<StudentAbilityArchive[]>(mockStudentAbilityArchives)
+  const [studentAbilityPortraits, setStudentAbilityPortraits] = useState<StudentAbilityPortrait[]>(mockStudentAbilityPortraits)
+  const [creditConversionRules, setCreditConversionRules] = useState<CreditConversionRule[]>(mockCreditConversionRules)
+  const [archiveVersions] = useState<ArchiveVersion[]>(mockArchiveVersions)
+  const [portraitUpdateConfig, setPortraitUpdateConfig] = useState<PortraitUpdateConfig>({
+    updateCycle: 'daily',
+    queryLimit: 10,
+    queryTimeStart: '08:00',
+    queryTimeEnd: '22:00',
+  })
 
   const approveItem = useCallback((id: string, remark?: string) => {
     setApprovalItems((prev) =>
@@ -424,6 +515,180 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     approvalItems,
     approveItem,
     rejectItem,
+    graduationProjectTopics,
+    graduationProjectArchives,
+    graduationProjectEvaluations,
+    graduationQueryResults,
+    // 毕业设计管理操作
+    createGraduationProjectTopic: (data: any) => {
+      const newTopic: GraduationProjectTopic = {
+        id: `gp-topic-${Date.now()}`,
+        name: data.name,
+        positionId: data.positionId || 'pos-1',
+        positionName: data.positionName || '全栈开发工程师',
+        sceneName: data.sceneName,
+        source: data.source || 'enterprise',
+        status: 'published',
+        capacity: Number(data.capacity) || 1,
+        appliedCount: 0,
+        advisorName: data.advisorName,
+        enterpriseMentorName: data.enterpriseMentorName,
+        startDate: new Date(data.startDate),
+        endDate: new Date(data.endDate),
+        description: data.description,
+        createdAt: new Date(),
+      }
+      setGraduationProjectTopics((prev) => [...prev, newTopic])
+      return newTopic
+    },
+    updateGraduationProjectTopic: (id: string, data: any) => {
+      setGraduationProjectTopics((prev) =>
+        prev.map((t) => (t.id === id ? { ...t, ...data } : t))
+      )
+    },
+    deleteGraduationProjectTopic: (id: string) => {
+      setGraduationProjectTopics((prev) => prev.filter((t) => t.id !== id))
+    },
+    updateGraduationProjectArchive: (id: string, data: Partial<GraduationProjectArchive>) => {
+      setGraduationProjectArchives((prev) =>
+        prev.map((a) => (a.id === id ? { ...a, ...data } : a))
+      )
+    },
+    updateGraduationProjectEvaluation: (id: string, data: Partial<GraduationProjectEvaluation>) => {
+      setGraduationProjectEvaluations((prev) =>
+        prev.map((e) => (e.id === id ? { ...e, ...data, status: 'completed' as const } : e))
+      )
+    },
+
+    // 学生能力画像管理操作
+    createStudentAbilityArchive: (data: any) => {
+      const newArchive: StudentAbilityArchive = {
+        id: `sp-arch-${Date.now()}`,
+        studentName: data.studentName,
+        studentId: data.studentId,
+        className: data.className,
+        materialType: data.materialType,
+        materialName: data.materialName,
+        issuingOrg: data.issuingOrg,
+        obtainDate: new Date(data.obtainDate),
+        auditStatus: 'pending',
+        convertedCredit: 0,
+        direction: data.direction || 'positive',
+        isVisible: true,
+        createdAt: new Date(),
+      }
+      setStudentAbilityArchives((prev) => [...prev, newArchive])
+      return newArchive
+    },
+    updateStudentAbilityArchive: (id: string, data: Partial<StudentAbilityArchive>) => {
+      setStudentAbilityArchives((prev) =>
+        prev.map((a) => (a.id === id ? { ...a, ...data } : a))
+      )
+    },
+    deleteStudentAbilityArchive: (id: string) => {
+      setStudentAbilityArchives((prev) => prev.filter((a) => a.id !== id))
+    },
+    updateStudentAbilityPortrait: (id: string, data: Partial<StudentAbilityPortrait>) => {
+      setStudentAbilityPortraits((prev) =>
+        prev.map((p) => (p.id === id ? { ...p, ...data, updatedAt: new Date() } : p))
+      )
+    },
+    updateCreditConversionRules: (rules: CreditConversionRule[]) => {
+      setCreditConversionRules(rules)
+    },
+    updatePortraitUpdateConfig: (config: Partial<PortraitUpdateConfig>) => {
+      setPortraitUpdateConfig((prev) => ({ ...prev, ...config }))
+    },
+
+    // 扩展演示数据
+    processEvaluations,
+    rectificationDetails,
+    appealRecords,
+    evaluationStandards,
+    topicApplications,
+    createTopicApplication: (data: any) => {
+      const newApp: TopicApplication = {
+        id: `app-${Date.now()}`,
+        topicId: data.topicId,
+        topicName: data.topicName,
+        studentId: data.studentId,
+        studentName: data.studentName,
+        className: data.className,
+        status: 'pending',
+        applyReason: data.applyReason,
+        appliedAt: new Date(),
+      }
+      setTopicApplications((prev) => [...prev, newApp])
+      return newApp
+    },
+    updateTopicApplication: (id: string, data: Partial<TopicApplication>) => {
+      setTopicApplications((prev) =>
+        prev.map((a) => (a.id === id ? { ...a, ...data } : a))
+      )
+    },
+    createProcessEvaluation: (data: any) => {
+      const newEval: ProcessEvaluation = {
+        id: `pe-${Date.now()}`,
+        archiveId: data.archiveId,
+        studentName: data.studentName,
+        topicName: data.topicName,
+        phase: data.phase,
+        advisorScore: data.advisorScore,
+        comment: data.comment,
+        evaluatedAt: new Date(),
+      }
+      setProcessEvaluations((prev) => [...prev, newEval])
+      return newEval
+    },
+    createRectificationDetail: (data: any) => {
+      const newRect: RectificationDetail = {
+        id: `rect-${Date.now()}`,
+        archiveId: data.archiveId,
+        studentName: data.studentName,
+        topicName: data.topicName,
+        requirement: data.requirement,
+        deadline: new Date(data.deadline),
+        status: 'pending',
+        studentResponse: data.studentResponse,
+        submittedAt: data.submittedAt ? new Date(data.submittedAt) : undefined,
+      }
+      setRectificationDetails((prev) => [...prev, newRect])
+      return newRect
+    },
+    updateRectificationDetail: (id: string, data: Partial<RectificationDetail>) => {
+      setRectificationDetails((prev) =>
+        prev.map((r) => (r.id === id ? { ...r, ...data } : r))
+      )
+    },
+    createAppealRecord: (data: any) => {
+      const newAppeal: AppealRecord = {
+        id: `appeal-${Date.now()}`,
+        studentId: data.studentId,
+        studentName: data.studentName,
+        type: data.type,
+        reason: data.reason,
+        status: 'pending',
+        createdAt: new Date(),
+      }
+      setAppealRecords((prev) => [...prev, newAppeal])
+      return newAppeal
+    },
+    updateAppealRecord: (id: string, data: Partial<AppealRecord>) => {
+      setAppealRecords((prev) =>
+        prev.map((a) => (a.id === id ? { ...a, ...data } : a))
+      )
+    },
+    updateEvaluationStandard: (id: string, data: Partial<EvaluationStandard>) => {
+      setEvaluationStandards((prev) =>
+        prev.map((s) => (s.id === id ? { ...s, ...data } : s))
+      )
+    },
+
+    creditConversionRules,
+    archiveVersions,
+    portraitUpdateConfig,
+    studentAbilityArchives,
+    studentAbilityPortraits,
   }
 
   return <DataContext.Provider value={value}>{children}</DataContext.Provider>

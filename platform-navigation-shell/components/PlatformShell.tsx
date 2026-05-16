@@ -347,11 +347,13 @@ export function PlatformShell({
   config: PlatformNavigationConfig
   children: React.ReactNode
 }) {
+  const pathname = usePathname()
+  const isLandingPage = pathname.startsWith("/landingpage")
   return (
     <>
       <PlatformTopNav config={config} />
       <div className={cn("flex min-h-screen bg-[#f5f7fa]", "pt-14", config.shellClassName)}>
-        {config.hideSideNav ? null : <PlatformSideNav config={config} />}
+        {config.hideSideNav || isLandingPage ? null : <PlatformSideNav config={config} />}
         <main className={cn("min-w-0 flex-1", config.mainClassName)}>
           <div className={cn("p-6", config.contentClassName)}>{children}</div>
         </main>

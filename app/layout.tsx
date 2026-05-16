@@ -10,8 +10,8 @@ import './globals.css'
 // const geistMono = Geist_Mono({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: '测评管理系统',
-  description: '题库、组卷、试卷、岗位能力认证规则管理系统',
+  title: '能力测评认证平台',
+  description: '题库、组卷、试卷、岗位能力认证、毕业设计、学生能力画像管理系统',
 }
 
 export default function RootLayout({

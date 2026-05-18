@@ -1,9 +1,9 @@
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 // import { Geist, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
-import { PlatformShell } from '@/platform-navigation-shell'
-import { evaluationNavigationConfig } from '@/lib/navigation-config'
 import { DataProvider } from '@/components/providers/data-provider'
+import ShellWrapper from './shell-wrapper'
 import './globals.css'
 
 // const geist = Geist({ subsets: ["latin"] })
@@ -23,9 +23,13 @@ export default function RootLayout({
     <html lang="zh-CN">
       <body className={`font-sans antialiased`}>
         <DataProvider>
-          <PlatformShell config={evaluationNavigationConfig}>
-            {children}
-          </PlatformShell>
+          <Suspense fallback={
+            <div className="flex min-h-screen bg-[#f5f7fa] pt-14">
+              <main className="min-w-0 flex-1 p-6">{children}</main>
+            </div>
+          }>
+            <ShellWrapper>{children}</ShellWrapper>
+          </Suspense>
         </DataProvider>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>

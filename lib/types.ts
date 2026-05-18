@@ -99,6 +99,7 @@ export interface Question {
   difficulty?: Difficulty
   knowledgePoints?: string[]
   creatorId?: string
+  source?: string
   status: Status
   createdAt: Date
 }
@@ -171,6 +172,7 @@ export interface ExamFormData {
   name: string
   description: string
   duration: number
+  coverUrl?: string
   collaboratorIds?: string[]
   collaboratorDeptIds?: string[]
   batchId?: string
@@ -386,6 +388,8 @@ export interface EvaluationMethod {
   name: string
   enabled: boolean
   relatedTaskIds: string[]
+  description?: string
+  docLink?: string
 }
 
 // 场景任务
@@ -424,9 +428,13 @@ export interface JobAbilityResult {
   positionCode: string
   studentName: string
   studentId: string
+  className?: string
+  major?: string
+  department?: string
   totalAbilityPoints: number
   achievedAbilityPoints: number
   achievementRate: number // 0-100
+  grade?: string
   evaluationTime: Date
 }
 
@@ -730,4 +738,100 @@ export interface TopicApplication {
   appliedAt: Date
   allocatedAdvisorId?: string
   allocatedAdvisorName?: string
+}
+
+
+// ==================== 场景任务评价相关（从 zhiyu-scene 迁移）====================
+
+export interface SceneGradingStudent {
+  id: string
+  name: string
+  studentNumber: string
+  class: string
+  department: string
+  enrollmentYear: number
+}
+
+export interface SceneGradingSubmission {
+  id: string
+  studentId: string
+  scenarioId: string
+  scenarioName: string
+  taskId: string
+  taskName: string
+  assessmentForm: string
+  status: 'pending' | 'graded'
+  submittedAt: string
+  maxScore: number
+}
+
+export interface SceneGradingScenario {
+  id: string
+  name: string
+  code: string
+  positionName?: string
+  tasks: {
+    id: string
+    name: string
+    code: string
+    taskType: 'assessment' | 'training'
+    assessmentForm?: string
+  }[]
+}
+
+// ==================== 在线课堂评价相关 ====================
+
+export interface OnlineClassroomStudent {
+  id: string
+  name: string
+  studentNumber: string
+  className: string
+  enrollmentYear: number
+  status: 'pending' | 'graded'
+  submittedAt?: string
+  score?: number
+}
+
+export interface OnlineClassroom {
+  id: string
+  name: string
+  code: string
+  category: string
+  teacherName: string
+  studentCount: number
+  pendingCount: number
+  gradedCount: number
+  students: OnlineClassroomStudent[]
+}
+
+// ==================== 智慧课程评价相关 ====================
+
+export interface SmartCourseChapter {
+  id: string
+  name: string
+  order: number
+  studentCount: number
+  pendingCount: number
+  gradedCount: number
+}
+
+export interface SmartCourseStudent {
+  id: string
+  name: string
+  studentNumber: string
+  className: string
+  enrollmentYear: number
+  status: 'pending' | 'graded'
+  submittedAt?: string
+  score?: number
+}
+
+export interface SmartCourse {
+  id: string
+  name: string
+  code: string
+  category: string
+  teacherName: string
+  chapters: SmartCourseChapter[]
+  students: SmartCourseStudent[]
 }

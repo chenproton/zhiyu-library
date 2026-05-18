@@ -205,6 +205,7 @@ export const mockQuestions: Question[] = [
   {
     id: 'q-1-1',
       bankId: 'draft-pool',
+        source: '场景任务',
     type: 'single',
     content: 'JavaScript 中，typeof null 的返回值是什么？',
     options: ['null', 'undefined', 'object', 'number'],
@@ -219,6 +220,7 @@ export const mockQuestions: Question[] = [
   {
     id: 'q-1-2',
       bankId: 'draft-pool',
+        source: '数字课程',
     type: 'multiple',
     content: '以下哪些是 JavaScript 的原始数据类型？',
     options: ['String', 'Number', 'Object', 'Boolean', 'Symbol', 'Array'],
@@ -233,6 +235,7 @@ export const mockQuestions: Question[] = [
   {
     id: 'q-1-3',
       bankId: 'draft-pool',
+        source: '试卷',
     type: 'judge',
     content: 'let 和 const 声明的变量不存在变量提升。',
     answer: 'false',
@@ -246,6 +249,7 @@ export const mockQuestions: Question[] = [
   {
     id: 'q-1-4',
       bankId: 'draft-pool',
+        source: '其他来源',
     type: 'fill',
     content: 'Promise 的三种状态分别是 pending、______ 和 ______。',
     answer: ['fulfilled', 'rejected'],
@@ -259,6 +263,7 @@ export const mockQuestions: Question[] = [
   {
     id: 'q-1-5',
       bankId: 'draft-pool',
+        source: '场景任务',
     type: 'essay',
     content: '请简述 JavaScript 事件循环（Event Loop）的工作原理。',
     answer: '参考答案：JavaScript 事件循环是处理异步操作的机制...',
@@ -272,6 +277,7 @@ export const mockQuestions: Question[] = [
   {
     id: 'q-1-6',
       bankId: 'draft-pool',
+        source: '数字课程',
     type: 'single',
     content: '以下代码的输出结果是什么？\nconsole.log(1 + "2" + 3)',
     options: ['6', '123', '"123"', 'NaN'],
@@ -286,6 +292,7 @@ export const mockQuestions: Question[] = [
   {
     id: 'q-1-7',
       bankId: 'draft-pool',
+        source: '试卷',
     type: 'single',
     content: 'JavaScript 中 == 和 === 的主要区别是什么？',
     options: ['没有区别', '=== 比较类型，== 不比较', '=== 会进行类型转换', '== 会进行类型转换，=== 不会'],
@@ -300,6 +307,7 @@ export const mockQuestions: Question[] = [
   {
     id: 'q-1-8',
       bankId: 'draft-pool',
+        source: '其他来源',
     type: 'multiple',
     content: '以下哪些方法可以创建数组的浅拷贝？',
     options: ['Array.from()', 'slice()', 'spread operator (...)', 'concat()', 'JSON.parse(JSON.stringify())'],
@@ -1330,7 +1338,11 @@ export const mockExams: Exam[] = [
     version: 'v0.1.0',
     ownerType: 'public',
     creatorId: 'user-3',
-    questions: [],
+    questions: [
+      { id: 'eq-3-1', questionId: 'q-3-1', type: 'single', content: '以下哪个命令用于初始化一个新的Node.js项目？', options: ['npm start', 'npm init', 'npm install', 'npm run'], answer: 'npm init', analysis: 'npm init 用于创建 package.json 文件', score: 10, order: 1 },
+      { id: 'eq-3-2', questionId: 'q-3-2', type: 'multiple', content: '全栈开发中常用的数据库有哪些？', options: ['MySQL', 'MongoDB', 'Redis', 'Oracle', 'SQLite'], answer: ['MySQL', 'MongoDB', 'Redis'], analysis: '常用的全栈数据库包括关系型和非关系型', score: 15, order: 2 },
+      { id: 'eq-3-3', questionId: 'q-3-3', type: 'essay', content: '简述 RESTful API 设计原则。', answer: 'RESTful API 设计应遵循资源导向、统一接口、无状态等原则', analysis: '应包含 URI 设计、HTTP 方法、状态码等内容', score: 25, order: 3 },
+    ],
     createdAt: new Date('2024-03-25'),
     updatedAt: new Date('2024-03-25'),
   },
@@ -1346,7 +1358,11 @@ export const mockExams: Exam[] = [
     version: 'v0.1.0',
     ownerType: 'mine',
     creatorId: 'user-1',
-    questions: [],
+    questions: [
+      { id: 'eq-4-1', questionId: 'q-4-1', type: 'single', content: 'Vue3 中组合式 API 的入口函数是？', options: ['createApp', 'setup', 'defineComponent', 'ref'], answer: 'setup', analysis: 'setup 是组合式 API 的核心入口', score: 10, order: 1 },
+      { id: 'eq-4-2', questionId: 'q-4-2', type: 'multiple', content: 'Vue3 的响应式 API 包括哪些？', options: ['ref', 'reactive', 'computed', 'watch', 'data'], answer: ['ref', 'reactive', 'computed', 'watch'], analysis: 'data 是选项式 API 的属性', score: 15, order: 2 },
+      { id: 'eq-4-3', questionId: 'q-4-3', type: 'essay', content: '简述 Vue3 中 Composition API 与 Options API 的区别。', answer: 'Composition API 通过函数组织逻辑，更适合大型项目', analysis: '应从代码组织、逻辑复用、TypeScript 支持等角度回答', score: 20, order: 3 },
+    ],
     createdAt: new Date('2024-03-01'),
     updatedAt: new Date('2024-03-01'),
   },
@@ -1362,7 +1378,10 @@ export const mockExams: Exam[] = [
     version: 'v0.8.0',
     ownerType: 'collaborate',
     creatorId: 'user-2',
-    questions: [],
+    questions: [
+      { id: 'eq-5-1', questionId: 'q-5-1', type: 'single', content: 'MySQL 中 InnoDB 存储引擎默认的隔离级别是？', options: ['READ UNCOMMITTED', 'READ COMMITTED', 'REPEATABLE READ', 'SERIALIZABLE'], answer: 'REPEATABLE READ', analysis: 'InnoDB 默认使用可重复读隔离级别', score: 10, order: 1 },
+      { id: 'eq-5-2', questionId: 'q-5-2', type: 'multiple', content: '以下哪些属于数据库索引类型？', options: ['B-Tree', 'Hash', 'Bitmap', 'Full-text', 'Stack'], answer: ['B-Tree', 'Hash', 'Bitmap', 'Full-text'], analysis: 'Stack 不是数据库索引类型', score: 15, order: 2 },
+    ],
     createdAt: new Date('2024-03-05'),
     updatedAt: new Date('2024-03-15'),
   },
@@ -1377,7 +1396,10 @@ export const mockExams: Exam[] = [
     version: 'v1.0.0',
     ownerType: 'public',
     creatorId: 'user-3',
-    questions: [],
+    questions: [
+      { id: 'eq-6-1', questionId: 'q-6-1', type: 'single', content: 'OWASP Top 10 中排名第一的安全风险是？', options: ['注入', '失效的访问控制', '敏感数据泄露', 'XXE'], answer: '失效的访问控制', analysis: '2021 年 OWASP Top 10 中失效的访问控制排名第一', score: 10, order: 1 },
+      { id: 'eq-6-2', questionId: 'q-6-2', type: 'multiple', content: '常见的 Web 安全漏洞有哪些？', options: ['XSS', 'CSRF', 'SQL注入', '点击劫持', 'DNS劫持'], answer: ['XSS', 'CSRF', 'SQL注入', '点击劫持'], analysis: 'DNS劫持属于网络层攻击', score: 15, order: 2 },
+    ],
     createdAt: new Date('2024-03-10'),
     updatedAt: new Date('2024-03-20'),
   },
@@ -1393,7 +1415,11 @@ export const mockExams: Exam[] = [
     version: 'v1.0.0',
     ownerType: 'mine',
     creatorId: 'user-1',
-    questions: [],
+    questions: [
+      { id: 'eq-7-1', questionId: 'q-7-1', type: 'single', content: 'Python 中用于创建虚拟环境的模块是？', options: ['venv', 'virtualenv', 'env', 'conda'], answer: 'venv', analysis: 'venv 是 Python3 内置的虚拟环境模块', score: 10, order: 1 },
+      { id: 'eq-7-2', questionId: 'q-7-2', type: 'multiple', content: 'Python 中的可变数据类型有哪些？', options: ['list', 'tuple', 'dict', 'set', 'str'], answer: ['list', 'dict', 'set'], analysis: 'tuple 和 str 是不可变类型', score: 15, order: 2 },
+      { id: 'eq-7-3', questionId: 'q-7-3', type: 'essay', content: '简述 Python 中的装饰器及其使用场景。', answer: '装饰器是一种高阶函数，用于扩展函数功能', analysis: '应从语法、应用场景、常见内置装饰器等方面回答', score: 20, order: 3 },
+    ],
     createdAt: new Date('2024-03-12'),
     updatedAt: new Date('2024-03-22'),
   },
@@ -1409,7 +1435,10 @@ export const mockExams: Exam[] = [
     version: 'v0.5.0',
     ownerType: 'collaborate',
     creatorId: 'user-2',
-    questions: [],
+    questions: [
+      { id: 'eq-8-1', questionId: 'q-8-1', type: 'single', content: 'Docker 中用于查看正在运行容器的命令是？', options: ['docker ps', 'docker images', 'docker run', 'docker build'], answer: 'docker ps', analysis: 'docker ps 列出所有正在运行的容器', score: 10, order: 1 },
+      { id: 'eq-8-2', questionId: 'q-8-2', type: 'multiple', content: 'DevOps 常用的 CI/CD 工具有哪些？', options: ['Jenkins', 'GitLab CI', 'GitHub Actions', 'Travis CI', 'Webpack'], answer: ['Jenkins', 'GitLab CI', 'GitHub Actions', 'Travis CI'], analysis: 'Webpack 是构建工具，不是 CI/CD 工具', score: 15, order: 2 },
+    ],
     createdAt: new Date('2024-03-15'),
     updatedAt: new Date('2024-03-18'),
   },
@@ -1424,7 +1453,10 @@ export const mockExams: Exam[] = [
     version: 'v0.1.0',
     ownerType: 'public',
     creatorId: 'user-4',
-    questions: [],
+    questions: [
+      { id: 'eq-9-1', questionId: 'q-9-1', type: 'single', content: 'CSS 中用于创建弹性布局的属性是？', options: ['display: grid', 'display: flex', 'display: block', 'display: inline'], answer: 'display: flex', analysis: 'Flexbox 通过 display: flex 启用', score: 10, order: 1 },
+      { id: 'eq-9-2', questionId: 'q-9-2', type: 'multiple', content: 'CSS Grid 布局中常用的属性有哪些？', options: ['grid-template-columns', 'grid-template-rows', 'grid-gap', 'justify-content', 'float'], answer: ['grid-template-columns', 'grid-template-rows', 'grid-gap', 'justify-content'], analysis: 'float 不是 Grid 布局的属性', score: 15, order: 2 },
+    ],
     createdAt: new Date('2024-03-18'),
     updatedAt: new Date('2024-03-18'),
   },
@@ -1440,7 +1472,11 @@ export const mockExams: Exam[] = [
     version: 'v2.0.0',
     ownerType: 'mine',
     creatorId: 'user-1',
-    questions: [],
+    questions: [
+      { id: 'eq-10-1', questionId: 'q-10-1', type: 'single', content: 'HTTP 状态码 500 表示？', options: ['请求成功', '未授权', '服务器内部错误', '请求超时'], answer: '服务器内部错误', analysis: '500 Internal Server Error', score: 10, order: 1 },
+      { id: 'eq-10-2', questionId: 'q-10-2', type: 'multiple', content: '前后端分离架构的优势有哪些？', options: ['开发效率高', '技术栈独立', '部署灵活', '利于扩展', '耦合度高'], answer: ['开发效率高', '技术栈独立', '部署灵活', '利于扩展'], analysis: '前后端分离降低了耦合度', score: 15, order: 2 },
+      { id: 'eq-10-3', questionId: 'q-10-3', type: 'essay', content: '简述微服务架构的核心特点与挑战。', answer: '微服务架构将应用拆分为小型、独立的服务', analysis: '应从服务拆分、通信、数据管理、运维挑战等角度回答', score: 25, order: 3 },
+    ],
     createdAt: new Date('2024-03-20'),
     updatedAt: new Date('2024-03-25'),
   },
@@ -1450,16 +1486,16 @@ import type { CertificationRule, AbilityItem, RelatedTask, Position } from './ty
 
 // 可选任务列表（用于任务选择器）
 export const availableTasks: RelatedTask[] = [
-  { id: 'task-1', name: '前端基础知识测试', maxScore: 100, weight: 0 },
-  { id: 'task-2', name: 'JavaScript 编程实践', maxScore: 100, weight: 0 },
-  { id: 'task-3', name: 'React 框架应用', maxScore: 100, weight: 0 },
-  { id: 'task-4', name: 'CSS 布局与样式', maxScore: 100, weight: 0 },
-  { id: 'task-5', name: '项目实战考核', maxScore: 150, weight: 0 },
-  { id: 'task-6', name: '代码审查能力测试', maxScore: 100, weight: 0 },
-  { id: 'task-7', name: '技术文档撰写', maxScore: 80, weight: 0 },
-  { id: 'task-8', name: '团队协作评估', maxScore: 100, weight: 0 },
-  { id: 'task-9', name: '性能优化实践', maxScore: 100, weight: 0 },
-  { id: 'task-10', name: '安全编码规范', maxScore: 100, weight: 0 },
+  { id: 'task-1', name: 'Web前端实训室-前端基础知识测试', maxScore: 100, weight: 0 },
+  { id: 'task-2', name: '软件工程实训室-JavaScript编程实践', maxScore: 100, weight: 0 },
+  { id: 'task-3', name: 'React专项训练室-React框架应用', maxScore: 100, weight: 0 },
+  { id: 'task-4', name: 'Web前端实训室-CSS布局与样式', maxScore: 100, weight: 0 },
+  { id: 'task-5', name: '项目评审室-项目实战考核', maxScore: 150, weight: 0 },
+  { id: 'task-6', name: '软件工程实训室-代码审查能力测试', maxScore: 100, weight: 0 },
+  { id: 'task-7', name: '在线学习平台-技术文档撰写', maxScore: 80, weight: 0 },
+  { id: 'task-8', name: '协作学习空间-团队协作评估', maxScore: 100, weight: 0 },
+  { id: 'task-9', name: 'Web前端实训室-性能优化实践', maxScore: 100, weight: 0 },
+  { id: 'task-10', name: '软件工程实训室-安全编码规范', maxScore: 100, weight: 0 },
 ]
 
 // 能力项数据
@@ -1484,8 +1520,8 @@ export const abilityItems: AbilityItem[] = [
           { level: '精通', min: 96, max: 100 },
         ],
         relatedTasks: [
-          { id: 'task-1', name: '前端基础知识测试', maxScore: 100, weight: 60 },
-          { id: 'task-7', name: '技术文档撰写', maxScore: 80, weight: 40 },
+          { id: 'task-1', name: 'Web前端实训室-前端基础知识测试', maxScore: 100, weight: 60 },
+          { id: 'task-7', name: '在线学习平台-技术文档撰写', maxScore: 80, weight: 40 },
         ],
       },
       {
@@ -1521,17 +1557,17 @@ export const abilityItems: AbilityItem[] = [
         relatedTasks: [
           {
             id: 'task-2',
-            name: 'JavaScript 编程实践',
+            name: '软件工程实训室-JavaScript编程实践',
             maxScore: 100,
             weight: 50,
           },
-          { id: 'task-5', name: '项目实战考核', maxScore: 150, weight: 30 },
-          { id: 'task-9', name: '性能优化实践', maxScore: 100, weight: 20 },
+          { id: 'task-5', name: '项目评审室-项目实战考核', maxScore: 150, weight: 30 },
+          { id: 'task-9', name: 'Web前端实训室-性能优化实践', maxScore: 100, weight: 20 },
         ],
       },
       {
         id: 'point-2-2',
-        name: 'React 框架应用',
+        name: 'React专项训练室-React框架应用',
         description:
           '熟练使用 React 框架进行组件化开发，理解虚拟 DOM、Hooks、状态管理等核心概念。',
         mappingType: 'custom',
@@ -1545,8 +1581,8 @@ export const abilityItems: AbilityItem[] = [
           { level: '精通', min: 93, max: 100 },
         ],
         relatedTasks: [
-          { id: 'task-3', name: 'React 框架应用', maxScore: 100, weight: 70 },
-          { id: 'task-5', name: '项目实战考核', maxScore: 150, weight: 30 },
+          { id: 'task-3', name: 'React专项训练室-React框架应用', maxScore: 100, weight: 70 },
+          { id: 'task-5', name: '项目评审室-项目实战考核', maxScore: 150, weight: 30 },
         ],
       },
       {
@@ -1557,7 +1593,7 @@ export const abilityItems: AbilityItem[] = [
         mappingType: 'inherit',
         requiredLevel: '掌握',
         relatedTasks: [
-          { id: 'task-4', name: 'CSS 布局与样式', maxScore: 100, weight: 100 },
+          { id: 'task-4', name: 'Web前端实训室-CSS布局与样式', maxScore: 100, weight: 100 },
         ],
       },
     ],
@@ -1582,7 +1618,7 @@ export const abilityItems: AbilityItem[] = [
           { level: '精通', min: 96, max: 100 },
         ],
         relatedTasks: [
-          { id: 'task-8', name: '团队协作评估', maxScore: 100, weight: 100 },
+          { id: 'task-8', name: '协作学习空间-团队协作评估', maxScore: 100, weight: 100 },
         ],
       },
       {
@@ -1593,14 +1629,100 @@ export const abilityItems: AbilityItem[] = [
         mappingType: 'inherit',
         requiredLevel: '理解',
         relatedTasks: [
-          { id: 'task-7', name: '技术文档撰写', maxScore: 80, weight: 100 },
+          { id: 'task-7', name: '在线学习平台-技术文档撰写', maxScore: 80, weight: 100 },
         ],
       },
     ],
   },
 ]
 
-// 初始认证规则数据
+// 各岗位能力项映射（用于学生能力画像弹窗岗位切换）
+export const positionAbilityItemsMap: Record<string, AbilityItem[]> = {
+  'pos-1': abilityItems,
+  'pos-2': [
+    {
+      id: 'be-item-1',
+      name: '后端基础',
+      abilityPoints: [
+        { id: 'be-p1-1', name: 'Java/Python 语言基础', description: '掌握至少一门后端编程语言', mappingType: 'inherit', requiredLevel: '熟练', relatedTasks: [{ id: 't1', name: '后端实训室-语言基础测试', maxScore: 100, weight: 100 }] },
+        { id: 'be-p1-2', name: '数据结构与算法', description: '理解常用数据结构和算法', mappingType: 'inherit', requiredLevel: '掌握', relatedTasks: [{ id: 't2', name: '算法训练室-数据结构考核', maxScore: 100, weight: 100 }] },
+      ],
+    },
+    {
+      id: 'be-item-2',
+      name: '数据库与中间件',
+      abilityPoints: [
+        { id: 'be-p2-1', name: 'MySQL/PostgreSQL', description: '掌握关系型数据库设计和优化', mappingType: 'inherit', requiredLevel: '熟练', relatedTasks: [{ id: 't3', name: '数据库实训室-SQL优化', maxScore: 100, weight: 100 }] },
+        { id: 'be-p2-2', name: 'Redis 缓存', description: '掌握缓存设计和使用', mappingType: 'inherit', requiredLevel: '掌握', relatedTasks: [{ id: 't4', name: '中间件实训室-Redis应用', maxScore: 100, weight: 100 }] },
+        { id: 'be-p2-3', name: '消息队列', description: '理解消息队列原理和应用', mappingType: 'inherit', requiredLevel: '理解', relatedTasks: [{ id: 't5', name: '分布式实训室-消息队列实践', maxScore: 100, weight: 100 }] },
+      ],
+    },
+    {
+      id: 'be-item-3',
+      name: '系统架构',
+      abilityPoints: [
+        { id: 'be-p3-1', name: '微服务设计', description: '掌握微服务架构设计', mappingType: 'inherit', requiredLevel: '掌握', relatedTasks: [{ id: 't6', name: '架构实训室-微服务设计', maxScore: 100, weight: 100 }] },
+        { id: 'be-p3-2', name: 'API 设计规范', description: '掌握 RESTful API 设计', mappingType: 'inherit', requiredLevel: '熟练', relatedTasks: [{ id: 't7', name: '接口实训室-API设计', maxScore: 100, weight: 100 }] },
+      ],
+    },
+  ],
+  'pos-3': [
+    {
+      id: 'pm-item-1',
+      name: '产品思维',
+      abilityPoints: [
+        { id: 'pm-p1-1', name: '用户研究', description: '掌握用户调研和需求分析方法', mappingType: 'inherit', requiredLevel: '熟练', relatedTasks: [{ id: 't1', name: '产品实训室-用户调研', maxScore: 100, weight: 100 }] },
+        { id: 'pm-p1-2', name: '竞品分析', description: '能够进行竞品分析和市场洞察', mappingType: 'inherit', requiredLevel: '掌握', relatedTasks: [{ id: 't2', name: '市场分析室-竞品报告', maxScore: 100, weight: 100 }] },
+      ],
+    },
+    {
+      id: 'pm-item-2',
+      name: '产品设计',
+      abilityPoints: [
+        { id: 'pm-p2-1', name: '原型设计', description: '熟练使用原型设计工具', mappingType: 'inherit', requiredLevel: '熟练', relatedTasks: [{ id: 't3', name: '设计实训室-原型制作', maxScore: 100, weight: 100 }] },
+        { id: 'pm-p2-2', name: 'PRD 撰写', description: '能够编写清晰的产品需求文档', mappingType: 'inherit', requiredLevel: '掌握', relatedTasks: [{ id: 't4', name: '文档实训室-PRD撰写', maxScore: 100, weight: 100 }] },
+        { id: 'pm-p2-3', name: '数据分析', description: '掌握产品数据分析方法', mappingType: 'inherit', requiredLevel: '理解', relatedTasks: [{ id: 't5', name: '数据实训室-产品数据分析', maxScore: 100, weight: 100 }] },
+      ],
+    },
+    {
+      id: 'pm-item-3',
+      name: '项目管理',
+      abilityPoints: [
+        { id: 'pm-p3-1', name: '敏捷开发', description: '熟悉 Scrum 等敏捷开发方法', mappingType: 'inherit', requiredLevel: '掌握', relatedTasks: [{ id: 't6', name: '敏捷实训室-Scrum实践', maxScore: 100, weight: 100 }] },
+        { id: 'pm-p3-2', name: '跨部门协作', description: '具备跨团队沟通协调能力', mappingType: 'inherit', requiredLevel: '熟练', relatedTasks: [{ id: 't7', name: '协作实训室-跨部门沟通', maxScore: 100, weight: 100 }] },
+      ],
+    },
+  ],
+  'pos-4': [
+    {
+      id: 'ui-item-1',
+      name: '设计基础',
+      abilityPoints: [
+        { id: 'ui-p1-1', name: '色彩理论', description: '掌握色彩搭配和视觉层次', mappingType: 'inherit', requiredLevel: '熟练', relatedTasks: [{ id: 't1', name: '美术实训室-色彩构成', maxScore: 100, weight: 100 }] },
+        { id: 'ui-p1-2', name: '排版布局', description: '掌握字体、间距、网格系统', mappingType: 'inherit', requiredLevel: '熟练', relatedTasks: [{ id: 't2', name: '排版实训室-版式设计', maxScore: 100, weight: 100 }] },
+      ],
+    },
+    {
+      id: 'ui-item-2',
+      name: '工具技能',
+      abilityPoints: [
+        { id: 'ui-p2-1', name: 'Figma/Sketch', description: '熟练使用主流设计工具', mappingType: 'inherit', requiredLevel: '熟练', relatedTasks: [{ id: 't3', name: '软件实训室-Figma高保真', maxScore: 100, weight: 100 }] },
+        { id: 'ui-p2-2', name: '动效设计', description: '掌握交互动效设计', mappingType: 'inherit', requiredLevel: '掌握', relatedTasks: [{ id: 't4', name: '动效实训室-AE动画制作', maxScore: 100, weight: 100 }] },
+        { id: 'ui-p2-3', name: '设计规范', description: '能够建立和维护设计系统', mappingType: 'inherit', requiredLevel: '掌握', relatedTasks: [{ id: 't5', name: '规范实训室-组件库搭建', maxScore: 100, weight: 100 }] },
+      ],
+    },
+    {
+      id: 'ui-item-3',
+      name: '用户体验',
+      abilityPoints: [
+        { id: 'ui-p3-1', name: '交互设计', description: '掌握交互设计原则和方法', mappingType: 'inherit', requiredLevel: '熟练', relatedTasks: [{ id: 't6', name: '交互实训室-可用性测试', maxScore: 100, weight: 100 }] },
+        { id: 'ui-p3-2', name: '用户同理心', description: '具备用户需求洞察能力', mappingType: 'inherit', requiredLevel: '掌握', relatedTasks: [{ id: 't7', name: '用户实训室-用户画像', maxScore: 100, weight: 100 }] },
+      ],
+    },
+  ],
+}
+
+// 初始认定规则数据
 export const initialRule: CertificationRule = {
   id: 'rule-1',
   positionName: '前端开发工程师',
@@ -1715,24 +1837,294 @@ export const positionsList: Position[] = [
 
 // 岗位能力测评结果模拟数据
 export const mockJobAbilityResults: JobAbilityResult[] = [
-  { id: 'jar-1', positionId: 'pos-1', positionName: '前端开发工程师', positionCode: 'FE-001', studentName: '张小明', studentId: 'stu-001', totalAbilityPoints: 12, achievedAbilityPoints: 10, achievementRate: 83, evaluationTime: new Date('2024-03-15 10:00') },
-  { id: 'jar-2', positionId: 'pos-1', positionName: '前端开发工程师', positionCode: 'FE-001', studentName: '李华', studentId: 'stu-002', totalAbilityPoints: 12, achievedAbilityPoints: 9, achievementRate: 75, evaluationTime: new Date('2024-03-15 10:30') },
-  { id: 'jar-3', positionId: 'pos-1', positionName: '前端开发工程师', positionCode: 'FE-001', studentName: '王芳', studentId: 'stu-003', totalAbilityPoints: 12, achievedAbilityPoints: 11, achievementRate: 92, evaluationTime: new Date('2024-03-16 09:00') },
-  { id: 'jar-4', positionId: 'pos-1', positionName: '前端开发工程师', positionCode: 'FE-001', studentName: '赵强', studentId: 'stu-004', totalAbilityPoints: 12, achievedAbilityPoints: 7, achievementRate: 58, evaluationTime: new Date('2024-03-16 14:00') },
-  { id: 'jar-5', positionId: 'pos-2', positionName: '后端开发工程师', positionCode: 'BE-001', studentName: '张小明', studentId: 'stu-001', totalAbilityPoints: 15, achievedAbilityPoints: 12, achievementRate: 80, evaluationTime: new Date('2024-03-20 10:00') },
-  { id: 'jar-6', positionId: 'pos-2', positionName: '后端开发工程师', positionCode: 'BE-001', studentName: '李华', studentId: 'stu-002', totalAbilityPoints: 15, achievedAbilityPoints: 13, achievementRate: 87, evaluationTime: new Date('2024-03-20 11:00') },
-  { id: 'jar-7', positionId: 'pos-2', positionName: '后端开发工程师', positionCode: 'BE-001', studentName: '王芳', studentId: 'stu-003', totalAbilityPoints: 15, achievedAbilityPoints: 14, achievementRate: 93, evaluationTime: new Date('2024-03-21 09:30') },
-  { id: 'jar-8', positionId: 'pos-3', positionName: '产品经理', positionCode: 'PM-001', studentName: '赵强', studentId: 'stu-004', totalAbilityPoints: 8, achievedAbilityPoints: 6, achievementRate: 75, evaluationTime: new Date('2024-03-22 10:00') },
-  { id: 'jar-9', positionId: 'pos-3', positionName: '产品经理', positionCode: 'PM-001', studentName: '孙丽', studentId: 'stu-005', totalAbilityPoints: 8, achievedAbilityPoints: 7, achievementRate: 88, evaluationTime: new Date('2024-03-22 11:00') },
-  { id: 'jar-10', positionId: 'pos-4', positionName: 'UI设计师', positionCode: 'UI-001', studentName: '孙丽', studentId: 'stu-005', totalAbilityPoints: 10, achievedAbilityPoints: 9, achievementRate: 90, evaluationTime: new Date('2024-03-25 09:00') },
-  { id: 'jar-11', positionId: 'pos-4', positionName: 'UI设计师', positionCode: 'UI-001', studentName: '周杰', studentId: 'stu-006', totalAbilityPoints: 10, achievedAbilityPoints: 8, achievementRate: 80, evaluationTime: new Date('2024-03-25 10:00') },
-  { id: 'jar-12', positionId: 'pos-5', positionName: '测试工程师', positionCode: 'QA-001', studentName: '吴敏', studentId: 'stu-007', totalAbilityPoints: 9, achievedAbilityPoints: 7, achievementRate: 78, evaluationTime: new Date('2024-03-28 09:00') },
-  { id: 'jar-13', positionId: 'pos-6', positionName: '运维工程师', positionCode: 'OPS-001', studentName: '郑伟', studentId: 'stu-008', totalAbilityPoints: 11, achievedAbilityPoints: 9, achievementRate: 82, evaluationTime: new Date('2024-04-01 10:00') },
-  { id: 'jar-14', positionId: 'pos-7', positionName: '数据分析师', positionCode: 'DA-001', studentName: '钱红', studentId: 'stu-009', totalAbilityPoints: 7, achievedAbilityPoints: 5, achievementRate: 71, evaluationTime: new Date('2024-04-02 09:00') },
-  { id: 'jar-15', positionId: 'pos-8', positionName: '项目经理', positionCode: 'PJM-001', studentName: '冯刚', studentId: 'stu-010', totalAbilityPoints: 6, achievedAbilityPoints: 5, achievementRate: 83, evaluationTime: new Date('2024-04-05 10:00') },
-  { id: 'jar-16', positionId: 'pos-1', positionName: '前端开发工程师', positionCode: 'FE-001', studentName: '陈静', studentId: 'stu-011', totalAbilityPoints: 12, achievedAbilityPoints: 8, achievementRate: 67, evaluationTime: new Date('2024-04-08 09:00') },
-  { id: 'jar-17', positionId: 'pos-2', positionName: '后端开发工程师', positionCode: 'BE-001', studentName: '陈静', studentId: 'stu-011', totalAbilityPoints: 15, achievedAbilityPoints: 10, achievementRate: 67, evaluationTime: new Date('2024-04-10 10:00') },
-  { id: 'jar-18', positionId: 'pos-9', positionName: '技术总监', positionCode: 'CTO-001', studentName: '张小明', studentId: 'stu-001', totalAbilityPoints: 0, achievedAbilityPoints: 0, achievementRate: 0, evaluationTime: new Date('2024-04-12 09:00') },
+    {
+    id: 'jar-1',
+    positionId: 'pos-1',
+    positionName: '前端开发工程师',
+    positionCode: 'FE-001',
+    studentName: '张小明',
+    studentId: 'stu-001',
+    totalAbilityPoints: 12,
+    achievedAbilityPoints: 10,
+    achievementRate: 83,
+    className: '2021级前端开发1班',
+    major: '软件工程',
+    department: '软件学院',
+    grade: 'A+',
+    evaluationTime: new Date('2024-03-15 10:00'),
+  },
+    {
+    id: 'jar-2',
+    positionId: 'pos-1',
+    positionName: '前端开发工程师',
+    positionCode: 'FE-001',
+    studentName: '李华',
+    studentId: 'stu-002',
+    totalAbilityPoints: 12,
+    achievedAbilityPoints: 9,
+    achievementRate: 75,
+    className: '2021级前端开发1班',
+    major: '软件工程',
+    department: '软件学院',
+    grade: 'A',
+    evaluationTime: new Date('2024-03-15 10:30'),
+  },
+    {
+    id: 'jar-3',
+    positionId: 'pos-1',
+    positionName: '前端开发工程师',
+    positionCode: 'FE-001',
+    studentName: '王芳',
+    studentId: 'stu-003',
+    totalAbilityPoints: 12,
+    achievedAbilityPoints: 11,
+    achievementRate: 92,
+    className: '2021级前端开发2班',
+    major: '计算机科学',
+    department: '计算机学院',
+    grade: 'B+',
+    evaluationTime: new Date('2024-03-16 09:00'),
+  },
+    {
+    id: 'jar-4',
+    positionId: 'pos-1',
+    positionName: '前端开发工程师',
+    positionCode: 'FE-001',
+    studentName: '赵强',
+    studentId: 'stu-004',
+    totalAbilityPoints: 12,
+    achievedAbilityPoints: 7,
+    achievementRate: 58,
+    className: '2021级后端开发1班',
+    major: '计算机科学',
+    department: '计算机学院',
+    grade: 'B',
+    evaluationTime: new Date('2024-03-16 14:00'),
+  },
+    {
+    id: 'jar-5',
+    positionId: 'pos-2',
+    positionName: '后端开发工程师',
+    positionCode: 'BE-001',
+    studentName: '张小明',
+    studentId: 'stu-001',
+    totalAbilityPoints: 15,
+    achievedAbilityPoints: 12,
+    achievementRate: 80,
+    className: '2021级后端开发1班',
+    major: '计算机科学',
+    department: '计算机学院',
+    grade: 'C',
+    evaluationTime: new Date('2024-03-20 10:00'),
+  },
+    {
+    id: 'jar-6',
+    positionId: 'pos-2',
+    positionName: '后端开发工程师',
+    positionCode: 'BE-001',
+    studentName: '李华',
+    studentId: 'stu-002',
+    totalAbilityPoints: 15,
+    achievedAbilityPoints: 13,
+    achievementRate: 87,
+    className: '2021级后端开发2班',
+    major: '软件工程',
+    department: '软件学院',
+    grade: 'A',
+    evaluationTime: new Date('2024-03-20 11:00'),
+  },
+    {
+    id: 'jar-7',
+    positionId: 'pos-2',
+    positionName: '后端开发工程师',
+    positionCode: 'BE-001',
+    studentName: '王芳',
+    studentId: 'stu-003',
+    totalAbilityPoints: 15,
+    achievedAbilityPoints: 14,
+    achievementRate: 93,
+    className: '2021级全栈开发班',
+    major: '软件工程',
+    department: '软件学院',
+    grade: 'B+',
+    evaluationTime: new Date('2024-03-21 09:30'),
+  },
+    {
+    id: 'jar-8',
+    positionId: 'pos-3',
+    positionName: '产品经理',
+    positionCode: 'PM-001',
+    studentName: '赵强',
+    studentId: 'stu-004',
+    totalAbilityPoints: 8,
+    achievedAbilityPoints: 6,
+    achievementRate: 75,
+    className: '2021级产品设计班',
+    major: '数字媒体',
+    department: '设计学院',
+    grade: 'A',
+    evaluationTime: new Date('2024-03-22 10:00'),
+  },
+    {
+    id: 'jar-9',
+    positionId: 'pos-3',
+    positionName: '产品经理',
+    positionCode: 'PM-001',
+    studentName: '孙丽',
+    studentId: 'stu-005',
+    totalAbilityPoints: 8,
+    achievedAbilityPoints: 7,
+    achievementRate: 88,
+    className: '2021级产品设计班',
+    major: '数字媒体',
+    department: '设计学院',
+    grade: 'B',
+    evaluationTime: new Date('2024-03-22 11:00'),
+  },
+    {
+    id: 'jar-10',
+    positionId: 'pos-4',
+    positionName: 'UI设计师',
+    positionCode: 'UI-001',
+    studentName: '孙丽',
+    studentId: 'stu-005',
+    totalAbilityPoints: 10,
+    achievedAbilityPoints: 9,
+    achievementRate: 90,
+    className: '2021级测试工程班',
+    major: '软件工程',
+    department: '软件学院',
+    grade: 'A+',
+    evaluationTime: new Date('2024-03-25 09:00'),
+  },
+    {
+    id: 'jar-11',
+    positionId: 'pos-4',
+    positionName: 'UI设计师',
+    positionCode: 'UI-001',
+    studentName: '周杰',
+    studentId: 'stu-006',
+    totalAbilityPoints: 10,
+    achievedAbilityPoints: 8,
+    achievementRate: 80,
+    className: '2021级测试工程班',
+    major: '软件工程',
+    department: '软件学院',
+    grade: 'B+',
+    evaluationTime: new Date('2024-03-25 10:00'),
+  },
+    {
+    id: 'jar-12',
+    positionId: 'pos-5',
+    positionName: '测试工程师',
+    positionCode: 'QA-001',
+    studentName: '吴敏',
+    studentId: 'stu-007',
+    totalAbilityPoints: 9,
+    achievedAbilityPoints: 7,
+    achievementRate: 78,
+    className: '2021级运维工程班',
+    major: '网络工程',
+    department: '信息学院',
+    grade: 'A',
+    evaluationTime: new Date('2024-03-28 09:00'),
+  },
+    {
+    id: 'jar-13',
+    positionId: 'pos-6',
+    positionName: '运维工程师',
+    positionCode: 'OPS-001',
+    studentName: '郑伟',
+    studentId: 'stu-008',
+    totalAbilityPoints: 11,
+    achievedAbilityPoints: 9,
+    achievementRate: 82,
+    className: '2021级数据分析班',
+    major: '数据科学',
+    department: '数据学院',
+    grade: 'B',
+    evaluationTime: new Date('2024-04-01 10:00'),
+  },
+    {
+    id: 'jar-14',
+    positionId: 'pos-7',
+    positionName: '数据分析师',
+    positionCode: 'DA-001',
+    studentName: '钱红',
+    studentId: 'stu-009',
+    totalAbilityPoints: 7,
+    achievedAbilityPoints: 5,
+    achievementRate: 71,
+    className: '2021级项目管理班',
+    major: '工商管理',
+    department: '管理学院',
+    grade: 'B+',
+    evaluationTime: new Date('2024-04-02 09:00'),
+  },
+    {
+    id: 'jar-15',
+    positionId: 'pos-8',
+    positionName: '项目经理',
+    positionCode: 'PJM-001',
+    studentName: '冯刚',
+    studentId: 'stu-010',
+    totalAbilityPoints: 6,
+    achievedAbilityPoints: 5,
+    achievementRate: 83,
+    className: '2021级前端开发2班',
+    major: '软件工程',
+    department: '软件学院',
+    grade: 'A',
+    evaluationTime: new Date('2024-04-05 10:00'),
+  },
+    {
+    id: 'jar-16',
+    positionId: 'pos-1',
+    positionName: '前端开发工程师',
+    positionCode: 'FE-001',
+    studentName: '陈静',
+    studentId: 'stu-011',
+    totalAbilityPoints: 12,
+    achievedAbilityPoints: 8,
+    achievementRate: 67,
+    className: '2021级后端开发2班',
+    major: '计算机科学',
+    department: '计算机学院',
+    grade: 'B',
+    evaluationTime: new Date('2024-04-08 09:00'),
+  },
+    {
+    id: 'jar-17',
+    positionId: 'pos-2',
+    positionName: '后端开发工程师',
+    positionCode: 'BE-001',
+    studentName: '陈静',
+    studentId: 'stu-011',
+    totalAbilityPoints: 15,
+    achievedAbilityPoints: 10,
+    achievementRate: 67,
+    className: '2021级技术管理班',
+    major: '软件工程',
+    department: '软件学院',
+    grade: 'C',
+    evaluationTime: new Date('2024-04-10 10:00'),
+  },
+    {
+    id: 'jar-18',
+    positionId: 'pos-9',
+    positionName: '技术总监',
+    positionCode: 'CTO-001',
+    studentName: '张小明',
+    studentId: 'stu-001',
+    totalAbilityPoints: 0,
+    achievedAbilityPoints: 0,
+    achievementRate: 0,
+    className: '2021级前端开发1班',
+    major: '软件工程',
+    department: '软件学院',
+    grade: '-',
+    evaluationTime: new Date('2024-04-12 09:00'),
+  },
 ]
 
 
@@ -1795,7 +2187,7 @@ export const mockEvaluationMethods: EvaluationMethod[] = [
   // 综合考核
   { id: 'method-9-1', categoryId: 'cat-9', name: '期末综合测评', enabled: true, relatedTaskIds: ['st-26'] },
   { id: 'method-9-2', categoryId: 'cat-9', name: '项目答辩总评', enabled: true, relatedTaskIds: ['st-27'] },
-  { id: 'method-9-3', categoryId: 'cat-9', name: '职业能力认证', enabled: true, relatedTaskIds: ['st-28'] },
+  { id: 'method-9-3', categoryId: 'cat-9', name: '职业能力认定', enabled: true, relatedTaskIds: ['st-28'] },
 ]
 
 // 场景任务
@@ -1827,7 +2219,7 @@ export const mockSceneTasks: SceneTask[] = [
   { id: 'st-25', name: '技能大赛专家评审', sceneName: '技能大赛赛场', methodIds: ['method-8-2'] },
   { id: 'st-26', name: '学期末综合能力考核', sceneName: '综合测评中心', methodIds: ['method-9-1'] },
   { id: 'st-27', name: '创新项目终期答辩', sceneName: '学术报告厅', methodIds: ['method-9-2'] },
-  { id: 'st-28', name: '前端开发工程师认证', sceneName: '职业能力认证中心', methodIds: ['method-9-3'] },
+  { id: 'st-28', name: '前端开发工程师认定', sceneName: '职业能力认定中心', methodIds: ['method-9-3'] },
 ]
 
 // 场景任务测评结果
@@ -2048,7 +2440,7 @@ export const mockSceneEvaluationResults: SceneEvaluationResult[] = [
   },
   {
     id: 'res-27', methodId: 'method-9-3', evaluationTime: new Date('2024-10-06 09:30'),
-    taskId: 'st-28', taskName: '前端开发工程师认证', sceneName: '职业能力认证中心',
+    taskId: 'st-28', taskName: '前端开发工程师认定', sceneName: '职业能力认定中心',
     evaluateeType: 'student', evaluateeId: 's-17', evaluateeName: '徐明',
     evaluatorIds: ['user-2'], evaluatorNames: ['李四'], score: 90, maxScore: 100,
     evaluatorType: 'teacher',
@@ -2728,4 +3120,64 @@ export const mockTopicApplications: TopicApplication[] = [
   { id: 'app-14', topicId: 'gp-topic-11', topicName: 'VR虚拟现实交互体验设计', studentId: '2021014', studentName: '蒋十六', className: '2021级数字媒体1班', status: 'allocated', applyReason: '对WebXR和虚拟现实技术感兴趣', appliedAt: new Date('2024-02-28'), allocatedAdvisorId: 't3', allocatedAdvisorName: '刘教授' },
   { id: 'app-15', topicId: 'gp-topic-12', topicName: '校园二手交易平台开发', studentId: '2021015', studentName: '沈十七', className: '2021级全栈开发1班', status: 'allocated', applyReason: '全栈开发能力提升需求', appliedAt: new Date('2024-03-01'), allocatedAdvisorId: 't3', allocatedAdvisorName: '李教授' },
   { id: 'app-16', topicId: 'gp-topic-12', topicName: '校园二手交易平台开发', studentId: '2021016', studentName: '韩十八', className: '2021级全栈开发1班', status: 'allocated', applyReason: '希望独立完成完整项目', appliedAt: new Date('2024-03-02'), allocatedAdvisorId: 't3', allocatedAdvisorName: '李教授' },
+]
+
+
+export const sceneGradingStudents = [
+  { id: 'sg-s-1', name: '张三', studentNumber: '2021001', class: '2021级前端开发1班', department: '软件学院', enrollmentYear: 2021 },
+  { id: 'sg-s-2', name: '李四', studentNumber: '2021002', class: '2021级前端开发1班', department: '软件学院', enrollmentYear: 2021 },
+  { id: 'sg-s-3', name: '王五', studentNumber: '2021003', class: '2021级后端开发1班', department: '计算机学院', enrollmentYear: 2021 },
+]
+
+export const sceneGradingScenarios = [
+  {
+    id: 'sg-sc-1', name: 'Web前端开发实训', code: 'FE-001', positionName: '前端开发工程师',
+    tasks: [
+      { id: 'sg-t-1', name: 'HTML/CSS基础考核', code: 'FE-T01', taskType: 'assessment' as const, assessmentForm: '实操' },
+      { id: 'sg-t-2', name: 'JavaScript编程练习', code: 'FE-T02', taskType: 'training' as const },
+    ],
+  },
+  {
+    id: 'sg-sc-2', name: 'Java后端开发实训', code: 'BE-001', positionName: 'Java开发工程师',
+    tasks: [
+      { id: 'sg-t-3', name: 'Spring Boot项目实战', code: 'BE-T01', taskType: 'assessment' as const, assessmentForm: '项目' },
+    ],
+  },
+]
+
+export const sceneGradingSubmissions = [
+  { id: 'sg-sub-1', studentId: 'sg-s-1', scenarioId: 'sg-sc-1', scenarioName: 'Web前端开发实训', taskId: 'sg-t-1', taskName: 'HTML/CSS基础考核', assessmentForm: '实操', status: 'graded' as const, submittedAt: '2024-03-15', maxScore: 100 },
+  { id: 'sg-sub-2', studentId: 'sg-s-2', scenarioId: 'sg-sc-1', scenarioName: 'Web前端开发实训', taskId: 'sg-t-1', taskName: 'HTML/CSS基础考核', assessmentForm: '实操', status: 'pending' as const, submittedAt: '2024-03-16', maxScore: 100 },
+]
+
+export const mockOnlineClassrooms = [
+  {
+    id: 'oc-1', name: '前端开发基础', code: 'OC-FE-001', category: '专业技能', teacherName: '张老师',
+    studentCount: 45, pendingCount: 5, gradedCount: 40,
+    students: [
+      { id: 'oc-s-1', name: '张三', studentNumber: '2021001', className: '2021级前端开发1班', enrollmentYear: 2021, status: 'graded' as const, submittedAt: '2024-03-10', score: 88 },
+      { id: 'oc-s-2', name: '李四', studentNumber: '2021002', className: '2021级前端开发1班', enrollmentYear: 2021, status: 'pending' as const },
+    ],
+  },
+  {
+    id: 'oc-2', name: 'Java后端进阶', code: 'OC-BE-001', category: '专业技能', teacherName: '李老师',
+    studentCount: 38, pendingCount: 8, gradedCount: 30,
+    students: [
+      { id: 'oc-s-3', name: '王五', studentNumber: '2021003', className: '2021级后端开发1班', enrollmentYear: 2021, status: 'graded' as const, submittedAt: '2024-03-12', score: 92 },
+    ],
+  },
+]
+
+export const mockSmartCourses = [
+  {
+    id: 'sc-1', name: 'React进阶实战', code: 'SC-REACT-001', category: '前端框架', teacherName: '张老师',
+    chapters: [
+      { id: 'sc-ch-1', name: 'Hooks深度解析', order: 1, studentCount: 50, pendingCount: 10, gradedCount: 40 },
+      { id: 'sc-ch-2', name: '性能优化策略', order: 2, studentCount: 50, pendingCount: 15, gradedCount: 35 },
+    ],
+    students: [
+      { id: 'sc-s-1', name: '张三', studentNumber: '2021001', className: '2021级前端开发1班', enrollmentYear: 2021, status: 'graded' as const, submittedAt: '2024-03-10', score: 85 },
+      { id: 'sc-s-2', name: '李四', studentNumber: '2021002', className: '2021级前端开发1班', enrollmentYear: 2021, status: 'pending' as const },
+    ],
+  },
 ]

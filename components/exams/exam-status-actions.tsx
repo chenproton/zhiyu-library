@@ -21,6 +21,7 @@ import {
   XCircle,
   Rocket,
   Eye,
+  MonitorPlay,
 } from "lucide-react"
 import type { Status, StatusAction } from "@/lib/types"
 import { canPerformAction } from "@/lib/types"
@@ -31,6 +32,7 @@ interface ExamStatusActionsProps {
   onDelete?: () => void
   onStatusChange: (action: StatusAction) => void
   onView?: () => void
+  onPreview?: () => void
   onCompose?: () => void
   onInvite?: () => void
 }
@@ -81,6 +83,7 @@ export function ExamStatusActions({
   onDelete,
   onStatusChange,
   onView,
+  onPreview,
 }: ExamStatusActionsProps) {
   const [confirmType, setConfirmType] = useState<ConfirmType>(null)
 
@@ -137,6 +140,12 @@ export function ExamStatusActions({
               <DropdownMenuItem onClick={onView}>
                 <Eye />
                 进入试卷
+              </DropdownMenuItem>
+            )}
+            {onPreview && (
+              <DropdownMenuItem onClick={onPreview}>
+                <MonitorPlay />
+                预览试卷
               </DropdownMenuItem>
             )}
             {canEdit && onEdit && (

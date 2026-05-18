@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react"
 import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, Plus, Search, Edit, Trash2, Eye, Upload, Copy, Users, Building2, ImageIcon, List, LayoutGrid } from "lucide-react"
+import { ArrowLeft, Plus, Search, Edit, Trash2, Eye, Upload, Copy, Users, Building2, ImageIcon, List, LayoutGrid, FolderInput } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -48,6 +48,8 @@ export default function QuestionBankDetailPage() {
     createQuestion,
     updateQuestion,
     deleteQuestion,
+    moveQuestions,
+    questionBanks,
   } = useData()
 
   const bank = getQuestionBank(bankId)
@@ -64,6 +66,7 @@ export default function QuestionBankDetailPage() {
   const [deleteConfirm, setDeleteConfirm] = useState<Question | null>(null)
   const [selectedQuestions, setSelectedQuestions] = useState<Set<string>>(new Set())
   const [batchDeleteConfirm, setBatchDeleteConfirm] = useState(false)
+  const [batchMoveOpen, setBatchMoveOpen] = useState(false)
 
   // 获取题目创建人列表
   const creators = useMemo(() => {
@@ -175,6 +178,12 @@ export default function QuestionBankDetailPage() {
       }
     })
     setSelectedQuestions(new Set())
+  }
+
+  const handleBatchMove = (targetBankId: string) => {
+    moveQuestions(Array.from(selectedQuestions), targetBankId)
+    setSelectedQuestions(new Set())
+    setBatchMoveOpen(false)
   }
 
   const handleCopyQuestion = (question: Question) => {
@@ -343,6 +352,10 @@ export default function QuestionBankDetailPage() {
             <Copy className="mr-1 size-3" />
             批量复制
           </Button>
+          <Button variant="outline" size="sm" onClick={() => setBatchMoveOpen(true)}>
+            <FolderInput className="mr-1 size-3" />
+            批量移动
+          </Button>
           <Button
             variant="outline"
             size="sm"
@@ -401,6 +414,7 @@ export default function QuestionBankDetailPage() {
               <TableHead className="w-[40%]">题目内容</TableHead>
               <TableHead className="w-[100px]">题型</TableHead>
               <TableHead className="w-[80px]">难度</TableHead>
+              <TableHead className="w-[100px]">添加来源</TableHead>
               <TableHead className="w-[120px]">创建时间</TableHead>
               <TableHead className="w-[120px] text-right">操作</TableHead>
             </TableRow>
@@ -408,7 +422,7 @@ export default function QuestionBankDetailPage() {
           <TableBody>
             {filteredQuestions.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={canEdit ? 6 : 5} className="h-24 text-center text-muted-foreground">
+                <TableCell colSpan={canEdit ? 7 : 6} className="h-24 text-center text-muted-foreground">
                   {questions.length === 0 ? "暂无题目，点击上方按钮添加" : "没有找到匹配的题目"}
                 </TableCell>
               </TableRow>
@@ -437,6 +451,9 @@ export default function QuestionBankDetailPage() {
                         {DIFFICULTY_LABELS[question.difficulty]}
                       </Badge>
                     )}
+                  </TableCell>
+                  <TableCell>
+                    <span className="text-sm text-muted-foreground">{question.source || '-'}</span>
                   </TableCell>
                   <TableCell className="text-muted-foreground">
                     {formatDate(question.createdAt)}
@@ -530,6 +547,36 @@ export default function QuestionBankDetailPage() {
         variant="destructive"
         onConfirm={handleBatchDelete}
       />
+
+      {/* 批量移动弹窗 */}
+      {batchMoveOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="w-full max-w-md rounded-lg border bg-white p-6 shadow-lg">
+            <h3 className="text-lg font-semibold">批量移动题目</h3>
+            <p className="mt-1 text-sm text-muted-foreground">选择目标题库，将选中的 {selectedQuestions.size} 道题目移动过去</p>
+            <div className="mt-4 max-h-60 overflow-auto">
+              {questionBanks.filter(b => b.id !== bankId && !b.isDraftPool).map(bank => (
+                <button
+                  key={bank.id}
+                  className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-sm hover:bg-muted"
+                  onClick={() => handleBatchMove(bank.id)}
+                >
+                  <div className="flex size-8 items-center justify-center rounded bg-blue-50">
+                    <ImageIcon className="size-4 text-blue-600" />
+                  </div>
+                  <div>
+                    <div className="font-medium">{bank.name}</div>
+                    <div className="text-xs text-muted-foreground">{bank.questionCount} 题</div>
+                  </div>
+                </button>
+              ))}
+            </div>
+            <div className="mt-4 flex justify-end gap-2">
+              <Button variant="outline" size="sm" onClick={() => setBatchMoveOpen(false)}>取消</Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
-import { Plus, Search, FileText, CheckCircle, Pencil, Trash2, Eye, FolderOpen, Settings, FolderTree, Upload, List, LayoutGrid } from "lucide-react"
+import { Plus, Search, FileText, CheckCircle, Pencil, Trash2, Eye, FolderOpen, Settings, FolderTree, Upload, List, LayoutGrid, Send, RotateCcw, Globe, Undo2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -26,7 +26,9 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { StatusBadge } from "@/components/shared/status-badge"
 import { BankFormDialog } from "@/components/question-banks/bank-form-dialog"
 import { useData } from "@/components/providers/data-provider"
-import type { QuestionBank, QuestionBankFormData } from "@/lib/types"
+import type { QuestionBank, QuestionBankFormData, StatusAction } from "@/lib/types"
+import { canPerformAction } from "@/lib/types"
+import { mockUsers } from "@/lib/mock-data"
 
 type OwnerTab = 'mine' | 'collaborate' | 'public'
 type ViewMode = 'list' | 'batch'
@@ -39,6 +41,7 @@ export default function QuestionBanksPage() {
     createQuestionBank,
     updateQuestionBank,
     deleteQuestionBank,
+    updateQuestionBankStatus,
   } = useData()
 
   const [search, setSearch] = useState("")
@@ -214,13 +217,14 @@ export default function QuestionBanksPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[300px]">题库名称</TableHead>
+                <TableHead className="w-[260px]">题库名称</TableHead>
                 <TableHead className="w-[100px]">题目数量</TableHead>
-                <TableHead className="w-[100px]">来源</TableHead>
                 <TableHead className="w-[100px]">状态</TableHead>
+                <TableHead className="w-[100px]">创建人</TableHead>
+                <TableHead className="w-[100px]">共建人</TableHead>
                 <TableHead className="w-[120px]">创建时间</TableHead>
                 <TableHead className="w-[120px]">更新时间</TableHead>
-                <TableHead className="sticky right-0 w-[200px] bg-white text-right">操作</TableHead>
+                <TableHead className="sticky right-0 w-[240px] bg-white text-right">操作</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -252,12 +256,17 @@ export default function QuestionBanksPage() {
                       <span className="text-sm">{bank.questionCount} 题</span>
                     </TableCell>
                     <TableCell>
-                      <span className="text-sm text-muted-foreground">
-                        {bank.ownerType === 'mine' ? '我的' : bank.ownerType === 'collaborate' ? '共建' : '公共'}
-                      </span>
+                      {bank.isDraftPool ? (
+                        <span className="text-sm text-muted-foreground">-</span>
+                      ) : (
+                        <StatusBadge status={bank.status} />
+                      )}
                     </TableCell>
                     <TableCell>
-                      <StatusBadge status={bank.status} />
+                      <span className="text-sm text-muted-foreground">{bank.isDraftPool ? '张三' : '张三'}</span>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm text-muted-foreground">{bank.isDraftPool ? '李四、王五' : (bank.collaboratorIds?.length ? bank.collaboratorIds.map(id => mockUsers.find(u => u.id === id)?.name).filter(Boolean).join('、') || '-' : '-')}</span>
                     </TableCell>
                     <TableCell>
                       <span className="text-sm text-muted-foreground">{formatDate(bank.createdAt)}</span>
@@ -276,6 +285,31 @@ export default function QuestionBanksPage() {
                           <FolderOpen className="size-3" />
                           管理题目
                         </Button>
+                        {bank.isDraftPool && (
+                          <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs text-emerald-600" onClick={(e) => { e.stopPropagation(); updateQuestionBankStatus(bank.id, 'submit') }}>
+                            <Send className="size-3" />提交审批
+                          </Button>
+                        )}
+                        {!bank.isDraftPool && canPerformAction(bank.status, 'submit') && (
+                          <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs text-emerald-600" onClick={(e) => { e.stopPropagation(); updateQuestionBankStatus(bank.id, 'submit') }}>
+                            <Send className="size-3" />提交审批
+                          </Button>
+                        )}
+                        {!bank.isDraftPool && canPerformAction(bank.status, 'withdraw') && (
+                          <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs text-amber-600" onClick={(e) => { e.stopPropagation(); updateQuestionBankStatus(bank.id, 'withdraw') }}>
+                            <RotateCcw className="size-3" />撤回审批
+                          </Button>
+                        )}
+                        {!bank.isDraftPool && canPerformAction(bank.status, 'publish') && (
+                          <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs text-blue-600" onClick={(e) => { e.stopPropagation(); updateQuestionBankStatus(bank.id, 'publish') }}>
+                            <Globe className="size-3" />发布
+                          </Button>
+                        )}
+                        {!bank.isDraftPool && canPerformAction(bank.status, 'unpublish') && (
+                          <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs text-destructive" onClick={(e) => { e.stopPropagation(); updateQuestionBankStatus(bank.id, 'unpublish') }}>
+                            <Undo2 className="size-3" />撤回发布
+                          </Button>
+                        )}
                         <Button
                           variant="ghost"
                           size="icon"

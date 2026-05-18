@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { ArrowLeft, Edit2, Check, X, Info, Settings } from 'lucide-react'
+import { ArrowLeft, Edit2, Check, X, Info, Settings, Plus } from 'lucide-react'
 import {
   Table,
   TableBody,
@@ -78,6 +78,75 @@ interface TaskRowData {
   abilityPointRowSpan: number
   mappingType: 'inherit' | 'custom'
   customMapping?: LevelMapping[]
+}
+
+function ScoringRuleCard() {
+  const [rules, setRules] = useState([
+    { min: 95, max: 100, label: 'A+' },
+    { min: 85, max: 95, label: 'A' },
+    { min: 75, max: 85, label: 'B+' },
+    { min: 60, max: 75, label: 'B' },
+    { min: 0, max: 60, label: 'C' },
+  ])
+
+  const addRule = () => {
+    setRules([...rules, { min: 0, max: 0, label: '' }])
+  }
+
+  const removeRule = (index: number) => {
+    setRules(rules.filter((_, i) => i !== index))
+  }
+
+  const updateRule = (index: number, field: string, value: string | number) => {
+    const newRules = [...rules]
+    newRules[index] = { ...newRules[index], [field]: value }
+    setRules(newRules)
+  }
+
+  return (
+    <div className="rounded-lg border border-border bg-card p-6">
+      <div className="space-y-3">
+        {rules.map((rule, index) => (
+          <div key={index} className="flex items-center gap-3">
+            <div className="flex items-center gap-2 flex-1">
+              <Input
+                type="number"
+                min={0}
+                max={100}
+                value={rule.min}
+                onChange={(e) => updateRule(index, 'min', Number(e.target.value))}
+                className="w-20 h-8 text-center"
+              />
+              <span className="text-muted-foreground">%</span>
+              <span className="text-muted-foreground">~</span>
+              <Input
+                type="number"
+                min={0}
+                max={100}
+                value={rule.max}
+                onChange={(e) => updateRule(index, 'max', Number(e.target.value))}
+                className="w-20 h-8 text-center"
+              />
+              <span className="text-muted-foreground">%</span>
+            </div>
+            <Input
+              value={rule.label}
+              onChange={(e) => updateRule(index, 'label', e.target.value)}
+              placeholder="等级名称"
+              className="w-32 h-8"
+            />
+            <Button variant="ghost" size="sm" className="h-8 px-2 text-destructive" onClick={() => removeRule(index)}>
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        ))}
+      </div>
+      <Button variant="outline" size="sm" className="mt-4" onClick={addRule}>
+        <Plus className="mr-1 h-3.5 w-3.5" />
+        添加档次
+      </Button>
+    </div>
+  )
 }
 
 export function CertificationRulePage({
@@ -473,6 +542,15 @@ export function CertificationRulePage({
               <Settings className="size-4" />
               配置全局等级映射
             </Button>
+            <Button
+              variant="default"
+              size="sm"
+              className={cn('gap-2', isReadOnly && 'pointer-events-auto')}
+              onClick={() => toast({ title: '保存成功', description: '规则已保存' })}
+            >
+              <Check className="size-4" />
+              保存规则
+            </Button>
           </div>
         </header>
 
@@ -496,7 +574,7 @@ export function CertificationRulePage({
                 <TableRow className="hover:bg-transparent bg-muted/30">
                   <TableHead className="w-[130px] font-medium">能力域</TableHead>
                   <TableHead className="w-[130px] font-medium">能力点</TableHead>
-                  <TableHead className="w-[150px] font-medium">关联任务</TableHead>
+                  <TableHead className="w-[200px] font-medium">关联场景任务</TableHead>
                   <TableHead className="w-[80px] text-center font-medium">权重</TableHead>
                   <TableHead className="w-[180px] font-medium">
                     <div className="flex items-center gap-1">
@@ -642,19 +720,14 @@ export function CertificationRulePage({
           </div>
         </main>
 
-        {/* 底部操作栏 */}
-        <div className={cn(isReadOnly && 'pointer-events-auto')}>
-          <ActionBar
-            status={rule.status}
-            onSaveDraft={handleSaveDraft}
-            onSubmitReview={handleSubmitReview}
-            onCancelReview={handleCancelReview}
-            onPublish={handlePublish}
-            onCancelPublish={handleCancelPublish}
-            onInviteCollaborate={handleInviteCollaborate}
-            hasValidationErrors={hasValidationErrors}
-          />
-        </div>
+        {/* 配置赋分规则模块 */}
+        <main className="mx-auto px-6 py-8">
+          <div className="mb-4">
+            <h2 className="text-lg font-semibold">配置赋分规则</h2>
+            <p className="text-sm text-muted-foreground">为岗位能力认定配置得分与等级的映射关系</p>
+          </div>
+          <ScoringRuleCard />
+        </main>
 
         {/* 编辑任务映射弹窗 */}
         <Dialog

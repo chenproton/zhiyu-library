@@ -22,7 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import { X } from "lucide-react"
+import { X, ImageIcon, Upload } from "lucide-react"
 import type { Exam, ExamFormData } from "@/lib/types"
 import { mockUsers, mockDepartments, mockBatches } from "@/lib/mock-data"
 
@@ -44,6 +44,7 @@ export function ExamFormDialog({
   const [collaboratorIds, setCollaboratorIds] = useState<string[]>([])
   const [collaboratorDeptIds, setCollaboratorDeptIds] = useState<string[]>([])
   const [batchId, setBatchId] = useState<string>("")
+  const [coverUrl, setCoverUrl] = useState<string>("")
 
   useEffect(() => {
     if (exam) {
@@ -52,12 +53,14 @@ export function ExamFormDialog({
       setCollaboratorIds(exam.collaboratorIds || [])
       setCollaboratorDeptIds(exam.collaboratorDeptIds || [])
       setBatchId(exam.batchId || "")
+      setCoverUrl(exam.coverUrl || "")
     } else {
       setName("")
       setDescription("")
       setCollaboratorIds([])
       setCollaboratorDeptIds([])
       setBatchId("")
+      setCoverUrl("")
     }
   }, [exam, open])
 
@@ -68,6 +71,7 @@ export function ExamFormDialog({
       name: name.trim(),
       description: description.trim(),
       duration: 60,
+      coverUrl: coverUrl || undefined,
       collaboratorIds: collaboratorIds.length > 0 ? collaboratorIds : undefined,
       collaboratorDeptIds: collaboratorDeptIds.length > 0 ? collaboratorDeptIds : undefined,
       batchId: batchId || undefined,
@@ -128,6 +132,43 @@ export function ExamFormDialog({
                 placeholder="请输入试卷简介"
                 rows={3}
               />
+            </Field>
+            <Field>
+              <FieldLabel>封面图片</FieldLabel>
+              <div className="flex items-center gap-4">
+                {coverUrl ? (
+                  <div className="relative">
+                    <img src={coverUrl} alt="封面" className="h-20 w-32 rounded-lg object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => setCoverUrl("")}
+                      className="absolute -right-2 -top-2 flex size-5 items-center justify-center rounded-full bg-destructive text-white"
+                    >
+                      <X className="size-3" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex h-20 w-32 items-center justify-center rounded-lg border border-dashed bg-muted">
+                    <ImageIcon className="size-6 text-muted-foreground" />
+                  </div>
+                )}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const urls = [
+                      '/placeholder-logo.png',
+                      '/placeholder.jpg',
+                      '/placeholder.svg',
+                    ]
+                    setCoverUrl(urls[Math.floor(Math.random() * urls.length)])
+                  }}
+                >
+                  <Upload className="mr-1 size-3.5" />
+                  上传封面
+                </Button>
+              </div>
             </Field>
             <Field>
               <FieldLabel>共建人</FieldLabel>

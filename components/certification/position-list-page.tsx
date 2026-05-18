@@ -62,9 +62,6 @@ export function PositionListPage() {
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [professionalDirectionFilter, setProfessionalDirectionFilter] = useState<string>("all")
-  const [globalMapping, setGlobalMapping] = useState<LevelMapping[]>(defaultLevelMapping)
-  
-  const [globalConfigDialogOpen, setGlobalConfigDialogOpen] = useState(false)
   
   // 确认弹窗状态
   const [confirmDialog, setConfirmDialog] = useState<{
@@ -111,11 +108,15 @@ export function PositionListPage() {
     router.push(`/job-ability/config/${position.id}`)
   }
 
+  const handleSaveRule = () => {
+    alert('保存规则功能开发中')
+  }
+
   const handleCancelApproval = (position: Position) => {
     setConfirmDialog({
       open: true,
       title: "取消审批",
-      description: `确定要取消「${position.name}」的能力认证规则审批吗？取消后规则将退回至草稿状态。`,
+      description: `确定要取消「${position.name}」的岗位能力认定规则审批吗？取消后规则将退回至草稿状态。`,
       action: () => {
         setPositions((prev) =>
           prev.map((p) =>
@@ -131,7 +132,7 @@ export function PositionListPage() {
     setConfirmDialog({
       open: true,
       title: "发布规则",
-      description: `确定要发布「${position.name}」的能力认证规则吗？发布后将立即生效。`,
+      description: `确定要发布「${position.name}」的岗位能力认定规则吗？发布后将立即生效。`,
       action: () => {
         setPositions((prev) =>
           prev.map((p) =>
@@ -149,7 +150,7 @@ export function PositionListPage() {
     setConfirmDialog({
       open: true,
       title: "取消发布",
-      description: `确定要取消发布「${position.name}」的能力认证规则吗？取消后规则将进入待发布状态。`,
+      description: `确定要取消发布「${position.name}」的岗位能力认定规则吗？取消后规则将进入待发布状态。`,
       action: () => {
         setPositions((prev) =>
           prev.map((p) =>
@@ -172,7 +173,7 @@ export function PositionListPage() {
     setConfirmDialog({
       open: true,
       title: "批量发布",
-      description: `确定要批量发布 ${readyPositions.length} 个岗位的能力认证规则吗？`,
+      description: `确定要批量发布 ${readyPositions.length} 个岗位的能力认定规则吗？`,
       action: () => {
         setPositions((prev) =>
           prev.map((p) =>
@@ -207,17 +208,14 @@ export function PositionListPage() {
       <div className="mb-4 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">
-            岗位能力认证规则
+            岗位能力认定规则
           </h1>
           <p className="text-muted-foreground">
-            管理各岗位的能力认证规则配置
+            管理各岗位的能力认定规则配置
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="outline" onClick={() => setGlobalConfigDialogOpen(true)}>
-            <Settings className="mr-2 h-4 w-4" />
-            配置全局等级映射
-          </Button>
+          {/* 操作按钮区域 */}
         </div>
       </div>
         {/* 精简统计卡片 */}
@@ -348,7 +346,7 @@ export function PositionListPage() {
                     <TableCell className="text-right">
                       <Button variant="outline" size="sm" onClick={() => handleConfig(position)}>
                         <Settings2 className="mr-1 h-3.5 w-3.5" />
-                        配置规则
+                        配置认定规则
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -378,15 +376,7 @@ export function PositionListPage() {
           </div>
         </div>
 
-      {/* 全局配置弹窗 - 查看和编辑合并 */}
-      <LevelMappingDialog
-        open={globalConfigDialogOpen}
-        onOpenChange={setGlobalConfigDialogOpen}
-        mapping={globalMapping}
-        onSave={setGlobalMapping}
-        title="配置全局等级映射"
-        description="配置全局等级映射规则，所有岗位默认继承此配置"
-      />
+
 
       {/* 确认弹窗 */}
       <Dialog

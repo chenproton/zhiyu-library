@@ -13,6 +13,7 @@ import {
   ClipboardCheck,
   Send,
   Ban,
+  Eye,
 } from "lucide-react"
 import {
   Select,
@@ -46,10 +47,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { useData } from "@/components/providers/data-provider"
 import { APPROVAL_TYPE_LABELS, APPROVAL_STATUS_LABELS } from "@/lib/types"
 import type { ApprovalType, ApprovalItem, ApprovalStatus } from "@/lib/types"
-
-const typeTabs: { value: ApprovalType | "all"; label: string }[] = [
-  { value: "all", label: "全部" },
-  { value: "question", label: "题目" },
+const typeTabs: { value: ApprovalType; label: string }[] = [
   { value: "questionBank", label: "题库" },
   { value: "exam", label: "试卷" },
   { value: "onlineExam", label: "在线考试" },
@@ -66,7 +64,7 @@ export default function ApprovalCenterPage() {
   const { approvalItems, approveItem, rejectItem } = useData()
 
   const [search, setSearch] = useState("")
-  const [typeTab, setTypeTab] = useState<ApprovalType | "all">("all")
+  const [typeTab, setTypeTab] = useState<ApprovalType>("questionBank")
   const [statusTab, setStatusTab] = useState<ApprovalStatus | "all">("all")
   const [approveDialog, setApproveDialog] = useState<{ open: boolean; item: ApprovalItem | null }>({
     open: false,
@@ -77,12 +75,14 @@ export default function ApprovalCenterPage() {
     item: null,
   })
   const [remark, setRemark] = useState("")
+  const [detailDialog, setDetailDialog] = useState<{ open: boolean; item: ApprovalItem | null }>({
+    open: false,
+    item: null,
+  })
 
   const filteredItems = useMemo(() => {
     let list = [...approvalItems]
-    if (typeTab !== "all") {
-      list = list.filter((item) => item.type === typeTab)
-    }
+    list = list.filter((item) => item.type === typeTab)
     if (statusTab !== "all") {
       list = list.filter((item) => item.status === statusTab)
     }
@@ -200,7 +200,7 @@ export default function ApprovalCenterPage() {
 
       {/* Tab 切换 */}
       <div className="mb-4">
-        <Tabs value={typeTab} onValueChange={(v) => setTypeTab(v as ApprovalType | "all")}>
+        <Tabs value={typeTab} onValueChange={(v) => setTypeTab(v as ApprovalType)}>
           <TabsList>
             {typeTabs.map((tab) => (
               <TabsTrigger key={tab.value} value={tab.value}>
@@ -242,16 +242,42 @@ export default function ApprovalCenterPage() {
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead className="w-[100px]">审批类型</TableHead>
-                <TableHead className="w-[200px]">标题</TableHead>
-                <TableHead className="w-[240px]">描述</TableHead>
-                <TableHead className="w-[100px]">提交人</TableHead>
-                <TableHead className="w-[150px]">提交时间</TableHead>
-                <TableHead className="w-[100px]">状态</TableHead>
-                <TableHead className="w-[200px]">备注</TableHead>
-                <TableHead className="sticky right-0 w-[140px] bg-white text-right">操作</TableHead>
-              </TableRow>
+              {typeTab === 'questionBank' && (
+                <TableRow>
+                  <TableHead className="w-[100px]">审批类型</TableHead>
+                  <TableHead className="w-[200px]">题库名称</TableHead>
+                  <TableHead className="w-[200px]">题库描述</TableHead>
+                  <TableHead className="w-[100px]">提交人</TableHead>
+                  <TableHead className="w-[150px]">提交时间</TableHead>
+                  <TableHead className="w-[100px]">状态</TableHead>
+                  <TableHead className="w-[150px]">备注</TableHead>
+                  <TableHead className="sticky right-0 w-[160px] bg-white text-right">操作</TableHead>
+                </TableRow>
+              )}
+              {typeTab === 'exam' && (
+                <TableRow>
+                  <TableHead className="w-[100px]">审批类型</TableHead>
+                  <TableHead className="w-[200px]">试卷名称</TableHead>
+                  <TableHead className="w-[200px]">试卷描述</TableHead>
+                  <TableHead className="w-[100px]">提交人</TableHead>
+                  <TableHead className="w-[150px]">提交时间</TableHead>
+                  <TableHead className="w-[100px]">状态</TableHead>
+                  <TableHead className="w-[150px]">备注</TableHead>
+                  <TableHead className="sticky right-0 w-[160px] bg-white text-right">操作</TableHead>
+                </TableRow>
+              )}
+              {typeTab === 'onlineExam' && (
+                <TableRow>
+                  <TableHead className="w-[100px]">审批类型</TableHead>
+                  <TableHead className="w-[200px]">考试名称</TableHead>
+                  <TableHead className="w-[200px]">考试描述</TableHead>
+                  <TableHead className="w-[100px]">提交人</TableHead>
+                  <TableHead className="w-[150px]">提交时间</TableHead>
+                  <TableHead className="w-[100px]">状态</TableHead>
+                  <TableHead className="w-[150px]">备注</TableHead>
+                  <TableHead className="sticky right-0 w-[160px] bg-white text-right">操作</TableHead>
+                </TableRow>
+              )}
             </TableHeader>
             <TableBody>
               {filteredItems.length === 0 ? (
@@ -288,36 +314,45 @@ export default function ApprovalCenterPage() {
                       </span>
                     </TableCell>
                     <TableCell className="sticky right-0 bg-white text-right">
-                      {item.status === "pending" ? (
-                        <div className="flex items-center justify-end gap-1">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-emerald-600 hover:text-emerald-600"
-                            onClick={() => {
-                              setApproveDialog({ open: true, item })
-                              setRemark("")
-                            }}
-                          >
-                            <CheckCircle2 className="mr-1 size-3.5" />
-                            同意
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-destructive hover:text-destructive"
-                            onClick={() => {
-                              setRejectDialog({ open: true, item })
-                              setRemark("")
-                            }}
-                          >
-                            <Ban className="mr-1 size-3.5" />
-                            驳回
-                          </Button>
-                        </div>
-                      ) : (
-                        <span className="text-xs text-muted-foreground">-</span>
-                      )}
+                      <div className="flex items-center justify-end gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 gap-1 text-xs text-blue-600"
+                          onClick={() => setDetailDialog({ open: true, item })}
+                        >
+                          <Eye className="size-3" />
+                          查看详情
+                        </Button>
+                        {item.status === "pending" && (
+                          <>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-emerald-600 hover:text-emerald-600"
+                              onClick={() => {
+                                setApproveDialog({ open: true, item })
+                                setRemark("")
+                              }}
+                            >
+                              <CheckCircle2 className="mr-1 size-3.5" />
+                              同意
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-destructive hover:text-destructive"
+                              onClick={() => {
+                                setRejectDialog({ open: true, item })
+                                setRemark("")
+                              }}
+                            >
+                              <Ban className="mr-1 size-3.5" />
+                              驳回
+                            </Button>
+                          </>
+                        )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))
@@ -384,6 +419,48 @@ export default function ApprovalCenterPage() {
               确认驳回
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* 查看详情弹窗 */}
+      <Dialog open={detailDialog.open} onOpenChange={(open) => !open && setDetailDialog({ open: false, item: null })}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>审批详情</DialogTitle>
+            <DialogDescription>
+              {detailDialog.item?.title}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 py-4">
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">审批类型</span>
+              <span>{detailDialog.item ? APPROVAL_TYPE_LABELS[detailDialog.item.type] : '-'}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">标题</span>
+              <span>{detailDialog.item?.title}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">描述</span>
+              <span className="max-w-xs text-right">{detailDialog.item?.description || '-'}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">提交人</span>
+              <span>{detailDialog.item?.submitterName}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">提交时间</span>
+              <span>{detailDialog.item ? formatDate(detailDialog.item.submitTime) : '-'}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">状态</span>
+              <span>{detailDialog.item ? getStatusBadge(detailDialog.item.status) : '-'}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">备注</span>
+              <span className="max-w-xs text-right">{detailDialog.item?.remark || '-'}</span>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

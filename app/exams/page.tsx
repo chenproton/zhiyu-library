@@ -275,6 +275,7 @@ export default function ExamsPage() {
                       onDelete={() => deleteExam(exam.id)}
                       onStatusChange={(action) => updateExamStatus(exam.id, action)}
                       onView={() => router.push(`/exams/${exam.id}`)}
+                      onPreview={() => router.push(`/exams/${exam.id}?mode=preview`)}
                     />
                   </TableCell>
                 </TableRow>

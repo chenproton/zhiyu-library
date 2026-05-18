@@ -14,12 +14,16 @@ import {
   BookOpen,
   TrendingUp,
   BarChart3,
+  Target,
+  X,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Progress } from "@/components/ui/progress"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { StudentPortraitModal } from "@/components/shared/student-portrait-modal"
 
 const myCerts = [
   { id: 1, name: "数据库工程师", level: "初级", status: "已通过", date: "2024-05-20", score: 88 },
@@ -38,6 +42,8 @@ const allCerts = [
 
 export default function CertificationsPage() {
   const [search, setSearch] = useState("")
+  const [activeTab, setActiveTab] = useState<'my' | 'interested'>('my')
+  const [portraitOpen, setPortraitOpen] = useState(false)
 
   const filtered = allCerts.filter((c) => c.name.toLowerCase().includes(search.toLowerCase()))
 
@@ -50,42 +56,49 @@ export default function CertificationsPage() {
             返回首页
           </Button>
         </Link>
-        <h1 className="text-xl font-bold">能力认证</h1>
+        <h1 className="text-xl font-bold">能力认定</h1>
       </div>
 
       {/* My Certs */}
       <section className="mb-8">
-        <h2 className="mb-4 text-base font-semibold">我的认证</h2>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {myCerts.map((cert) => (
-            <Card key={cert.id} className="border-emerald-200 bg-emerald-50/30">
-              <CardContent className="p-4">
-                <div className="flex items-start justify-between">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-100 text-emerald-600">
-                    <Award className="h-4.5 w-4.5" />
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'my' | 'interested')} className="mb-4">
+          <TabsList>
+            <TabsTrigger value="my">我的认证岗位</TabsTrigger>
+            <TabsTrigger value="interested">我的感兴趣岗位</TabsTrigger>
+          </TabsList>
+        </Tabs>
+        {activeTab === 'my' && (
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {myCerts.map((cert) => (
+              <Card key={cert.id} className="border-emerald-200 bg-emerald-50/30 cursor-pointer transition-shadow hover:shadow-md" onClick={() => setPortraitOpen(true)}>
+                <CardContent className="p-4">
+                  <div className="flex items-start justify-between">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-100 text-emerald-600">
+                      <Award className="h-4.5 w-4.5" />
+                    </div>
+                    <Badge variant="default" className="bg-emerald-500 text-[10px]">
+                      <CheckCircle2 className="mr-1 h-3 w-3" />
+                      {cert.status}
+                    </Badge>
                   </div>
-                  <Badge variant="default" className="bg-emerald-500 text-[10px]">
-                    <CheckCircle2 className="mr-1 h-3 w-3" />
-                    {cert.status}
-                  </Badge>
-                </div>
-                <h4 className="mt-2 text-sm font-semibold">{cert.name}</h4>
-                <div className="mt-1 text-xs text-muted-foreground">
-                  {cert.level} · 获得日期 {cert.date}
-                </div>
-                <div className="mt-2 flex items-center gap-2">
-                  <Progress value={cert.score} className="h-1.5 flex-1" />
-                  <span className="text-xs font-medium">{cert.score}分</span>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-          <Card className="flex flex-col items-center justify-center border-dashed p-4">
-            <Award className="h-8 w-8 text-muted-foreground/50" />
-            <p className="mt-2 text-sm text-muted-foreground">还有更多认证等你挑战</p>
-            <Button variant="outline" size="sm" className="mt-2 text-xs">去报名</Button>
-          </Card>
-        </div>
+                  <h4 className="mt-2 text-sm font-semibold">{cert.name}</h4>
+                  <div className="mt-1 text-xs text-muted-foreground">
+                    {cert.level} · 获得日期 {cert.date}
+                  </div>
+                  <div className="mt-2 flex items-center gap-2">
+                    <Progress value={cert.score} className="h-1.5 flex-1" />
+                    <span className="text-xs font-medium">{cert.score}分</span>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+        {activeTab === 'interested' && (
+          <div className="rounded-lg border py-12 text-center text-sm text-muted-foreground">
+            暂无感兴趣岗位，请前往全部认证项目浏览
+          </div>
+        )}
       </section>
 
       {/* All Certs */}
@@ -129,6 +142,13 @@ export default function CertificationsPage() {
           <div className="rounded-lg border py-12 text-center text-sm text-muted-foreground">暂无匹配认证</div>
         )}
       </section>
+
+      <StudentPortraitModal
+        open={portraitOpen}
+        onOpenChange={setPortraitOpen}
+        studentName="张同学"
+        className="2021级前端开发1班"
+      />
     </div>
   )
 }

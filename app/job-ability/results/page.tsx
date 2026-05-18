@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { Search, Eye, Briefcase, User, Target, Calendar, TrendingUp, CheckCircle2, AlertCircle, BarChart3 } from "lucide-react"
+import { Search, Eye, Briefcase, User, Target, Calendar, TrendingUp, CheckCircle2, AlertCircle, BarChart3, GraduationCap, Building2, BookOpen, Award } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -12,9 +12,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useData } from "@/components/providers/data-provider"
+import { StudentPortraitModal } from "@/components/shared/student-portrait-modal"
 
 export default function JobAbilityResultsPage() {
   const { jobAbilityResults, positionsList } = useData()
@@ -22,6 +22,8 @@ export default function JobAbilityResultsPage() {
   const [search, setSearch] = useState("")
   const [selectedPositionId, setSelectedPositionId] = useState<string>("all")
   const [rateFilter, setRateFilter] = useState<string>("all")
+  const [portraitOpen, setPortraitOpen] = useState(false)
+  const [selectedStudent, setSelectedStudent] = useState<typeof filteredResults[0] | null>(null)
 
   // 左侧岗位列表（只显示有结果的岗位）
   const positionsWithResults = useMemo(() => {
@@ -71,16 +73,9 @@ export default function JobAbilityResultsPage() {
     return { total, excellent, good, pass, fail, avgRate }
   }, [filteredResults])
 
-  const getRateBadge = (rate: number) => {
-    if (rate >= 90) {
-      return <Badge variant="default" className="bg-emerald-500 gap-1"><CheckCircle2 className="size-3" />优秀</Badge>
-    } else if (rate >= 80) {
-      return <Badge variant="default" className="bg-blue-500 gap-1"><TrendingUp className="size-3" />良好</Badge>
-    } else if (rate >= 60) {
-      return <Badge variant="secondary" className="gap-1"><AlertCircle className="size-3" />合格</Badge>
-    } else {
-      return <Badge variant="destructive" className="gap-1"><AlertCircle className="size-3" />不合格</Badge>
-    }
+  const getGradeLabel = (grade?: string) => {
+    if (!grade || grade === '-') return '-'
+    return grade
   }
 
   const formatDateTime = (date: Date) => {
@@ -217,31 +212,21 @@ export default function JobAbilityResultsPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[120px]">
-                    <div className="flex items-center gap-1">
-                      <User className="size-3.5" />
-                      学生名称
-                    </div>
-                  </TableHead>
-                  <TableHead className="w-[160px]">
-                    <div className="flex items-center gap-1">
-                      <Target className="size-3.5" />
-                      岗位胜任达成率
-                    </div>
-                  </TableHead>
-                  <TableHead className="w-[140px]">
-                    <div className="flex items-center gap-1">
-                      <Calendar className="size-3.5" />
-                      测评时间
-                    </div>
-                  </TableHead>
-                  <TableHead className="sticky right-0 w-[100px] bg-white text-right">操作</TableHead>
+                  <TableHead className="w-[100px]">学生名称</TableHead>
+                  <TableHead className="w-[100px]">学号</TableHead>
+                  <TableHead className="w-[120px]">班级</TableHead>
+                  <TableHead className="w-[100px]">专业</TableHead>
+                  <TableHead className="w-[100px]">院系</TableHead>
+                  <TableHead className="w-[140px]">岗位胜任达成率</TableHead>
+                  <TableHead className="w-[80px]">评价赋分</TableHead>
+                  <TableHead className="w-[140px]">测评时间</TableHead>
+                  <TableHead className="sticky right-0 w-[140px] bg-white text-right">操作</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredResults.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
+                    <TableCell colSpan={9} className="h-24 text-center text-muted-foreground">
                       {jobAbilityResults.length === 0 ? "暂无测评结果" : "没有找到匹配的测评结果"}
                     </TableCell>
                   </TableRow>
@@ -254,38 +239,23 @@ export default function JobAbilityResultsPage() {
                           <span className="text-sm">{result.studentName}</span>
                         </div>
                       </TableCell>
+                      <TableCell className="text-sm text-muted-foreground">{result.studentId}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">{result.className || '-'}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">{result.major || '-'}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">{result.department || '-'}</TableCell>
                       <TableCell>
-                        <div className="space-y-1.5">
-                          <div className="flex items-center gap-2">
-                            <span className="text-lg font-bold">{result.achievementRate}%</span>
-                            {getRateBadge(result.achievementRate)}
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            共 {result.totalAbilityPoints} 个能力点，达标 {result.achievedAbilityPoints} 个
-                          </div>
-                          <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
-                            <div
-                              className={`h-full rounded-full ${
-                                result.achievementRate >= 90
-                                  ? "bg-emerald-500"
-                                  : result.achievementRate >= 80
-                                  ? "bg-blue-500"
-                                  : result.achievementRate >= 60
-                                  ? "bg-amber-500"
-                                  : "bg-red-500"
-                              }`}
-                              style={{ width: `${result.achievementRate}%` }}
-                            />
-                          </div>
-                        </div>
+                        <span className="text-sm font-medium">{result.achievementRate}%（{result.achievedAbilityPoints}/{result.totalAbilityPoints} 能力点达成）</span>
+                      </TableCell>
+                      <TableCell>
+                        <span className="text-sm font-medium">{getGradeLabel(result.grade)}</span>
                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground">
                         {formatDateTime(result.evaluationTime)}
                       </TableCell>
                       <TableCell className="sticky right-0 bg-white text-right">
-                        <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs">
+                        <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs" onClick={() => { setSelectedStudent(result); setPortraitOpen(true) }}>
                           <Eye className="size-3.5" />
-                          查看详情
+                          查看能力画像详情
                         </Button>
                       </TableCell>
                     </TableRow>
@@ -296,6 +266,17 @@ export default function JobAbilityResultsPage() {
           </div>
         </div>
       </div>
+
+      <StudentPortraitModal
+        open={portraitOpen}
+        onOpenChange={setPortraitOpen}
+        studentName={selectedStudent?.studentName || '学生'}
+        className={selectedStudent?.className || '-'}
+        positionId={selectedStudent?.positionId}
+        department={selectedStudent?.department}
+        major={selectedStudent?.major}
+        grade={selectedStudent?.grade}
+      />
     </div>
   )
 }

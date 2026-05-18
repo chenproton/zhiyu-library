@@ -32,6 +32,12 @@ import type {
   EvaluationStandard,
   PortraitUpdateConfig,
   TopicApplication,
+  SceneGradingStudent,
+  SceneGradingScenario,
+  SceneGradingSubmission,
+  OnlineClassroom,
+  SmartCourse,
+  AbilityItem,
 } from '@/lib/types'
 import { getNextStatus, canPerformAction } from '@/lib/types'
 import {
@@ -58,6 +64,13 @@ import {
   mockArchiveVersions,
   mockEvaluationStandards,
   mockTopicApplications,
+  sceneGradingStudents,
+  sceneGradingScenarios,
+  sceneGradingSubmissions,
+  mockOnlineClassrooms,
+  mockSmartCourses,
+  positionAbilityItemsMap,
+  abilityItems,
 } from '@/lib/mock-data'
 
 interface DataContextValue {
@@ -77,6 +90,7 @@ interface DataContextValue {
   updateQuestion: (id: string, data: QuestionFormData) => void
   deleteQuestion: (id: string) => void
   updateQuestionStatus: (id: string, action: StatusAction) => void
+  moveQuestions: (questionIds: string[], targetBankId: string) => void
 
   // 试卷相关
   exams: Exam[]
@@ -99,9 +113,21 @@ interface DataContextValue {
   getSceneTasksByMethod: (methodId: string) => SceneTask[]
   getResultsByMethod: (methodId: string) => SceneEvaluationResult[]
 
+  // 场景任务评价（从 zhiyu-scene 迁移）
+  sceneGradingStudents: SceneGradingStudent[]
+  sceneGradingScenarios: SceneGradingScenario[]
+  sceneGradingSubmissions: SceneGradingSubmission[]
+
+  // 在线课堂评价
+  onlineClassrooms: OnlineClassroom[]
+
+  // 智慧课程评价
+  smartCourses: SmartCourse[]
+
   // 岗位能力测评结果
   jobAbilityResults: JobAbilityResult[]
   positionsList: Position[]
+  getPositionAbilityItems: (positionId: string) => AbilityItem[]
 
   // 审批中心
   approvalItems: ApprovalItem[]
@@ -165,6 +191,17 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const [jobAbilityResults] = useState<JobAbilityResult[]>(mockJobAbilityResults)
   const [positionsListState] = useState<Position[]>(positionsList)
   const [approvalItems, setApprovalItems] = useState<ApprovalItem[]>(mockApprovalItems)
+
+  // 场景任务评价状态
+  const [sceneGradingStudentsState] = useState<SceneGradingStudent[]>(sceneGradingStudents)
+  const [sceneGradingScenariosState] = useState<SceneGradingScenario[]>(sceneGradingScenarios)
+  const [sceneGradingSubmissionsState] = useState<SceneGradingSubmission[]>(sceneGradingSubmissions)
+
+  // 在线课堂评价状态
+  const [onlineClassroomsState] = useState<OnlineClassroom[]>(mockOnlineClassrooms)
+
+  // 智慧课程评价状态
+  const [smartCoursesState] = useState<SmartCourse[]>(mockSmartCourses)
 
   // 毕业设计管理状态
   const [graduationProjectTopics, setGraduationProjectTopics] = useState<GraduationProjectTopic[]>(mockGraduationProjectTopics)
@@ -321,6 +358,31 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     }
   }, [questions])
 
+  const moveQuestions = useCallback((questionIds: string[], targetBankId: string) => {
+    const targetBank = questionBanks.find((b) => b.id === targetBankId)
+    if (!targetBank) return
+    
+    const movedQuestions = questions.filter((q) => questionIds.includes(q.id))
+    const sourceBankIds = new Set(movedQuestions.map((q) => q.bankId))
+    
+    setQuestions((prev) =>
+      prev.map((q) => (questionIds.includes(q.id) ? { ...q, bankId: targetBankId } : q))
+    )
+    
+    setQuestionBanks((prev) =>
+      prev.map((bank) => {
+        if (bank.id === targetBankId) {
+          return { ...bank, questionCount: bank.questionCount + movedQuestions.length, updatedAt: new Date() }
+        }
+        if (sourceBankIds.has(bank.id)) {
+          const count = movedQuestions.filter((q) => q.bankId === bank.id).length
+          return { ...bank, questionCount: Math.max(0, bank.questionCount - count), updatedAt: new Date() }
+        }
+        return bank
+      })
+    )
+  }, [questions, questionBanks])
+
   // 试卷操作
   const getExam = useCallback(
     (id: string) => exams.find((exam) => exam.id === id),
@@ -333,6 +395,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       name: data.name,
       description: data.description,
       duration: data.duration,
+      coverUrl: data.coverUrl,
       collaboratorIds: data.collaboratorIds,
       collaboratorDeptIds: data.collaboratorDeptIds,
       batchId: data.batchId,
@@ -493,6 +556,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     updateQuestion,
     deleteQuestion,
     updateQuestionStatus,
+    moveQuestions,
     exams,
     getExam,
     createExam,
@@ -510,8 +574,14 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     updateEvaluationMethod,
     getSceneTasksByMethod,
     getResultsByMethod,
+    sceneGradingStudents: sceneGradingStudentsState,
+    sceneGradingScenarios: sceneGradingScenariosState,
+    sceneGradingSubmissions: sceneGradingSubmissionsState,
+    onlineClassrooms: onlineClassroomsState,
+    smartCourses: smartCoursesState,
     jobAbilityResults,
     positionsList: positionsListState,
+    getPositionAbilityItems: (positionId: string) => positionAbilityItemsMap[positionId] || abilityItems,
     approvalItems,
     approveItem,
     rejectItem,

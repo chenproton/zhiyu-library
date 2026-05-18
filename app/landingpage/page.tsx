@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import { useState } from "react"
 import {
   BookOpen,
   FileText,
@@ -26,12 +27,17 @@ import {
   TrendingUp,
   Bell,
   Calendar,
+  MonitorPlay,
+  Eye,
+  X,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Input } from "@/components/ui/input"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
 const platformStats = [
   { label: "题库数量", value: "8,500+", icon: Database },
@@ -76,11 +82,11 @@ const workspacePreview = {
   todos: [
     { id: 1, title: "《Python程序设计》期末统考", time: "今天 14:00", type: "exam", urgent: true },
     { id: 2, title: "毕业设计选题截止", time: "3天后", type: "graduation", urgent: false },
-    { id: 3, title: '岗位认证"Java开发工程师"作品待提交', time: "5天后", type: "cert", urgent: false },
+    { id: 3, title: '岗位认定"Java开发工程师"作品待提交', time: "5天后", type: "cert", urgent: false },
   ],
   stats: [
     { label: "进行中的考试", value: 2, icon: PlayCircle },
-    { label: "已获得认证", value: 3, icon: Award },
+    { label: "已获得认定", value: 3, icon: Award },
     { label: "画像完成度", value: "78%", icon: UserCircle },
   ],
 }
@@ -93,9 +99,23 @@ const questionBanks = [
 ]
 
 const exams = [
-  { id: 1, title: "2024年春季《数据结构》期末统考", type: "期末考", duration: 120, questions: 40, participants: 2340 },
-  { id: 2, title: "全国计算机等级考试二级Python真题", type: "真题", duration: 120, questions: 40, participants: 2840 },
-  { id: 3, title: "2024年春季《数据结构》模拟测试卷", type: "模拟卷", duration: 90, questions: 35, participants: 1256 },
+  { id: 'exam-1', title: "2024年春季《数据结构》期末统考", type: "期末考", duration: 120, questions: 40, participants: 2340 },
+  { id: 'exam-2', title: "全国计算机等级考试二级Python真题", type: "真题", duration: 120, questions: 40, participants: 2840 },
+  { id: 'exam-3', title: "2024年春季《数据结构》模拟测试卷", type: "模拟卷", duration: 90, questions: 35, participants: 1256 },
+]
+
+const myExams = [
+  { id: 1, examId: 'exam-1', name: "前端基础测试", status: "进行中", type: "随堂测", time: "2024-03-15 14:00", duration: 60, questionCount: 20 },
+  { id: 2, examId: 'exam-2', name: "TypeScript 能力测试", status: "未开始", type: "教学考试", time: "2024-03-20 10:00", duration: 90, questionCount: 30 },
+]
+
+const allExams = [
+  { id: 1, examId: 'exam-1', name: "前端基础测试", status: "进行中", type: "随堂测", time: "2024-03-15 14:00", duration: 60, questionCount: 20 },
+  { id: 2, examId: 'exam-2', name: "TypeScript 能力测试", status: "未开始", type: "教学考试", time: "2024-03-20 10:00", duration: 90, questionCount: 30 },
+  { id: 3, examId: 'exam-3', name: "React 进阶考核", status: "已结束", type: "期末考", time: "2024-03-10 09:00", duration: 120, questionCount: 40 },
+  { id: 4, examId: 'exam-4', name: "Node.js 后端测试", status: "进行中", type: "随堂测", time: "2024-02-28 14:00", duration: 60, questionCount: 25 },
+  { id: 5, examId: 'exam-5', name: "Vue.js 进阶考核", status: "未开始", type: "期末考", time: "2024-04-05 10:00", duration: 120, questionCount: 35 },
+  { id: 6, examId: 'exam-6', name: "全栈开发综合测试", status: "已结束", type: "综合考", time: "2024-03-25 09:00", duration: 150, questionCount: 50 },
 ]
 
 const certifications = [
@@ -113,19 +133,30 @@ const topics = [
 ]
 
 export default function LandingHomePage() {
+  const [previewBank, setPreviewBank] = useState<typeof questionBanks[0] | null>(null)
+  const [activeTab, setActiveTab] = useState<'my' | 'interested'>('my')
+  const [examCenterTab, setExamCenterTab] = useState<'my' | 'all'>('my')
+
   return (
     <div>
       {/* Platform Intro + Stats */}
       <section className="border-b bg-white py-12">
         <div className="mx-auto max-w-7xl px-6 text-center">
-          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">能力测评认证平台</h1>
+          <div className="mb-4 flex items-center justify-end">
+            <Link href="/landingpage/workspace">
+              <Button variant="outline" size="sm" className="gap-1">
+                进入工作台 <ArrowRight className="h-3.5 w-3.5" />
+              </Button>
+            </Link>
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">能力测评认定平台</h1>
           <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground sm:text-lg">
-            集测评资源、能力认证、毕业设计、学生画像于一体的一站式能力成长平台
+            集测评资源、能力认定、毕业设计、学生画像于一体的一站式能力成长平台
           </p>
           <div className="mx-auto mt-6 flex max-w-xl gap-2">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input placeholder="搜索题库、试卷、认证项目..." className="h-10 pl-9" />
+              <Input placeholder="搜索题库、试卷、认定项目..." className="h-10 pl-9" />
             </div>
             <Button className="h-10 gap-1 px-5">
               搜索 <ArrowRight className="h-4 w-4" />
@@ -143,99 +174,7 @@ export default function LandingHomePage() {
         </div>
       </section>
 
-      {/* Workspace Preview */}
-      <section className="border-b bg-white py-8">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="flex items-center justify-between mb-5">
-            <div className="flex items-center gap-2">
-              <Briefcase className="h-5 w-5 text-primary" />
-              <h2 className="text-lg font-semibold">我的工作台</h2>
-              <span className="text-sm text-muted-foreground">欢迎回来，{workspacePreview.name}</span>
-            </div>
-            <Link href="/landingpage/workspace">
-              <Button variant="outline" size="sm" className="gap-1">
-                进入工作台 <ArrowRight className="h-3.5 w-3.5" />
-              </Button>
-            </Link>
-          </div>
-          <div className="grid gap-4 lg:grid-cols-3">
-            {/* Todos */}
-            <Card className="lg:col-span-2">
-              <CardHeader className="pb-3 pt-5 px-5">
-                <CardTitle className="text-sm font-semibold flex items-center gap-1.5">
-                  <Bell className="h-3.5 w-3.5 text-muted-foreground" />
-                  今日待办
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 px-5 pb-5">
-                {workspacePreview.todos.map((todo) => (
-                  <div
-                    key={todo.id}
-                    className={`flex items-start gap-3 rounded-lg border p-3 transition-colors hover:bg-muted/50 ${
-                      todo.urgent ? "border-l-4 border-l-red-500" : ""
-                    }`}
-                  >
-                    <div
-                      className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-md ${
-                        todo.type === "exam"
-                          ? "bg-blue-50 text-blue-600"
-                          : todo.type === "graduation"
-                          ? "bg-emerald-50 text-emerald-600"
-                          : "bg-amber-50 text-amber-600"
-                      }`}
-                    >
-                      {todo.type === "exam" ? (
-                        <PlayCircle className="h-4 w-4" />
-                      ) : todo.type === "graduation" ? (
-                        <GraduationCap className="h-4 w-4" />
-                      ) : (
-                        <Award className="h-4 w-4" />
-                      )}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium">{todo.title}</p>
-                      <p
-                        className={`mt-0.5 flex items-center gap-1 text-xs ${
-                          todo.urgent ? "font-medium text-red-600" : "text-muted-foreground"
-                        }`}
-                      >
-                        {todo.urgent && <AlertCircle className="h-3 w-3" />}
-                        {todo.time}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
 
-            {/* Quick Stats */}
-            <Card>
-              <CardHeader className="pb-3 pt-5 px-5">
-                <CardTitle className="text-sm font-semibold flex items-center gap-1.5">
-                  <TrendingUp className="h-3.5 w-3.5 text-muted-foreground" />
-                  我的概况
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 px-5 pb-5">
-                {workspacePreview.stats.map((stat) => (
-                  <div
-                    key={stat.label}
-                    className="flex items-center gap-3 rounded-lg border p-3"
-                  >
-                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                      <stat.icon className="h-4.5 w-4.5" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="text-sm font-semibold">{stat.value}</div>
-                      <div className="text-xs text-muted-foreground">{stat.label}</div>
-                    </div>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
 
       {/* Service Entries */}
       <section className="py-10">
@@ -274,7 +213,7 @@ export default function LandingHomePage() {
             <h3 className="mb-3 text-sm font-medium text-muted-foreground">热门题库</h3>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {questionBanks.map((bank) => (
-                <Card key={bank.id} className="cursor-pointer transition-shadow hover:shadow-md">
+                <Card key={bank.id} className="cursor-pointer transition-shadow hover:shadow-md" onClick={() => setPreviewBank(bank)}>
                   <CardContent className="p-4">
                     <div className="mb-2 flex items-center justify-between">
                       <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
@@ -302,8 +241,9 @@ export default function LandingHomePage() {
             <h3 className="mb-3 text-sm font-medium text-muted-foreground">热门试卷</h3>
             <div className="space-y-2">
               {exams.map((exam) => (
-                <div
+                <Link
                   key={exam.id}
+                  href={`/exams/${exam.id}?mode=preview`}
                   className="flex flex-col gap-2 rounded-lg border bg-white p-4 transition-colors hover:border-primary/50 sm:flex-row sm:items-center"
                 >
                   <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-orange-50 text-orange-600">
@@ -318,10 +258,59 @@ export default function LandingHomePage() {
                       <span className="flex items-center gap-1"><Users className="h-3 w-3" />{exam.participants} 人已考</span>
                     </div>
                   </div>
-                  <Button variant="outline" size="sm" className="shrink-0 text-xs h-8">查看详情</Button>
-                </div>
+                  <span className="inline-flex shrink-0 items-center gap-1 rounded-md border bg-background px-2.5 py-1 text-xs font-medium hover:bg-accent">
+                    <Eye className="h-3 w-3" />预览
+                  </span>
+                </Link>
               ))}
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Exam Center */}
+      <section className="border-t bg-white py-10">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="mb-5 flex items-center justify-between">
+            <h2 className="text-lg font-semibold">考试中心</h2>
+            <Link href="/landingpage/exams">
+              <Button variant="ghost" size="sm" className="gap-1">
+                查看全部 <ChevronRight className="h-4 w-4" />
+              </Button>
+            </Link>
+          </div>
+          <Tabs value={examCenterTab} onValueChange={(v) => setExamCenterTab(v as 'my' | 'all')} className="mb-4">
+            <TabsList>
+              <TabsTrigger value="my">我的考试</TabsTrigger>
+              <TabsTrigger value="all">全部考试</TabsTrigger>
+            </TabsList>
+          </Tabs>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {(examCenterTab === 'my' ? myExams : allExams).map((exam) => (
+              <Link key={exam.id} href={`/landingpage/exams/${exam.examId}`} className="block">
+                <Card className="transition-shadow hover:shadow-md cursor-pointer h-full">
+                  <CardContent className="p-4">
+                    <div className="mb-2 flex items-start justify-between">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-purple-50 text-purple-600">
+                        <ClipboardList className="h-4.5 w-4.5" />
+                      </div>
+                      <Badge variant={exam.status === '进行中' ? 'default' : exam.status === '未开始' ? 'secondary' : 'outline'} className="text-[10px]">
+                        {exam.status}
+                      </Badge>
+                    </div>
+                    <h4 className="mb-1 text-sm font-semibold">{exam.name}</h4>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <Badge variant="outline" className="text-[10px] font-normal">{exam.type}</Badge>
+                      <span>{exam.time}</span>
+                    </div>
+                    <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
+                      <span>{exam.duration} 分钟</span>
+                      <span>{exam.questionCount} 题</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
@@ -330,7 +319,7 @@ export default function LandingHomePage() {
       <section className="py-10">
         <div className="mx-auto max-w-7xl px-6">
           <div className="mb-5 flex items-center justify-between">
-            <h2 className="text-lg font-semibold">能力认证</h2>
+            <h2 className="text-lg font-semibold">能力认定</h2>
             <Link href="/landingpage/certifications">
               <Button variant="ghost" size="sm" className="gap-1">
                 查看全部 <ChevronRight className="h-4 w-4" />
@@ -410,7 +399,7 @@ export default function LandingHomePage() {
                 <Badge variant="secondary" className="mb-3 w-fit">学生能力画像</Badge>
                 <h2 className="text-xl font-bold sm:text-2xl">全方位记录你的成长轨迹</h2>
                 <p className="mt-2 text-sm text-muted-foreground">
-                  基于课程成绩、考试成绩、认证结果、项目作品等多维数据，生成个人能力画像，助力职业发展规划。
+                  基于课程成绩、考试成绩、认定结果、项目作品等多维数据，生成个人能力画像，助力职业发展规划。
                 </p>
                 <div className="mt-5 space-y-2">
                   {[
@@ -454,6 +443,33 @@ export default function LandingHomePage() {
           </div>
         </div>
       </section>
+
+      {/* Preview Dialogs */}
+      <Dialog open={!!previewBank} onOpenChange={() => setPreviewBank(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>题库预览</DialogTitle>
+          </DialogHeader>
+          {previewBank && (
+            <div className="space-y-4 py-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+                  <BookOpen className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="font-semibold">{previewBank.title}</h3>
+                  <p className="text-sm text-muted-foreground">{previewBank.category} · {previewBank.questions} 题</p>
+                </div>
+              </div>
+              <div className="rounded-lg border p-4">
+                <p className="text-sm text-muted-foreground">题库内容预览区域，展示该题库下的部分题目...</p>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+
     </div>
   )
 }

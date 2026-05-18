@@ -1,8 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { useRouter } from "next/navigation"
-import { Search, BarChart3, Power, CheckCircle2 } from "lucide-react"
+import { Search, Power, CheckCircle2, Link as LinkIcon, FileText, Pencil, ExternalLink } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
@@ -15,18 +14,17 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { Textarea } from "@/components/ui/textarea"
 import { useData } from "@/components/providers/data-provider"
 import type { EvaluationMethod } from "@/lib/types"
 
 export default function EvaluationMethodsPage() {
-  const router = useRouter()
   const {
     evaluationCategories,
     evaluationMethods,
-    sceneTasks,
     updateEvaluationMethod,
     getSceneTasksByMethod,
-    getResultsByMethod,
   } = useData()
 
   const [search, setSearch] = useState("")
@@ -59,7 +57,6 @@ export default function EvaluationMethodsPage() {
       list.push(m)
       groups.set(m.categoryId, list)
     })
-    // 按分类 order 排序
     return Array.from(groups.entries()).sort((a, b) => getCategoryOrder(a[0]) - getCategoryOrder(b[0]))
   }, [filteredMethods])
 
@@ -67,8 +64,34 @@ export default function EvaluationMethodsPage() {
     updateEvaluationMethod(method.id, { enabled: !method.enabled })
   }
 
-  const handleViewResults = (methodId: string) => {
-    router.push(`/scene-task-results?methodId=${methodId}`)
+  // 场景任务弹窗
+  const [taskDialogOpen, setTaskDialogOpen] = useState(false)
+  const [selectedMethodForTasks, setSelectedMethodForTasks] = useState<EvaluationMethod | null>(null)
+
+  // 编辑弹窗
+  const [editDialogOpen, setEditDialogOpen] = useState(false)
+  const [editingMethod, setEditingMethod] = useState<EvaluationMethod | null>(null)
+  const [editDesc, setEditDesc] = useState("")
+  const [editLink, setEditLink] = useState("")
+
+  const handleOpenTasks = (method: EvaluationMethod) => {
+    setSelectedMethodForTasks(method)
+    setTaskDialogOpen(true)
+  }
+
+  const handleOpenEdit = (method: EvaluationMethod) => {
+    setEditingMethod(method)
+    setEditDesc(method.description || "")
+    setEditLink(method.docLink || "")
+    setEditDialogOpen(true)
+  }
+
+  const handleSaveEdit = () => {
+    if (editingMethod) {
+      updateEvaluationMethod(editingMethod.id, { description: editDesc, docLink: editLink })
+      setEditDialogOpen(false)
+      setEditingMethod(null)
+    }
   }
 
   return (
@@ -124,19 +147,20 @@ export default function EvaluationMethodsPage() {
       <div className="rounded-lg border bg-white">
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead className="w-[160px]">一级分类</TableHead>
-              <TableHead className="w-[200px]">二级分类（测评方式）</TableHead>
-              <TableHead className="w-[100px] text-center">前台展示</TableHead>
-              <TableHead className="w-[100px] text-center">关联任务</TableHead>
-              <TableHead className="w-[100px] text-center">关联结果</TableHead>
-              <TableHead className="w-[120px] text-right">操作</TableHead>
+            <TableRow className="bg-muted/30 hover:bg-muted/30">
+              <TableHead className="w-[130px]">一级分类</TableHead>
+              <TableHead className="w-[140px]">二级分类（测评方式）</TableHead>
+              <TableHead className="w-[90px] text-center">前台展示</TableHead>
+              <TableHead className="min-w-[260px]">测评方式说明</TableHead>
+              <TableHead className="w-[180px]">文档链接</TableHead>
+              <TableHead className="w-[120px] text-center">管理场景任务</TableHead>
+              <TableHead className="w-[100px] text-right">操作</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {groupedMethods.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
+                <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
                   暂无测评方式
                 </TableCell>
               </TableRow>
@@ -145,17 +169,14 @@ export default function EvaluationMethodsPage() {
                 const categoryName = getCategoryName(categoryId)
                 return methods.map((method, index) => {
                   const taskCount = getSceneTasksByMethod(method.id).length
-                  const resultCount = getResultsByMethod(method.id).length
                   return (
                     <TableRow key={method.id}>
                       {index === 0 && (
                         <TableCell
                           rowSpan={methods.length}
-                          className="align-top font-medium bg-muted/20 border-r"
+                          className="align-top font-medium bg-muted/10 border-r"
                         >
-                          <div className="flex items-center gap-2">
-                            <Badge variant="outline" className="text-xs">{categoryName}</Badge>
-                          </div>
+                          <Badge variant="outline" className="text-xs">{categoryName}</Badge>
                         </TableCell>
                       )}
                       <TableCell>
@@ -169,21 +190,43 @@ export default function EvaluationMethodsPage() {
                           onCheckedChange={() => handleToggle(method)}
                         />
                       </TableCell>
-                      <TableCell className="text-center">
-                        <span className="text-sm">{taskCount}</span>
+                      <TableCell>
+                        <span className="text-sm text-muted-foreground line-clamp-2">
+                          {method.description || '-'}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        {method.docLink ? (
+                          <a
+                            href={method.docLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline truncate max-w-[160px]"
+                          >
+                            <ExternalLink className="size-3 shrink-0" />
+                            <span className="truncate">{method.docLink}</span>
+                          </a>
+                        ) : (
+                          <span className="text-sm text-muted-foreground">-</span>
+                        )}
                       </TableCell>
                       <TableCell className="text-center">
-                        <span className="text-sm">{resultCount}</span>
+                        <button
+                          className="text-sm font-medium text-primary hover:underline"
+                          onClick={() => handleOpenTasks(method)}
+                        >
+                          {taskCount} 个任务
+                        </button>
                       </TableCell>
                       <TableCell className="text-right">
                         <Button
                           variant="ghost"
                           size="sm"
                           className="h-7 gap-1 text-xs"
-                          onClick={() => handleViewResults(method.id)}
+                          onClick={() => handleOpenEdit(method)}
                         >
-                          <BarChart3 className="size-3" />
-                          查看结果
+                          <Pencil className="size-3" />
+                          编辑
                         </Button>
                       </TableCell>
                     </TableRow>
@@ -194,6 +237,69 @@ export default function EvaluationMethodsPage() {
           </TableBody>
         </Table>
       </div>
+
+      {/* 场景任务列表弹窗 */}
+      <Dialog open={taskDialogOpen} onOpenChange={setTaskDialogOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>关联场景任务列表</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            {selectedMethodForTasks && (
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground mb-3">
+                  测评方式：{selectedMethodForTasks.name}
+                </p>
+                {getSceneTasksByMethod(selectedMethodForTasks.id).length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-4">暂无关联场景任务</p>
+                ) : (
+                  getSceneTasksByMethod(selectedMethodForTasks.id).map((task) => (
+                    <div key={task.id} className="flex items-center justify-between rounded-lg border p-3">
+                      <div>
+                        <p className="text-sm font-medium">{task.name}</p>
+                        <p className="text-xs text-muted-foreground">{task.sceneName}</p>
+                      </div>
+                      <Badge variant="outline" className="text-xs">{task.methodIds.length} 个测评方式</Badge>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* 编辑弹窗 */}
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>编辑测评方式</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div>
+              <label className="mb-2 block text-sm font-medium">测评方式说明</label>
+              <Textarea
+                value={editDesc}
+                onChange={(e) => setEditDesc(e.target.value)}
+                placeholder="请输入测评方式说明"
+                rows={3}
+              />
+            </div>
+            <div>
+              <label className="mb-2 block text-sm font-medium">文档链接</label>
+              <Input
+                value={editLink}
+                onChange={(e) => setEditLink(e.target.value)}
+                placeholder="https://..."
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditDialogOpen(false)}>取消</Button>
+            <Button onClick={handleSaveEdit}>保存</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

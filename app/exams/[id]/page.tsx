@@ -1,9 +1,9 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { useParams, useRouter } from "next/navigation"
+import { useParams, useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, GripVertical, Trash2, Eye, Clock, FileText, Award, Wand2, Hand, Plus, Edit, Send, Save } from "lucide-react"
+import { ArrowLeft, GripVertical, Trash2, Eye, Clock, FileText, Award, Wand2, Hand, Plus, Edit, Send, Save, FileUp, MonitorPlay } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -25,7 +25,9 @@ import { useToast } from "@/hooks/use-toast"
 export default function ExamComposerPage() {
   const params = useParams()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const examId = params.id as string
+  const isPreview = searchParams.get('mode') === 'preview'
 
   const {
     getExam,
@@ -67,9 +69,9 @@ export default function ExamComposerPage() {
     )
   }
 
-  const canEdit = ['draft', 'unsubmitted', 'rejected'].includes(exam.status)
-  const canDelete = ['draft', 'unsubmitted', 'rejected'].includes(exam.status)
-  const canSubmit = canPerformAction(exam.status, 'submit')
+  const canEdit = !isPreview && ['draft', 'unsubmitted', 'rejected'].includes(exam.status)
+  const canDelete = !isPreview && ['draft', 'unsubmitted', 'rejected'].includes(exam.status)
+  const canSubmit = !isPreview && canPerformAction(exam.status, 'submit')
 
   const handleExamUpdate = (data: ExamFormData) => {
     updateExam(examId, data)
@@ -148,18 +150,25 @@ export default function ExamComposerPage() {
       {/* 头部 */}
       <div className="border-b px-6 py-4">
         <div className="mb-4">
-          <Button variant="ghost" size="sm" asChild>
-            <Link href="/exams">
+          {isPreview ? (
+            <Button variant="ghost" size="sm" onClick={() => router.back()}>
               <ArrowLeft />
-              返回组卷列表
-            </Link>
-          </Button>
+              返回
+            </Button>
+          ) : (
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/exams">
+                <ArrowLeft />
+                返回组卷列表
+              </Link>
+            </Button>
+          )}
         </div>
         <div className="flex items-start justify-between">
           <div>
             <div className="flex items-center gap-3">
               <h1 className="text-xl font-bold">{exam.name}</h1>
-              <StatusBadge status={exam.status} />
+              {!isPreview && <StatusBadge status={exam.status} />}
             </div>
             {exam.description && (
               <p className="mt-1 text-sm text-muted-foreground">{exam.description}</p>
@@ -173,36 +182,44 @@ export default function ExamComposerPage() {
                 <Award className="size-4" />
                 总分 {exam.totalScore} 分
               </span>
-              <span className="flex items-center gap-1">
-                <Clock className="size-4" />
-                {formatDuration(exam.duration)}
-              </span>
+              {!isPreview && (
+                <span className="flex items-center gap-1">
+                  <Clock className="size-4" />
+                  {formatDuration(exam.duration)}
+                </span>
+              )}
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            {canEdit && (
-              <Button variant="outline" size="sm" onClick={() => setFormOpen(true)}>
-                <Edit className="mr-1 size-4" />
-                修改试卷基本信息
+          {!isPreview && (
+            <div className="flex items-center gap-2">
+              {canEdit && (
+                <Button variant="outline" size="sm" onClick={() => setFormOpen(true)}>
+                  <Edit className="mr-1 size-4" />
+                  修改试卷基本信息
+                </Button>
+              )}
+              {canSubmit && (
+                <Button variant="outline" size="sm" onClick={() => updateExamStatus(examId, 'submit')}>
+                  <Send className="mr-1 size-4" />
+                  提交审批
+                </Button>
+              )}
+              {canDelete && (
+                <Button variant="outline" size="sm" className="text-destructive hover:text-destructive" onClick={handleExamDelete}>
+                  <Trash2 className="mr-1 size-4" />
+                  删除
+                </Button>
+              )}
+              <Button variant="outline" size="sm" onClick={() => alert("试卷预览功能开发中")}>
+                <MonitorPlay className="mr-1 size-4" />
+                预览试卷
               </Button>
-            )}
-            {canSubmit && (
-              <Button variant="outline" size="sm" onClick={() => updateExamStatus(examId, 'submit')}>
-                <Send className="mr-1 size-4" />
-                提交审批
+              <Button size="sm" onClick={() => toast({ title: "保存成功", description: "试卷已保存" })}>
+                <Save className="mr-1 size-4" />
+                保存试卷
               </Button>
-            )}
-            {canDelete && (
-              <Button variant="outline" size="sm" className="text-destructive hover:text-destructive" onClick={handleExamDelete}>
-                <Trash2 className="mr-1 size-4" />
-                删除
-              </Button>
-            )}
-            <Button size="sm" onClick={() => toast({ title: "保存成功", description: "试卷已保存" })}>
-              <Save className="mr-1 size-4" />
-              保存试卷
-            </Button>
-          </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -229,17 +246,26 @@ export default function ExamComposerPage() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setManualDialogOpen(true)}
+                onClick={() => alert("此处参考 1.0 版本页面功能即可")}
               >
                 <Hand className="mr-1 size-4" />
                 手动抽题
               </Button>
               <Button
+                variant="outline"
                 size="sm"
-                onClick={() => setAddQuestionDialogOpen(true)}
+                onClick={() => alert("此处参考 1.0 版本页面功能即可")}
               >
                 <Plus className="mr-1 size-4" />
                 新增题目
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => alert("批量导入题目功能开发中")}
+              >
+                <FileUp className="mr-1 size-4" />
+                批量导入题目
               </Button>
             </div>
           )}

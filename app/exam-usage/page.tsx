@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
-import { Plus, Search, BookOpen, Video, GraduationCap, PlayCircle, X, ChevronDown, Check, MoreHorizontal, Eye, Pencil, Trash2, Clock, CheckCircle2, XCircle } from "lucide-react"
+import { Plus, Search, BookOpen, Video, GraduationCap, PlayCircle, X, ChevronDown, Check, MoreHorizontal, Eye, Pencil, Trash2, Clock, CheckCircle2, XCircle, Share2, Link as LinkIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Switch } from "@/components/ui/switch"
 import { Field, FieldGroup, FieldLabel, FieldDescription } from "@/components/ui/field"
 import { Textarea } from "@/components/ui/textarea"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -198,15 +199,17 @@ export default function ExamUsagePage() {
   
   // 创建在线考试表单
   const [selectedExamId, setSelectedExamId] = useState<string>("")
+  const [examName, setExamName] = useState("")
   const [examDesc, setExamDesc] = useState("")
   const [examDuration, setExamDuration] = useState(60)
   const [selectedClassIds, setSelectedClassIds] = useState<string[]>([])
+  const [examOpenType, setExamOpenType] = useState<'anytime' | 'scheduled' | 'manual'>("anytime")
   const [startTime, setStartTime] = useState<string>("")
   const [endTime, setEndTime] = useState<string>("")
-  const [passRate, setPassRate] = useState<number>(60)
+  const [publishToFront, setPublishToFront] = useState(false)
+  const [examLink, setExamLink] = useState("")
 
   const selectedExam = exams.find(e => e.id === selectedExamId)
-  const passScore = selectedExam ? Math.round((selectedExam.totalScore * passRate) / 100) : 0
 
   const filteredUsages = useMemo(() => {
     return mockUsages.filter((usage) => {
@@ -237,16 +240,25 @@ export default function ExamUsagePage() {
   }
 
   const handleCreateExam = () => {
-    if (!selectedExamId) return
+    if (!selectedExamId || !examName) return
     setCreateDialogOpen(false)
     // 重置表单
     setSelectedExamId("")
+    setExamName("")
     setExamDesc("")
     setExamDuration(60)
     setSelectedClassIds([])
+    setExamOpenType("anytime")
     setStartTime("")
     setEndTime("")
-    setPassRate(60)
+    setPublishToFront(false)
+    setExamLink("")
+  }
+
+  const handleShareExam = (usage: ExamUsage) => {
+    const url = `https://exam.example.com/e/${usage.id}`
+    navigator.clipboard.writeText(url)
+    alert(`已复制考试链接：${url}`)
   }
 
   const formatDate = (date: Date) => {
@@ -281,7 +293,7 @@ export default function ExamUsagePage() {
     }
   }
 
-  const isFormValid = selectedExamId && startTime && endTime
+  const isFormValid = selectedExamId && examName
 
   return (
     <div className="px-8 py-6">
@@ -290,6 +302,10 @@ export default function ExamUsagePage() {
           <h1 className="text-2xl font-bold tracking-tight">考试管理</h1>
           <p className="text-muted-foreground">查看试卷在各模块的使用情况</p>
         </div>
+        <Button onClick={() => setCreateDialogOpen(true)}>
+          <Plus className="mr-2 size-4" />
+          添加考试
+        </Button>
       </div>
 
       {/* 精简统计 */}
@@ -423,13 +439,19 @@ export default function ExamUsagePage() {
                     </TableCell>
                     <TableCell>{getStatusBadge(usage.status)}</TableCell>
                     <TableCell className="sticky right-0 bg-white text-right">
-                      {usage.status === 'ended' ? (
-                        <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs text-blue-600" onClick={() => router.push(`/exam-usage/results?usageId=${usage.id}`)}>
-                          <Eye className="size-3" />查看考试结果
+                      <div className="flex items-center justify-end gap-1">
+                        <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs text-emerald-600" onClick={() => handleShareExam(usage)}>
+                          <Share2 className="size-3" />分享考试
                         </Button>
-                      ) : (
-                        <span className="text-xs text-muted-foreground">-</span>
-                      )}
+                        {usage.status === 'ended' && (
+                          <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs text-blue-600" onClick={() => router.push(`/exam-usage/results?usageId=${usage.id}`)}>
+                            <Eye className="size-3" />查看考试结果
+                          </Button>
+                        )}
+                        {usage.status !== 'ended' && (
+                          <span className="text-xs text-muted-foreground">-</span>
+                        )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))
@@ -470,6 +492,15 @@ export default function ExamUsagePage() {
                     </SelectGroup>
                   </SelectContent>
                 </Select>
+              </Field>
+
+              <Field>
+                <FieldLabel>考试名称 *</FieldLabel>
+                <Input
+                  value={examName}
+                  onChange={(e) => setExamName(e.target.value)}
+                  placeholder="请输入考试名称"
+                />
               </Field>
 
               <Field>
@@ -532,43 +563,48 @@ export default function ExamUsagePage() {
               </Field>
 
               <Field>
-                <FieldLabel>考试开放时间</FieldLabel>
-                <div className="flex items-center gap-2">
-                  <Input
-                    type="datetime-local"
-                    value={startTime}
-                    onChange={(e) => setStartTime(e.target.value)}
-                    className="flex-1"
-                  />
-                  <span className="text-sm text-muted-foreground">至</span>
-                  <Input
-                    type="datetime-local"
-                    value={endTime}
-                    onChange={(e) => setEndTime(e.target.value)}
-                    className="flex-1"
-                  />
+                <FieldLabel>考试时间</FieldLabel>
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2 rounded border p-2 cursor-pointer hover:bg-muted">
+                    <input type="radio" name="openType" checked={examOpenType === 'anytime'} onChange={() => setExamOpenType('anytime')} />
+                    <span className="text-sm">随时开放</span>
+                  </label>
+                  <label className="flex items-center gap-2 rounded border p-2 cursor-pointer hover:bg-muted">
+                    <input type="radio" name="openType" checked={examOpenType === 'scheduled'} onChange={() => setExamOpenType('scheduled')} />
+                    <span className="text-sm">定期开放</span>
+                  </label>
+                  {examOpenType === 'scheduled' && (
+                    <div className="flex items-center gap-2 pl-6">
+                      <Input type="datetime-local" value={startTime} onChange={(e) => setStartTime(e.target.value)} className="flex-1" />
+                      <span className="text-sm text-muted-foreground">至</span>
+                      <Input type="datetime-local" value={endTime} onChange={(e) => setEndTime(e.target.value)} className="flex-1" />
+                    </div>
+                  )}
+                  <label className="flex items-center gap-2 rounded border p-2 cursor-pointer hover:bg-muted">
+                    <input type="radio" name="openType" checked={examOpenType === 'manual'} onChange={() => setExamOpenType('manual')} />
+                    <span className="text-sm">手动开放（在列表中点击“开放考试”按钮）</span>
+                  </label>
                 </div>
               </Field>
 
               <Field>
-                <FieldLabel>及格分数比例</FieldLabel>
-                <div className="flex items-center gap-3">
-                  <Input
-                    type="number"
-                    min={0}
-                    max={100}
-                    value={passRate}
-                    onChange={(e) => setPassRate(Number(e.target.value))}
-                    className="w-24"
-                  />
-                  <span className="text-sm">%</span>
+                <FieldLabel>是否发布到前台</FieldLabel>
+                <div className="flex items-center gap-2">
+                  <Switch checked={publishToFront} onCheckedChange={setPublishToFront} />
+                  <span className="text-sm text-muted-foreground">{publishToFront ? '已发布' : '未发布'}</span>
                 </div>
-                <FieldDescription>
-                  {selectedExam 
-                    ? `卷面总分 ${selectedExam.totalScore} 分，及格线约为 ${passScore} 分`
-                    : '请先选择试卷，系统将自动换算及格分数'
-                  }
-                </FieldDescription>
+              </Field>
+
+              <Field>
+                <FieldLabel>考试说明链接</FieldLabel>
+                <div className="flex items-center gap-2">
+                  <LinkIcon className="size-4 text-muted-foreground" />
+                  <Input
+                    value={examLink}
+                    onChange={(e) => setExamLink(e.target.value)}
+                    placeholder="https://..."
+                  />
+                </div>
               </Field>
             </FieldGroup>
           </ScrollArea>

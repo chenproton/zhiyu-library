@@ -528,7 +528,10 @@ body {
                         <div id="radarChart"></div>
                         <div class="score-overview">
                             <div class="score-big">
-                                <div class="pct" id="scorePct">86%</div>
+                                <div class="pct" style="display:flex;align-items:center;justify-content:center;gap:10px;">
+                                    <span id="scorePct">86%</span>
+                                    <span id="gradeLabel" style="background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#fff;padding:2px 10px;border-radius:10px;font-size:22px;font-weight:700;line-height:1;">A+</span>
+                                </div>
                                 <div class="desc">岗位能力达标率</div>
                             </div>
                             <div class="score-stats">
@@ -549,65 +552,144 @@ body {
                         <table class="ability-table">
                             <thead>
                                 <tr>
-                                    <th style="width:110px;">能力点认定明细</th>
+                                    <th style="width:110px;">能力域</th>
                                     <th>能力点</th>
                                     <th style="width:60px;">得分</th>
-                                    <th style="width:70px;">掌握度</th>
-                                    <th style="width:70px;">所需</th>
+                                    <th style="width:90px;">学生能力掌握度</th>
+                                    <th style="width:100px;">岗位能力胜任要求</th>
                                     <th style="width:80px;">认定结果</th>
                                 </tr>
                             </thead>
                             <tbody id="abilityBody">
                                 <tr>
-                                    <td class="cat-cell" rowspan="2">岗位与行业认知</td>
-                                    <td style="text-align:left;">行业发展趋势理解</td>
-                                    <td><span class="score-pill s-high">65</span></td>
-                                    <td><span class="lvl lvl-zhang">掌握</span></td>
-                                    <td><span class="lvl lvl-shu">熟练</span></td>
+                                    <td class="cat-cell" rowspan="4">岗位与行业认知</td>
+                                    <td style="text-align:left;">前端技术发展趋势</td>
+                                    <td><span class="score-pill s-high">78</span></td>
+                                    <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+                                    <td><span class="lvl lvl-shu">熟练 L5</span></td>
                                     <td><span class="res-pass">✓ 通过</span></td>
                                 </tr>
                                 <tr>
-                                    <td style="text-align:left;">岗位职责认知</td>
-                                    <td><span class="score-pill s-high">72</span></td>
-                                    <td><span class="lvl lvl-zhang">掌握</span></td>
-                                    <td><span class="lvl lvl-shu">熟练</span></td>
+                                    <td style="text-align:left;">岗位职责与工作流程</td>
+                                    <td><span class="score-pill s-high">82</span></td>
+                                    <td><span class="lvl lvl-shu">熟练 L5</span></td>
+                                    <td><span class="lvl lvl-shu">熟练 L5</span></td>
+                                    <td><span class="res-pass">✓ 通过</span></td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align:left;">行业规范与标准</td>
+                                    <td><span class="score-pill s-mid">68</span></td>
+                                    <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+                                    <td><span class="lvl lvl-shu">熟练 L5</span></td>
                                     <td><span class="res-fail">✗ 不通过</span></td>
                                 </tr>
                                 <tr>
-                                    <td class="cat-cell" rowspan="3">专业技能</td>
-                                    <td style="text-align:left;">JavaScript 高级能力</td>
+                                    <td style="text-align:left;">用户体验设计原则</td>
+                                    <td><span class="score-pill s-high">75</span></td>
+                                    <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+                                    <td><span class="lvl lvl-shu">熟练 L5</span></td>
+                                    <td><span class="res-pass">✓ 通过</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="cat-cell" rowspan="4">专业技能</td>
+                                    <td style="text-align:left;">HTML5/CSS3 核心技术</td>
+                                    <td><span class="score-pill s-high">88</span></td>
+                                    <td><span class="lvl lvl-shu">熟练 L5</span></td>
+                                    <td><span class="lvl lvl-shu">熟练 L5</span></td>
+                                    <td><span class="res-pass">✓ 通过</span></td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align:left;">JavaScript/TypeScript 编程</td>
                                     <td><span class="score-pill s-high">79</span></td>
-                                    <td><span class="lvl lvl-shu">熟练</span></td>
-                                    <td><span class="lvl lvl-shu">熟练</span></td>
+                                    <td><span class="lvl lvl-shu">熟练 L5</span></td>
+                                    <td><span class="lvl lvl-shu">熟练 L5</span></td>
                                     <td><span class="res-pass">✓ 通过</span></td>
                                 </tr>
                                 <tr>
-                                    <td style="text-align:left;">React 框架开发</td>
+                                    <td style="text-align:left;">React/Vue 框架应用</td>
                                     <td><span class="score-pill s-high">86</span></td>
-                                    <td><span class="lvl lvl-shu">熟练</span></td>
-                                    <td><span class="lvl lvl-shu">熟练</span></td>
+                                    <td><span class="lvl lvl-shu">熟练 L5</span></td>
+                                    <td><span class="lvl lvl-shu">熟练 L5</span></td>
                                     <td><span class="res-pass">✓ 通过</span></td>
                                 </tr>
                                 <tr>
-                                    <td style="text-align:left;">CSS 布局能力</td>
-                                    <td><span class="score-pill s-high">93</span></td>
-                                    <td><span class="lvl lvl-zhang">掌握</span></td>
-                                    <td><span class="lvl lvl-zhang">掌握</span></td>
-                                    <td><span class="res-pass">✓ 通过</span></td>
+                                    <td style="text-align:left;">前端性能优化</td>
+                                    <td><span class="score-pill s-mid">64</span></td>
+                                    <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+                                    <td><span class="lvl lvl-shu">熟练 L5</span></td>
+                                    <td><span class="res-fail">✗ 不通过</span></td>
                                 </tr>
                                 <tr>
-                                    <td class="cat-cell" rowspan="2">软技能</td>
-                                    <td style="text-align:left;">团队协作能力</td>
+                                    <td class="cat-cell" rowspan="4">软技能</td>
+                                    <td style="text-align:left;">团队协作与沟通</td>
                                     <td><span class="score-pill s-high">85</span></td>
-                                    <td><span class="lvl lvl-zhang">掌握</span></td>
-                                    <td><span class="lvl lvl-zhang">掌握</span></td>
+                                    <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+                                    <td><span class="lvl lvl-zhang">掌握 L4</span></td>
                                     <td><span class="res-pass">✓ 通过</span></td>
                                 </tr>
                                 <tr>
-                                    <td style="text-align:left;">技术文档能力</td>
+                                    <td style="text-align:left;">技术文档撰写</td>
                                     <td><span class="score-pill s-high">72</span></td>
-                                    <td><span class="lvl lvl-zhang">掌握</span></td>
-                                    <td><span class="lvl lvl-shu">熟练</span></td>
+                                    <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+                                    <td><span class="lvl lvl-shu">熟练 L5</span></td>
+                                    <td><span class="res-pass">✓ 通过</span></td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align:left;">问题分析与解决</td>
+                                    <td><span class="score-pill s-high">80</span></td>
+                                    <td><span class="lvl lvl-shu">熟练 L5</span></td>
+                                    <td><span class="lvl lvl-shu">熟练 L5</span></td>
+                                    <td><span class="res-pass">✓ 通过</span></td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align:left;">持续学习能力</td>
+                                    <td><span class="score-pill s-high">90</span></td>
+                                    <td><span class="lvl lvl-shu">熟练 L5</span></td>
+                                    <td><span class="lvl lvl-shu">熟练 L5</span></td>
+                                    <td><span class="res-pass">✓ 通过</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="cat-cell" rowspan="3">项目经验</td>
+                                    <td style="text-align:left;">完整项目开发经历</td>
+                                    <td><span class="score-pill s-high">82</span></td>
+                                    <td><span class="lvl lvl-shu">熟练 L5</span></td>
+                                    <td><span class="lvl lvl-shu">熟练 L5</span></td>
+                                    <td><span class="res-pass">✓ 通过</span></td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align:left;">需求评审与拆解</td>
+                                    <td><span class="score-pill s-high">76</span></td>
+                                    <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+                                    <td><span class="lvl lvl-shu">熟练 L5</span></td>
+                                    <td><span class="res-pass">✓ 通过</span></td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align:left;">版本控制与协作</td>
+                                    <td><span class="score-pill s-high">88</span></td>
+                                    <td><span class="lvl lvl-shu">熟练 L5</span></td>
+                                    <td><span class="lvl lvl-shu">熟练 L5</span></td>
+                                    <td><span class="res-pass">✓ 通过</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="cat-cell" rowspan="3">工具应用</td>
+                                    <td style="text-align:left;">VS Code 开发工具</td>
+                                    <td><span class="score-pill s-high">92</span></td>
+                                    <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+                                    <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+                                    <td><span class="res-pass">✓ 通过</span></td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align:left;">Git 版本管理</td>
+                                    <td><span class="score-pill s-high">85</span></td>
+                                    <td><span class="lvl lvl-shu">熟练 L5</span></td>
+                                    <td><span class="lvl lvl-shu">熟练 L5</span></td>
+                                    <td><span class="res-pass">✓ 通过</span></td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align:left;">Chrome DevTools 调试</td>
+                                    <td><span class="score-pill s-high">78</span></td>
+                                    <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+                                    <td><span class="lvl lvl-shu">熟练 L5</span></td>
                                     <td><span class="res-pass">✓ 通过</span></td>
                                 </tr>
                             </tbody>
@@ -617,8 +699,68 @@ body {
             </div>
         </div>
 
-        <!-- 右侧：课程成绩、推荐就业方向、能力认定 -->
+        <!-- 右侧：推荐就业方向、课程成绩、毕业设计 -->
         <div class="right-col">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">💼 推荐就业方向</div>
+                </div>
+                <!-- 推荐岗位 -->
+                <div style="margin-bottom:14px;">
+                    <div style="font-size:12px;font-weight:600;color:#374151;margin-bottom:8px;">推荐岗位</div>
+                    <div class="recommend-item">
+                        <div class="rec-row1">
+                            <div class="rec-name">物流工程师</div>
+                            <div class="match-tag">匹配 70%</div>
+                        </div>
+                        <div class="rec-progress"><div class="rec-progress-bar" style="width:70%;"></div></div>
+                        <div class="rec-detail">优秀 · 适合智能物流方向核心岗位</div>
+                    </div>
+                    <div class="recommend-item" style="border-left-color:#8b5cf6;background:linear-gradient(135deg,#f5f3ff,#ede9fe);">
+                        <div class="rec-row1">
+                            <div class="rec-name">供应链分析师</div>
+                            <div class="match-tag" style="background:linear-gradient(135deg,#8b5cf6,#a78bfa);">匹配 65%</div>
+                        </div>
+                        <div class="rec-progress"><div class="rec-progress-bar" style="width:65%;background:linear-gradient(90deg,#8b5cf6,#a78bfa);"></div></div>
+                        <div class="rec-detail">良好 · 数据分析能力突出</div>
+                    </div>
+                </div>
+                <!-- 推荐企业 -->
+                <div>
+                    <div style="font-size:12px;font-weight:600;color:#374151;margin-bottom:8px;">推荐企业</div>
+                    <div class="recommend-item" style="border-left-color:#10b981;background:linear-gradient(135deg,#ecfdf5,#d1fae5);">
+                        <div class="rec-row1">
+                            <div class="rec-name">顺丰科技</div>
+                            <div class="match-tag" style="background:linear-gradient(135deg,#10b981,#34d399);">匹配 88%</div>
+                        </div>
+                        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;">
+                            <span style="background:#d1fae5;color:#065f46;padding:1px 6px;border-radius:4px;font-size:10px;">物流工程师</span>
+                            <span style="background:#d1fae5;color:#065f46;padding:1px 6px;border-radius:4px;font-size:10px;">供应链分析师</span>
+                        </div>
+                    </div>
+                    <div class="recommend-item" style="border-left-color:#f59e0b;background:linear-gradient(135deg,#fffbeb,#fef3c7);">
+                        <div class="rec-row1">
+                            <div class="rec-name">京东物流</div>
+                            <div class="match-tag" style="background:linear-gradient(135deg,#f59e0b,#fbbf24);">匹配 82%</div>
+                        </div>
+                        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;">
+                            <span style="background:#fef3c7;color:#92400e;padding:1px 6px;border-radius:4px;font-size:10px;">仓储管理师</span>
+                            <span style="background:#fef3c7;color:#92400e;padding:1px 6px;border-radius:4px;font-size:10px;">运输调度专员</span>
+                        </div>
+                    </div>
+                    <div class="recommend-item" style="border-left-color:#3b82f6;background:linear-gradient(135deg,#eff6ff,#dbeafe);">
+                        <div class="rec-row1">
+                            <div class="rec-name">菜鸟网络</div>
+                            <div class="match-tag">匹配 76%</div>
+                        </div>
+                        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;">
+                            <span style="background:#dbeafe;color:#1e40af;padding:1px 6px;border-radius:4px;font-size:10px;">数据分析师</span>
+                            <span style="background:#dbeafe;color:#1e40af;padding:1px 6px;border-radius:4px;font-size:10px;">物流工程师</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="card">
                 <div class="card-header">
                     <div class="card-title">📚 课程成绩</div>
@@ -627,64 +769,35 @@ body {
                     <thead>
                         <tr>
                             <th>课程名称</th>
-                            <th style="width:60px;text-align:center;">分数</th>
-                            <th style="width:60px;text-align:center;">等级</th>
-                            <th style="width:70px;text-align:center;">到课率</th>
+                            <th style="width:50px;text-align:center;">分数</th>
+                            <th style="width:50px;text-align:center;">等级</th>
+                            <th style="width:60px;text-align:center;">班级排名</th>
+                            <th style="width:60px;text-align:center;">到课率</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><td>物流系统工程</td><td style="text-align:center;"><span class="score-num">93</span></td><td style="text-align:center;"><span class="grade-tag">优秀</span></td><td style="text-align:center;">98%</td></tr>
-                        <tr><td>供应链管理</td><td style="text-align:center;"><span class="score-num">91</span></td><td style="text-align:center;"><span class="grade-tag">优秀</span></td><td style="text-align:center;">98%</td></tr>
-                        <tr><td>运输与配送</td><td style="text-align:center;"><span class="score-num">95</span></td><td style="text-align:center;"><span class="grade-tag">优秀</span></td><td style="text-align:center;">98%</td></tr>
-                        <tr><td>仓储管理</td><td style="text-align:center;"><span class="score-num">90</span></td><td style="text-align:center;"><span class="grade-tag">优秀</span></td><td style="text-align:center;">98%</td></tr>
-                        <tr><td>数据分析</td><td style="text-align:center;"><span class="score-num">93</span></td><td style="text-align:center;"><span class="grade-tag">优秀</span></td><td style="text-align:center;">98%</td></tr>
+                        <tr><td>物流系统工程</td><td style="text-align:center;"><span class="score-num">93</span></td><td style="text-align:center;"><span class="grade-tag">优秀</span></td><td style="text-align:center;">3/45</td><td style="text-align:center;">98%</td></tr>
+                        <tr><td>供应链管理</td><td style="text-align:center;"><span class="score-num">91</span></td><td style="text-align:center;"><span class="grade-tag">优秀</span></td><td style="text-align:center;">5/45</td><td style="text-align:center;">98%</td></tr>
+                        <tr><td>运输与配送</td><td style="text-align:center;"><span class="score-num">95</span></td><td style="text-align:center;"><span class="grade-tag">优秀</span></td><td style="text-align:center;">1/45</td><td style="text-align:center;">98%</td></tr>
+                        <tr><td>仓储管理</td><td style="text-align:center;"><span class="score-num">90</span></td><td style="text-align:center;"><span class="grade-tag">优秀</span></td><td style="text-align:center;">6/45</td><td style="text-align:center;">98%</td></tr>
+                        <tr><td>数据分析</td><td style="text-align:center;"><span class="score-num">93</span></td><td style="text-align:center;"><span class="grade-tag">优秀</span></td><td style="text-align:center;">2/45</td><td style="text-align:center;">98%</td></tr>
                     </tbody>
                 </table>
             </div>
 
             <div class="card">
                 <div class="card-header">
-                    <div class="card-title">💼 推荐就业方向</div>
+                    <div class="card-title">🎓 毕业设计</div>
                 </div>
-                <div class="recommend-item">
-                    <div class="rec-row1">
-                        <div class="rec-name">物流工程师</div>
-                        <div class="match-tag">匹配 70%</div>
+                <div style="display:flex;flex-direction:column;gap:8px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:#f9fafb;border-radius:5px;">
+                        <span style="font-weight:500;color:#1f2937;font-size:12px;">基于物联网的智能仓储管理系统设计</span>
+                        <span style="background:#dcfce7;color:#15803d;padding:1px 8px;border-radius:10px;font-size:10px;font-weight:600;">已通过</span>
                     </div>
-                    <div class="rec-progress"><div class="rec-progress-bar" style="width:70%;"></div></div>
-                    <div class="rec-detail">优秀 · 适合智能物流方向核心岗位</div>
-                </div>
-                <div class="recommend-item" style="border-left-color:#8b5cf6;background:linear-gradient(135deg,#f5f3ff,#ede9fe);">
-                    <div class="rec-row1">
-                        <div class="rec-name">供应链分析师</div>
-                        <div class="match-tag" style="background:linear-gradient(135deg,#8b5cf6,#a78bfa);">匹配 65%</div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:#f9fafb;border-radius:5px;">
+                        <span style="font-weight:500;color:#1f2937;font-size:12px;">供应链风险预警模型构建与实现</span>
+                        <span style="background:#fef3c7;color:#b45309;padding:1px 8px;border-radius:10px;font-size:10px;font-weight:600;">评审中</span>
                     </div>
-                    <div class="rec-progress"><div class="rec-progress-bar" style="width:65%;background:linear-gradient(90deg,#8b5cf6,#a78bfa);"></div></div>
-                    <div class="rec-detail">良好 · 数据分析能力突出</div>
-                </div>
-                <div class="recommend-item" style="border-left-color:#10b981;background:linear-gradient(135deg,#ecfdf5,#d1fae5);">
-                    <div class="rec-row1">
-                        <div class="rec-name">推荐企业</div>
-                        <div class="match-tag" style="background:linear-gradient(135deg,#10b981,#34d399);">3 家</div>
-                    </div>
-                    <div class="rec-detail">🏢 顺丰科技 · 京东物流 · 菜鸟网络</div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-title">🎖️ 能力认定</div>
-                    <span style="font-size:11px;color:#6b7280;">2 个</span>
-                </div>
-                <div class="cert-row">
-                    <span class="name">物流工程师</span>
-                    <span class="cert-tag">A+ 达标</span>
-                </div>
-                <div class="cert-grades">
-                    <div class="cert-grade-item"><div class="l">综合评价</div><span class="cert-tag">A+</span></div>
-                    <div class="cert-grade-item"><div class="l">知识</div><span class="cert-tag">A+</span></div>
-                    <div class="cert-grade-item"><div class="l">技能</div><span class="cert-tag">A+</span></div>
-                    <div class="cert-grade-item"><div class="l">素养</div><span class="cert-tag">A+</span></div>
                 </div>
             </div>
         </div>
@@ -702,226 +815,542 @@ const dataMap = {
 };
 
 const scoreMap = {
-    '前端开发工程师': { pct: '86%', pass: 8, fail: 1 },
-    '后端开发工程师': { pct: '78%', pass: 7, fail: 2 },
-    '产品经理': { pct: '82%', pass: 8, fail: 1 },
-    'UI设计师': { pct: '75%', pass: 7, fail: 2 }
+    '前端开发工程师': { pct: '89%', pass: 16, fail: 2, grade: 'A+' },
+    '后端开发工程师': { pct: '78%', pass: 14, fail: 4, grade: 'B+' },
+    '产品经理': { pct: '83%', pass: 15, fail: 3, grade: 'A' },
+    'UI设计师': { pct: '83%', pass: 15, fail: 3, grade: 'A' }
 };
 
 const abilityMap = {
     '前端开发工程师': `
         <tr>
-            <td class="cat-cell" rowspan="2">岗位与行业认知</td>
-            <td style="text-align:left;">行业发展趋势理解</td>
-            <td><span class="score-pill s-high">65</span></td>
-            <td><span class="lvl lvl-zhang">掌握</span></td>
-            <td><span class="lvl lvl-shu">熟练</span></td>
+            <td class="cat-cell" rowspan="4">岗位与行业认知</td>
+            <td style="text-align:left;">前端技术发展趋势</td>
+            <td><span class="score-pill s-high">78</span></td>
+            <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
             <td><span class="res-pass">✓ 通过</span></td>
         </tr>
         <tr>
-            <td style="text-align:left;">岗位职责认知</td>
-            <td><span class="score-pill s-high">72</span></td>
-            <td><span class="lvl lvl-zhang">掌握</span></td>
-            <td><span class="lvl lvl-shu">熟练</span></td>
+            <td style="text-align:left;">岗位职责与工作流程</td>
+            <td><span class="score-pill s-high">82</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-pass">✓ 通过</span></td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">行业规范与标准</td>
+            <td><span class="score-pill s-mid">68</span></td>
+            <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
             <td><span class="res-fail">✗ 不通过</span></td>
         </tr>
         <tr>
-            <td class="cat-cell" rowspan="3">专业技能</td>
-            <td style="text-align:left;">JavaScript 高级能力</td>
+            <td style="text-align:left;">用户体验设计原则</td>
+            <td><span class="score-pill s-high">75</span></td>
+            <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-pass">✓ 通过</span></td>
+        </tr>
+        <tr>
+            <td class="cat-cell" rowspan="4">专业技能</td>
+            <td style="text-align:left;">HTML5/CSS3 核心技术</td>
+            <td><span class="score-pill s-high">88</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-pass">✓ 通过</span></td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">JavaScript/TypeScript 编程</td>
             <td><span class="score-pill s-high">79</span></td>
-            <td><span class="lvl lvl-shu">熟练</span></td>
-            <td><span class="lvl lvl-shu">熟练</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
             <td><span class="res-pass">✓ 通过</span></td>
         </tr>
         <tr>
-            <td style="text-align:left;">React 框架开发</td>
+            <td style="text-align:left;">React/Vue 框架应用</td>
             <td><span class="score-pill s-high">86</span></td>
-            <td><span class="lvl lvl-shu">熟练</span></td>
-            <td><span class="lvl lvl-shu">熟练</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
             <td><span class="res-pass">✓ 通过</span></td>
         </tr>
         <tr>
-            <td style="text-align:left;">CSS 布局能力</td>
-            <td><span class="score-pill s-high">93</span></td>
-            <td><span class="lvl lvl-zhang">掌握</span></td>
-            <td><span class="lvl lvl-zhang">掌握</span></td>
-            <td><span class="res-pass">✓ 通过</span></td>
+            <td style="text-align:left;">前端性能优化</td>
+            <td><span class="score-pill s-mid">64</span></td>
+            <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-fail">✗ 不通过</span></td>
         </tr>
         <tr>
-            <td class="cat-cell" rowspan="2">软技能</td>
-            <td style="text-align:left;">团队协作能力</td>
+            <td class="cat-cell" rowspan="4">软技能</td>
+            <td style="text-align:left;">团队协作与沟通</td>
             <td><span class="score-pill s-high">85</span></td>
-            <td><span class="lvl lvl-zhang">掌握</span></td>
-            <td><span class="lvl lvl-zhang">掌握</span></td>
+            <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+            <td><span class="lvl lvl-zhang">掌握 L4</span></td>
             <td><span class="res-pass">✓ 通过</span></td>
         </tr>
         <tr>
-            <td style="text-align:left;">技术文档能力</td>
+            <td style="text-align:left;">技术文档撰写</td>
             <td><span class="score-pill s-high">72</span></td>
-            <td><span class="lvl lvl-zhang">掌握</span></td>
-            <td><span class="lvl lvl-shu">熟练</span></td>
+            <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-pass">✓ 通过</span></td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">问题分析与解决</td>
+            <td><span class="score-pill s-high">80</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-pass">✓ 通过</span></td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">持续学习能力</td>
+            <td><span class="score-pill s-high">90</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-pass">✓ 通过</span></td>
+        </tr>
+        <tr>
+            <td class="cat-cell" rowspan="3">项目经验</td>
+            <td style="text-align:left;">完整项目开发经历</td>
+            <td><span class="score-pill s-high">82</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-pass">✓ 通过</span></td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">需求评审与拆解</td>
+            <td><span class="score-pill s-high">76</span></td>
+            <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-pass">✓ 通过</span></td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">版本控制与协作</td>
+            <td><span class="score-pill s-high">88</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-pass">✓ 通过</span></td>
+        </tr>
+        <tr>
+            <td class="cat-cell" rowspan="3">工具应用</td>
+            <td style="text-align:left;">VS Code 开发工具</td>
+            <td><span class="score-pill s-high">92</span></td>
+            <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+            <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+            <td><span class="res-pass">✓ 通过</span></td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">Git 版本管理</td>
+            <td><span class="score-pill s-high">85</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-pass">✓ 通过</span></td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">Chrome DevTools 调试</td>
+            <td><span class="score-pill s-high">78</span></td>
+            <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
             <td><span class="res-pass">✓ 通过</span></td>
         </tr>
     `,
     '后端开发工程师': `
         <tr>
-            <td class="cat-cell" rowspan="2">岗位与行业认知</td>
-            <td style="text-align:left;">后端架构趋势理解</td>
-            <td><span class="score-pill s-high">68</span></td>
-            <td><span class="lvl lvl-zhang">掌握</span></td>
-            <td><span class="lvl lvl-shu">熟练</span></td>
+            <td class="cat-cell" rowspan="4">岗位与行业认知</td>
+            <td style="text-align:left;">后端架构发展趋势</td>
+            <td><span class="score-pill s-high">72</span></td>
+            <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
             <td><span class="res-pass">✓ 通过</span></td>
         </tr>
         <tr>
-            <td style="text-align:left;">岗位职责认知</td>
-            <td><span class="score-pill s-mid">58</span></td>
-            <td><span class="lvl lvl-zhang">掌握</span></td>
-            <td><span class="lvl lvl-shu">熟练</span></td>
+            <td style="text-align:left;">分布式系统原理</td>
+            <td><span class="score-pill s-mid">62</span></td>
+            <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
             <td><span class="res-fail">✗ 不通过</span></td>
         </tr>
         <tr>
-            <td class="cat-cell" rowspan="3">专业技能</td>
-            <td style="text-align:left;">Java / Go 开发</td>
-            <td><span class="score-pill s-high">82</span></td>
-            <td><span class="lvl lvl-shu">熟练</span></td>
-            <td><span class="lvl lvl-shu">熟练</span></td>
+            <td style="text-align:left;">岗位职责认知</td>
+            <td><span class="score-pill s-high">78</span></td>
+            <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-pass">✓ 通过</span></td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">云原生技术认知</td>
+            <td><span class="score-pill s-mid">58</span></td>
+            <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-fail">✗ 不通过</span></td>
+        </tr>
+        <tr>
+            <td class="cat-cell" rowspan="4">专业技能</td>
+            <td style="text-align:left;">Java/Go 语言开发</td>
+            <td><span class="score-pill s-high">85</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
             <td><span class="res-pass">✓ 通过</span></td>
         </tr>
         <tr>
             <td style="text-align:left;">数据库设计与优化</td>
-            <td><span class="score-pill s-high">76</span></td>
-            <td><span class="lvl lvl-shu">熟练</span></td>
-            <td><span class="lvl lvl-shu">熟练</span></td>
+            <td><span class="score-pill s-high">80</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
             <td><span class="res-pass">✓ 通过</span></td>
         </tr>
         <tr>
-            <td style="text-align:left;">微服务架构</td>
+            <td style="text-align:left;">微服务架构设计</td>
             <td><span class="score-pill s-mid">64</span></td>
-            <td><span class="lvl lvl-zhang">掌握</span></td>
-            <td><span class="lvl lvl-shu">熟练</span></td>
+            <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
             <td><span class="res-fail">✗ 不通过</span></td>
         </tr>
         <tr>
-            <td class="cat-cell" rowspan="2">软技能</td>
-            <td style="text-align:left;">系统分析能力</td>
-            <td><span class="score-pill s-high">80</span></td>
-            <td><span class="lvl lvl-zhang">掌握</span></td>
-            <td><span class="lvl lvl-zhang">掌握</span></td>
+            <td style="text-align:left;">API 接口开发</td>
+            <td><span class="score-pill s-high">88</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-pass">✓ 通过</span></td>
+        </tr>
+        <tr>
+            <td class="cat-cell" rowspan="4">软技能</td>
+            <td style="text-align:left;">系统分析与设计</td>
+            <td><span class="score-pill s-high">82</span></td>
+            <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+            <td><span class="lvl lvl-zhang">掌握 L4</span></td>
             <td><span class="res-pass">✓ 通过</span></td>
         </tr>
         <tr>
             <td style="text-align:left;">接口文档编写</td>
-            <td><span class="score-pill s-high">75</span></td>
-            <td><span class="lvl lvl-zhang">掌握</span></td>
-            <td><span class="lvl lvl-shu">熟练</span></td>
+            <td><span class="score-pill s-high">76</span></td>
+            <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
             <td><span class="res-pass">✓ 通过</span></td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">跨团队协作</td>
+            <td><span class="score-pill s-high">70</span></td>
+            <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-pass">✓ 通过</span></td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">代码审查能力</td>
+            <td><span class="score-pill s-high">74</span></td>
+            <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-pass">✓ 通过</span></td>
+        </tr>
+        <tr>
+            <td class="cat-cell" rowspan="3">项目经验</td>
+            <td style="text-align:left;">高并发项目经验</td>
+            <td><span class="score-pill s-mid">66</span></td>
+            <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-fail">✗ 不通过</span></td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">系统架构设计</td>
+            <td><span class="score-pill s-high">72</span></td>
+            <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-pass">✓ 通过</span></td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">性能调优实践</td>
+            <td><span class="score-pill s-high">78</span></td>
+            <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-pass">✓ 通过</span></td>
+        </tr>
+        <tr>
+            <td class="cat-cell" rowspan="3">工具应用</td>
+            <td style="text-align:left;">Docker 容器化</td>
+            <td><span class="score-pill s-high">80</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-pass">✓ 通过</span></td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">Linux 系统运维</td>
+            <td><span class="score-pill s-high">75</span></td>
+            <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-pass">✓ 通过</span></td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">监控与日志工具</td>
+            <td><span class="score-pill s-mid">60</span></td>
+            <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-fail">✗ 不通过</span></td>
         </tr>
     `,
     '产品经理': `
         <tr>
-            <td class="cat-cell" rowspan="2">岗位与行业认知</td>
+            <td class="cat-cell" rowspan="4">岗位与行业认知</td>
             <td style="text-align:left;">互联网产品趋势</td>
-            <td><span class="score-pill s-high">88</span></td>
-            <td><span class="lvl lvl-shu">熟练</span></td>
-            <td><span class="lvl lvl-shu">熟练</span></td>
+            <td><span class="score-pill s-high">90</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-pass">✓ 通过</span></td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">竞品分析方法</td>
+            <td><span class="score-pill s-high">82</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
             <td><span class="res-pass">✓ 通过</span></td>
         </tr>
         <tr>
             <td style="text-align:left;">产品经理职责认知</td>
-            <td><span class="score-pill s-high">85</span></td>
-            <td><span class="lvl lvl-shu">熟练</span></td>
-            <td><span class="lvl lvl-shu">熟练</span></td>
+            <td><span class="score-pill s-high">88</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
             <td><span class="res-pass">✓ 通过</span></td>
         </tr>
         <tr>
-            <td class="cat-cell" rowspan="3">专业技能</td>
-            <td style="text-align:left;">需求分析能力</td>
-            <td><span class="score-pill s-high">90</span></td>
-            <td><span class="lvl lvl-shu">熟练</span></td>
-            <td><span class="lvl lvl-shu">熟练</span></td>
-            <td><span class="res-pass">✓ 通过</span></td>
-        </tr>
-        <tr>
-            <td style="text-align:left;">原型设计工具</td>
-            <td><span class="score-pill s-mid">62</span></td>
-            <td><span class="lvl lvl-zhang">掌握</span></td>
-            <td><span class="lvl lvl-shu">熟练</span></td>
+            <td style="text-align:left;">商业模式理解</td>
+            <td><span class="score-pill s-mid">65</span></td>
+            <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
             <td><span class="res-fail">✗ 不通过</span></td>
         </tr>
         <tr>
-            <td style="text-align:left;">数据分析能力</td>
-            <td><span class="score-pill s-high">78</span></td>
-            <td><span class="lvl lvl-shu">熟练</span></td>
-            <td><span class="lvl lvl-shu">熟练</span></td>
-            <td><span class="res-pass">✓ 通过</span></td>
-        </tr>
-        <tr>
-            <td class="cat-cell" rowspan="2">软技能</td>
-            <td style="text-align:left;">沟通协调能力</td>
+            <td class="cat-cell" rowspan="4">专业技能</td>
+            <td style="text-align:left;">需求分析与挖掘</td>
             <td><span class="score-pill s-high">92</span></td>
-            <td><span class="lvl lvl-shu">熟练</span></td>
-            <td><span class="lvl lvl-shu">熟练</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
             <td><span class="res-pass">✓ 通过</span></td>
         </tr>
         <tr>
-            <td style="text-align:left;">项目管理能力</td>
-            <td><span class="score-pill s-high">70</span></td>
-            <td><span class="lvl lvl-zhang">掌握</span></td>
-            <td><span class="lvl lvl-shu">熟练</span></td>
+            <td style="text-align:left;">原型设计与交互</td>
+            <td><span class="score-pill s-mid">62</span></td>
+            <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-fail">✗ 不通过</span></td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">数据分析与决策</td>
+            <td><span class="score-pill s-high">80</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-pass">✓ 通过</span></td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">产品规划与路线图</td>
+            <td><span class="score-pill s-high">85</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-pass">✓ 通过</span></td>
+        </tr>
+        <tr>
+            <td class="cat-cell" rowspan="4">软技能</td>
+            <td style="text-align:left;">跨部门沟通协调</td>
+            <td><span class="score-pill s-high">92</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-pass">✓ 通过</span></td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">用户访谈与调研</td>
+            <td><span class="score-pill s-high">78</span></td>
+            <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-pass">✓ 通过</span></td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">项目推进与管理</td>
+            <td><span class="score-pill s-high">75</span></td>
+            <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-pass">✓ 通过</span></td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">演讲与汇报能力</td>
+            <td><span class="score-pill s-high">88</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-pass">✓ 通过</span></td>
+        </tr>
+        <tr>
+            <td class="cat-cell" rowspan="3">项目经验</td>
+            <td style="text-align:left;">0-1 产品落地经验</td>
+            <td><span class="score-pill s-high">82</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-pass">✓ 通过</span></td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">产品迭代优化</td>
+            <td><span class="score-pill s-high">86</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-pass">✓ 通过</span></td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">上线运营配合</td>
+            <td><span class="score-pill s-mid">68</span></td>
+            <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-fail">✗ 不通过</span></td>
+        </tr>
+        <tr>
+            <td class="cat-cell" rowspan="3">工具应用</td>
+            <td style="text-align:left;">Axure/Figma 原型</td>
+            <td><span class="score-pill s-high">80</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-pass">✓ 通过</span></td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">数据分析平台</td>
+            <td><span class="score-pill s-high">76</span></td>
+            <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-pass">✓ 通过</span></td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">项目管理工具</td>
+            <td><span class="score-pill s-high">85</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
             <td><span class="res-pass">✓ 通过</span></td>
         </tr>
     `,
     'UI设计师': `
         <tr>
-            <td class="cat-cell" rowspan="2">岗位与行业认知</td>
+            <td class="cat-cell" rowspan="4">岗位与行业认知</td>
             <td style="text-align:left;">设计趋势洞察</td>
-            <td><span class="score-pill s-high">80</span></td>
-            <td><span class="lvl lvl-shu">熟练</span></td>
-            <td><span class="lvl lvl-shu">熟练</span></td>
+            <td><span class="score-pill s-high">88</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
             <td><span class="res-pass">✓ 通过</span></td>
         </tr>
         <tr>
-            <td style="text-align:left;">UI 设计师职责</td>
-            <td><span class="score-pill s-high">76</span></td>
-            <td><span class="lvl lvl-zhang">掌握</span></td>
-            <td><span class="lvl lvl-shu">熟练</span></td>
-            <td><span class="res-pass">✓ 通过</span></td>
-        </tr>
-        <tr>
-            <td class="cat-cell" rowspan="3">专业技能</td>
-            <td style="text-align:left;">Figma / Sketch</td>
+            <td style="text-align:left;">UI/UX 设计规范</td>
             <td><span class="score-pill s-high">85</span></td>
-            <td><span class="lvl lvl-shu">熟练</span></td>
-            <td><span class="lvl lvl-shu">熟练</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-pass">✓ 通过</span></td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">设计师职责认知</td>
+            <td><span class="score-pill s-high">80</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-pass">✓ 通过</span></td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">设计系统思维</td>
+            <td><span class="score-pill s-mid">65</span></td>
+            <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-fail">✗ 不通过</span></td>
+        </tr>
+        <tr>
+            <td class="cat-cell" rowspan="4">专业技能</td>
+            <td style="text-align:left;">Figma/Sketch 设计</td>
+            <td><span class="score-pill s-high">90</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
             <td><span class="res-pass">✓ 通过</span></td>
         </tr>
         <tr>
             <td style="text-align:left;">视觉设计规范</td>
             <td><span class="score-pill s-high">88</span></td>
-            <td><span class="lvl lvl-shu">熟练</span></td>
-            <td><span class="lvl lvl-shu">熟练</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
             <td><span class="res-pass">✓ 通过</span></td>
         </tr>
         <tr>
-            <td style="text-align:left;">交互设计基础</td>
-            <td><span class="score-pill s-mid">60</span></td>
-            <td><span class="lvl lvl-zhang">掌握</span></td>
-            <td><span class="lvl lvl-shu">熟练</span></td>
+            <td style="text-align:left;">交互设计原理</td>
+            <td><span class="score-pill s-mid">62</span></td>
+            <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
             <td><span class="res-fail">✗ 不通过</span></td>
         </tr>
         <tr>
-            <td class="cat-cell" rowspan="2">软技能</td>
-            <td style="text-align:left;">审美与创意</td>
-            <td><span class="score-pill s-high">90</span></td>
-            <td><span class="lvl lvl-shu">熟练</span></td>
-            <td><span class="lvl lvl-shu">熟练</span></td>
+            <td style="text-align:left;">设计交付与标注</td>
+            <td><span class="score-pill s-high">86</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-pass">✓ 通过</span></td>
+        </tr>
+        <tr>
+            <td class="cat-cell" rowspan="4">软技能</td>
+            <td style="text-align:left;">审美与创意表达</td>
+            <td><span class="score-pill s-high">92</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
             <td><span class="res-pass">✓ 通过</span></td>
         </tr>
         <tr>
             <td style="text-align:left;">设计提案表达</td>
+            <td><span class="score-pill s-high">78</span></td>
+            <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-pass">✓ 通过</span></td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">用户同理心</td>
+            <td><span class="score-pill s-high">85</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-pass">✓ 通过</span></td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">设计反馈处理</td>
             <td><span class="score-pill s-high">72</span></td>
-            <td><span class="lvl lvl-zhang">掌握</span></td>
-            <td><span class="lvl lvl-shu">熟练</span></td>
+            <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-pass">✓ 通过</span></td>
+        </tr>
+        <tr>
+            <td class="cat-cell" rowspan="3">项目经验</td>
+            <td style="text-align:left;">完整设计项目</td>
+            <td><span class="score-pill s-high">84</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-pass">✓ 通过</span></td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">设计评审经验</td>
+            <td><span class="score-pill s-high">76</span></td>
+            <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-pass">✓ 通过</span></td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">设计走查配合</td>
+            <td><span class="score-pill s-high">80</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-pass">✓ 通过</span></td>
+        </tr>
+        <tr>
+            <td class="cat-cell" rowspan="3">工具应用</td>
+            <td style="text-align:left;">Figma 高级功能</td>
+            <td><span class="score-pill s-high">88</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-pass">✓ 通过</span></td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">动效设计工具</td>
+            <td><span class="score-pill s-mid">66</span></td>
+            <td><span class="lvl lvl-zhang">掌握 L4</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="res-fail">✗ 不通过</span></td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">素材管理平台</td>
+            <td><span class="score-pill s-high">82</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
+            <td><span class="lvl lvl-shu">熟练 L5</span></td>
             <td><span class="res-pass">✓ 通过</span></td>
         </tr>
     `
@@ -980,6 +1409,7 @@ function switchTab(el, key) {
     document.getElementById('scorePct').textContent = s.pct;
     document.getElementById('passCount').textContent = s.pass;
     document.getElementById('failCount').textContent = s.fail;
+    document.getElementById('gradeLabel').textContent = s.grade;
     
     // 更新能力画像表
     document.getElementById('abilityBody').innerHTML = abilityMap[key];

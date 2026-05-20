@@ -761,6 +761,7 @@ export interface SceneGradingSubmission {
   taskId: string
   taskName: string
   assessmentForm: string
+  method: '试卷' | '题库' | '评审' | '现场问答'
   status: 'pending' | 'graded'
   submittedAt: string
   maxScore: number

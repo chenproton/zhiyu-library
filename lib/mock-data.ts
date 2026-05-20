@@ -2964,12 +2964,36 @@ function makePortrait(
 }
 
 export const mockStudentAbilityPortraits: StudentAbilityPortrait[] = [
-  makePortrait('sp-portrait-1', '张三', '2021001', '2021级全栈开发1班', '软件工程', '全栈开发工程师', 'A', '男', [88, 92, 90, 85, 87], 2, 35, 5, 120, [['全栈开发工程师', 95], ['后端开发工程师', 88], ['前端开发工程师', 85]]),
-  makePortrait('sp-portrait-2', '李四', '2021002', '2021级全栈开发1班', '软件工程', '全栈开发工程师', 'C', '男', [70, 72, 68, 75, 73], 28, 35, 95, 120, [['测试工程师', 72], ['运维工程师', 68]]),
-  makePortrait('sp-portrait-3', '王五', '2021003', '2021级后端开发1班', '计算机科学与技术', '后端开发工程师', 'B', '男', [80, 85, 82, 78, 80], 8, 30, 25, 120, [['后端开发工程师', 90], ['全栈开发工程师', 82]]),
-  makePortrait('sp-portrait-4', '赵六', '2021004', '2021级前端开发1班', '数字媒体技术', '前端开发工程师', 'D', '女', [62, 65, 60, 68, 55], 32, 32, 110, 120, [['UI设计师', 60], ['产品经理助理', 55]]),
-  makePortrait('sp-portrait-5', '孙七', '2021005', '2021级全栈开发1班', '软件工程', '全栈开发工程师', 'A', '男', [90, 93, 91, 88, 89], 1, 35, 2, 120, [['全栈开发工程师', 98], ['架构师助理', 92], ['后端开发工程师', 90]]),
-  makePortrait('sp-portrait-6', '周八', '2021006', '2021级后端开发1班', '计算机科学与技术', '后端开发工程师', 'B', '女', [82, 80, 84, 78, 81], 12, 30, 30, 120, [['后端开发工程师', 88], ['数据库工程师', 82]]),
+  makePortrait('sp-portrait-1', '张三', '2021001', '2021级全栈开发1班', '软件工程', '全栈开发工程师', 'A', '男', [88, 92, 90, 85, 87], 2, 40, 5, 150, [['全栈开发工程师', 95], ['后端开发工程师', 88], ['前端开发工程师', 85]]),
+  makePortrait('sp-portrait-2', '李四', '2021002', '2021级全栈开发1班', '软件工程', '全栈开发工程师', 'C', '男', [70, 72, 68, 75, 73], 28, 40, 95, 150, [['测试工程师', 72], ['运维工程师', 68]]),
+  makePortrait('sp-portrait-3', '王五', '2021003', '2021级后端开发1班', '计算机科学与技术', '后端开发工程师', 'B', '男', [80, 85, 82, 78, 80], 8, 35, 25, 150, [['后端开发工程师', 90], ['全栈开发工程师', 82]]),
+  makePortrait('sp-portrait-4', '赵六', '2021004', '2021级前端开发1班', '数字媒体技术', '前端开发工程师', 'D', '女', [62, 65, 60, 68, 55], 32, 38, 110, 150, [['UI设计师', 60], ['产品经理助理', 55]]),
+  makePortrait('sp-portrait-5', '孙七', '2021005', '2021级全栈开发1班', '软件工程', '全栈开发工程师', 'A', '男', [90, 93, 91, 88, 89], 1, 40, 2, 150, [['全栈开发工程师', 98], ['架构师助理', 92], ['后端开发工程师', 90]]),
+  makePortrait('sp-portrait-6', '周八', '2021006', '2021级后端开发1班', '计算机科学与技术', '后端开发工程师', 'B', '女', [82, 80, 84, 78, 81], 12, 35, 30, 150, [['后端开发工程师', 88], ['数据库工程师', 82]]),
+  makePortrait('sp-portrait-7', '吴九', '2021007', '2021级全栈开发2班', '软件工程', '全栈开发工程师', 'B', '女', [85, 83, 86, 80, 82], 10, 42, 28, 150, [['全栈开发工程师', 90], ['前端开发工程师', 85]]),
+  makePortrait('sp-portrait-8', '郑十', '2021008', '2021级全栈开发2班', '软件工程', '全栈开发工程师', 'A', '男', [92, 94, 91, 89, 90], 3, 42, 8, 150, [['全栈开发工程师', 96], ['技术总监助理', 90]]),
+  makePortrait('sp-portrait-9', '钱十一', '2021009', '2021级全栈开发2班', '软件工程', '全栈开发工程师', 'C', '女', [68, 70, 72, 65, 69], 35, 42, 102, 150, [['测试工程师', 70], ['运维工程师', 65]]),
+  makePortrait('sp-portrait-10', '冯十二', '2021010', '2021级后端开发2班', '计算机科学与技术', '后端开发工程师', 'A', '男', [90, 88, 92, 85, 87], 4, 36, 12, 150, [['后端开发工程师', 94], ['全栈开发工程师', 88]]),
+  makePortrait('sp-portrait-11', '陈十三', '2021011', '2021级后端开发2班', '计算机科学与技术', '后端开发工程师', 'B', '女', [78, 82, 80, 76, 79], 15, 36, 38, 150, [['后端开发工程师', 86], ['数据库工程师', 80]]),
+  makePortrait('sp-portrait-12', '褚十四', '2021012', '2021级后端开发2班', '计算机科学与技术', '后端开发工程师', 'D', '男', [55, 58, 60, 62, 52], 34, 36, 115, 150, [['运维工程师', 58], ['技术支持', 55]]),
+  makePortrait('sp-portrait-13', '卫十五', '2021013', '2021级前端开发2班', '数字媒体技术', '前端开发工程师', 'B', '女', [84, 86, 82, 80, 83], 9, 40, 32, 150, [['前端开发工程师', 88], ['UI设计师', 82]]),
+  makePortrait('sp-portrait-14', '蒋十六', '2021014', '2021级前端开发2班', '数字媒体技术', '前端开发工程师', 'A', '男', [91, 89, 93, 87, 90], 2, 40, 6, 150, [['前端开发工程师', 95], ['全栈开发工程师', 90]]),
+  makePortrait('sp-portrait-15', '沈十七', '2021015', '2021级前端开发2班', '数字媒体技术', '前端开发工程师', 'C', '女', [72, 68, 70, 74, 69], 30, 40, 98, 150, [['UI设计师', 72], ['视觉设计师', 68]]),
+  makePortrait('sp-portrait-16', '韩十八', '2021016', '2021级人工智能1班', '人工智能', '算法工程师', 'A', '男', [93, 95, 91, 88, 92], 1, 45, 3, 150, [['算法工程师', 97], ['数据科学家', 92]]),
+  makePortrait('sp-portrait-17', '杨十九', '2021017', '2021级人工智能1班', '人工智能', '算法工程师', 'B', '女', [85, 82, 88, 80, 84], 12, 45, 35, 150, [['算法工程师', 88], ['机器学习工程师', 82]]),
+  makePortrait('sp-portrait-18', '朱二十', '2021018', '2021级人工智能1班', '人工智能', '算法工程师', 'C', '男', [70, 68, 72, 65, 71], 38, 45, 105, 150, [['数据分析师', 72], ['Python开发工程师', 68]]),
+  makePortrait('sp-portrait-19', '秦二十一', '2021019', '2021级人工智能1班', '人工智能', '算法工程师', 'B', '女', [80, 84, 82, 78, 81], 18, 45, 42, 150, [['算法工程师', 85], ['数据科学家', 80]]),
+  makePortrait('sp-portrait-20', '尤二十二', '2021020', '2021级网络工程1班', '网络工程', '网络安全工程师', 'A', '男', [89, 91, 87, 85, 88], 2, 30, 10, 150, [['网络安全工程师', 94], ['运维工程师', 88]]),
+  makePortrait('sp-portrait-21', '许二十三', '2021021', '2021级网络工程1班', '网络工程', '网络安全工程师', 'B', '女', [78, 80, 82, 76, 79], 14, 30, 48, 150, [['网络安全工程师', 85], ['网络工程师', 80]]),
+  makePortrait('sp-portrait-22', '何二十四', '2021022', '2021级网络工程1班', '网络工程', '网络安全工程师', 'C', '男', [65, 68, 70, 62, 66], 28, 30, 112, 150, [['运维工程师', 70], ['技术支持', 65]]),
+  makePortrait('sp-portrait-23', '吕二十五', '2021023', '2021级前端开发1班', '数字媒体技术', '前端开发工程师', 'B', '男', [83, 85, 80, 78, 82], 14, 38, 45, 150, [['前端开发工程师', 86], ['UI设计师', 80]]),
+  makePortrait('sp-portrait-24', '施二十六', '2021024', '2021级前端开发1班', '数字媒体技术', '前端开发工程师', 'A', '女', [90, 88, 92, 86, 89], 5, 38, 15, 150, [['前端开发工程师', 93], ['全栈开发工程师', 88]]),
+  makePortrait('sp-portrait-25', '张二十七', '2021025', '2021级后端开发1班', '计算机科学与技术', '后端开发工程师', 'C', '女', [68, 70, 72, 66, 69], 25, 35, 100, 150, [['测试工程师', 72], ['运维工程师', 68]]),
+  makePortrait('sp-portrait-26', '孔二十八', '2021026', '2021级全栈开发1班', '软件工程', '全栈开发工程师', 'B', '男', [80, 82, 78, 76, 81], 18, 40, 55, 150, [['全栈开发工程师', 84], ['后端开发工程师', 78]]),
+  makePortrait('sp-portrait-27', '曹二十九', '2021027', '2021级全栈开发2班', '软件工程', '全栈开发工程师', 'D', '女', [58, 60, 62, 55, 59], 40, 42, 120, 150, [['测试工程师', 60], ['技术支持', 55]]),
+  makePortrait('sp-portrait-28', '严三十', '2021028', '2021级人工智能1班', '人工智能', '算法工程师', 'A', '男', [94, 92, 96, 90, 93], 2, 45, 5, 150, [['算法工程师', 98], ['数据科学家', 94]]),
+  makePortrait('sp-portrait-29', '华三十一', '2021029', '2021级网络工程1班', '网络工程', '网络安全工程师', 'B', '女', [82, 84, 80, 78, 83], 10, 30, 40, 150, [['网络安全工程师', 86], ['网络工程师', 82]]),
+  makePortrait('sp-portrait-30', '金三十二', '2021030', '2021级后端开发2班', '计算机科学与技术', '后端开发工程师', 'A', '男', [91, 89, 93, 87, 90], 3, 36, 9, 150, [['后端开发工程师', 95], ['架构师助理', 90]]),
 ]
 
 
@@ -3150,8 +3174,20 @@ export const sceneGradingScenarios = [
 ]
 
 export const sceneGradingSubmissions = [
-  { id: 'sg-sub-1', studentId: 'sg-s-1', scenarioId: 'sg-sc-1', scenarioName: 'Web前端开发实训', taskId: 'sg-t-1', taskName: 'HTML/CSS基础考核', assessmentForm: '实操', status: 'graded' as const, submittedAt: '2024-03-15', maxScore: 100 },
-  { id: 'sg-sub-2', studentId: 'sg-s-2', scenarioId: 'sg-sc-1', scenarioName: 'Web前端开发实训', taskId: 'sg-t-1', taskName: 'HTML/CSS基础考核', assessmentForm: '实操', status: 'pending' as const, submittedAt: '2024-03-16', maxScore: 100 },
+  // Web前端开发实训 - HTML/CSS基础考核
+  { id: 'sg-sub-1', studentId: 'sg-s-1', scenarioId: 'sg-sc-1', scenarioName: 'Web前端开发实训', taskId: 'sg-t-1', taskName: 'HTML/CSS基础考核', assessmentForm: '实操', method: '试卷' as const, status: 'graded' as const, submittedAt: '2024-03-15', maxScore: 100 },
+  { id: 'sg-sub-2', studentId: 'sg-s-2', scenarioId: 'sg-sc-1', scenarioName: 'Web前端开发实训', taskId: 'sg-t-1', taskName: 'HTML/CSS基础考核', assessmentForm: '实操', method: '试卷' as const, status: 'pending' as const, submittedAt: '2024-03-16', maxScore: 100 },
+  { id: 'sg-sub-3', studentId: 'sg-s-3', scenarioId: 'sg-sc-1', scenarioName: 'Web前端开发实训', taskId: 'sg-t-1', taskName: 'HTML/CSS基础考核', assessmentForm: '实操', method: '题库' as const, status: 'graded' as const, submittedAt: '2024-03-14', maxScore: 100 },
+  { id: 'sg-sub-4', studentId: 'sg-s-1', scenarioId: 'sg-sc-1', scenarioName: 'Web前端开发实训', taskId: 'sg-t-1', taskName: 'HTML/CSS基础考核', assessmentForm: '实操', method: '评审' as const, status: 'pending' as const, submittedAt: '2024-03-17', maxScore: 100 },
+  { id: 'sg-sub-5', studentId: 'sg-s-2', scenarioId: 'sg-sc-1', scenarioName: 'Web前端开发实训', taskId: 'sg-t-1', taskName: 'HTML/CSS基础考核', assessmentForm: '实操', method: '现场问答' as const, status: 'graded' as const, submittedAt: '2024-03-13', maxScore: 100 },
+  // Web前端开发实训 - JavaScript编程练习
+  { id: 'sg-sub-6', studentId: 'sg-s-1', scenarioId: 'sg-sc-1', scenarioName: 'Web前端开发实训', taskId: 'sg-t-2', taskName: 'JavaScript编程练习', assessmentForm: '训练', method: '试卷' as const, status: 'graded' as const, submittedAt: '2024-03-18', maxScore: 100 },
+  { id: 'sg-sub-7', studentId: 'sg-s-2', scenarioId: 'sg-sc-1', scenarioName: 'Web前端开发实训', taskId: 'sg-t-2', taskName: 'JavaScript编程练习', assessmentForm: '训练', method: '题库' as const, status: 'pending' as const, submittedAt: '2024-03-19', maxScore: 100 },
+  { id: 'sg-sub-8', studentId: 'sg-s-3', scenarioId: 'sg-sc-1', scenarioName: 'Web前端开发实训', taskId: 'sg-t-2', taskName: 'JavaScript编程练习', assessmentForm: '训练', method: '评审' as const, status: 'graded' as const, submittedAt: '2024-03-18', maxScore: 100 },
+  // Java后端开发实训 - Spring Boot项目实战
+  { id: 'sg-sub-9', studentId: 'sg-s-1', scenarioId: 'sg-sc-2', scenarioName: 'Java后端开发实训', taskId: 'sg-t-3', taskName: 'Spring Boot项目实战', assessmentForm: '项目', method: '试卷' as const, status: 'pending' as const, submittedAt: '2024-03-20', maxScore: 100 },
+  { id: 'sg-sub-10', studentId: 'sg-s-2', scenarioId: 'sg-sc-2', scenarioName: 'Java后端开发实训', taskId: 'sg-t-3', taskName: 'Spring Boot项目实战', assessmentForm: '项目', method: '现场问答' as const, status: 'graded' as const, submittedAt: '2024-03-19', maxScore: 100 },
+  { id: 'sg-sub-11', studentId: 'sg-s-3', scenarioId: 'sg-sc-2', scenarioName: 'Java后端开发实训', taskId: 'sg-t-3', taskName: 'Spring Boot项目实战', assessmentForm: '项目', method: '评审' as const, status: 'pending' as const, submittedAt: '2024-03-21', maxScore: 100 },
 ]
 
 export const mockOnlineClassrooms = [

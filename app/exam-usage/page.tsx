@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useRef } from "react"
 import { useRouter } from "next/navigation"
-import { Plus, Search, BookOpen, Video, GraduationCap, PlayCircle, X, ChevronDown, MoreHorizontal, Eye, Pencil, Trash2, Clock, CheckCircle2, XCircle, Share2, ImageIcon } from "lucide-react"
+import { Plus, Search, BookOpen, Video, GraduationCap, PlayCircle, X, ChevronDown, MoreHorizontal, Eye, Pencil, Trash2, Clock, CheckCircle2, XCircle, Share2, ImageIcon, Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -45,6 +45,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useData } from "@/components/providers/data-provider"
 import { PageHeaderCard } from "@/components/shared/page-header-card"
+import { CoBuilderDialog } from "@/components/shared/co-builder-dialog"
+import { mockUsers } from "@/lib/mock-data"
 
 // 使用类型：随堂测、在线考试
 type UsageType = 'quiz' | 'exam'
@@ -66,6 +68,8 @@ export interface ExamUsage {
   participantCount: number
   passCount?: number
   status: 'pending' | 'active' | 'ended'
+  targetAudience?: 'student' | 'teacher'
+  teacherIds?: string[]
 }
 
 // 模拟班级数据
@@ -186,6 +190,7 @@ export const mockUsages: ExamUsage[] = [
     participantCount: 42,
     passCount: 38,
     status: 'active',
+    targetAudience: 'student',
   },
   {
     id: 'usage-4',
@@ -216,6 +221,8 @@ export const mockUsages: ExamUsage[] = [
     participantCount: 0,
     passCount: 0,
     status: 'pending',
+    targetAudience: 'teacher',
+    teacherIds: ['user-1', 'user-2'],
   },
   {
     id: 'usage-6',
@@ -276,6 +283,9 @@ export default function ExamUsagePage() {
   const coverFileInputRef = useRef<HTMLInputElement>(null)
   const [orgPopoverOpen, setOrgPopoverOpen] = useState(false)
   const [orgSearch, setOrgSearch] = useState("")
+  const [targetAudience, setTargetAudience] = useState<'student' | 'teacher'>('student')
+  const [selectedTeacherIds, setSelectedTeacherIds] = useState<string[]>([])
+  const [teacherDialogOpen, setTeacherDialogOpen] = useState(false)
 
   const selectedExam = exams.find(e => e.id === selectedExamId)
 
@@ -327,6 +337,8 @@ export default function ExamUsagePage() {
     setPublishToFront(false)
     setCoverUrl("")
     setOrgSearch("")
+    setTargetAudience('student')
+    setSelectedTeacherIds([])
   }
 
   const openShareDialog = (usage: ExamUsage) => {
@@ -543,6 +555,7 @@ export default function ExamUsagePage() {
               <TableRow>
                 <TableHead className="w-[160px]">试卷名称</TableHead>
                 <TableHead className="w-[120px]">使用场景</TableHead>
+                <TableHead className="w-[100px]">面向对象</TableHead>
                 <TableHead className="w-[160px]">考试描述</TableHead>
                 <TableHead className="w-[90px]">考试时长</TableHead>
                 <TableHead className="w-[90px]">参考人数</TableHead>
@@ -555,7 +568,7 @@ export default function ExamUsagePage() {
             <TableBody>
               {filteredUsages.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={9} className="h-24 text-center text-muted-foreground">
+                  <TableCell colSpan={10} className="h-24 text-center text-muted-foreground">
                     暂无使用记录
                   </TableCell>
                 </TableRow>
@@ -568,6 +581,14 @@ export default function ExamUsagePage() {
                         {getDisplayTypeIcon(usage.displayType)}
                         <span className="text-sm">{getDisplayTypeLabel(usage.displayType)}</span>
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm">
+                        {usage.displayType === '教学考试'
+                          ? (usage.targetAudience === 'teacher' ? '教师' : '学生')
+                          : '-'
+                        }
+                      </span>
                     </TableCell>
                     <TableCell>
                       <span className="text-sm text-muted-foreground line-clamp-2">
@@ -727,69 +748,120 @@ export default function ExamUsagePage() {
               </Field>
 
               <Field>
-                <FieldLabel>考试时长（分钟）</FieldLabel>
-                <Input
-                  type="number"
-                  min={1}
-                  max={300}
-                  value={examDuration}
-                  onChange={(e) => setExamDuration(Number(e.target.value))}
-                />
+                <FieldLabel>面向对象</FieldLabel>
+                <div className="flex items-center gap-4">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="targetAudience"
+                      checked={targetAudience === 'student'}
+                      onChange={() => setTargetAudience('student')}
+                    />
+                    <span className="text-sm">学生</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="targetAudience"
+                      checked={targetAudience === 'teacher'}
+                      onChange={() => setTargetAudience('teacher')}
+                    />
+                    <span className="text-sm">教师</span>
+                  </label>
+                </div>
               </Field>
 
-              <Field>
-                <FieldLabel>参考班级</FieldLabel>
-                <Popover open={orgPopoverOpen} onOpenChange={setOrgPopoverOpen}>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-full justify-between font-normal">
-                      <span className="truncate">
-                        {selectedClassIds.length === 0
-                          ? "请选择参考班级"
-                          : `已选 ${selectedClassIds.length} 个班级`
-                        }
-                      </span>
-                      <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-[320px] p-0" align="start">
-                    <div className="border-b p-2">
-                      <div className="relative">
-                        <Search className="absolute left-2 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-                        <Input
-                          placeholder="搜索班级..."
-                          value={orgSearch}
-                          onChange={(e) => setOrgSearch(e.target.value)}
-                          className="pl-8"
-                        />
+              {targetAudience === 'student' && (
+                <Field>
+                  <FieldLabel>参考班级</FieldLabel>
+                  <Popover open={orgPopoverOpen} onOpenChange={setOrgPopoverOpen}>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" className="w-full justify-between font-normal">
+                        <span className="truncate">
+                          {selectedClassIds.length === 0
+                            ? "请选择参考班级"
+                            : `已选 ${selectedClassIds.length} 个班级`
+                          }
+                        </span>
+                        <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[320px] p-0" align="start">
+                      <div className="border-b p-2">
+                        <div className="relative">
+                          <Search className="absolute left-2 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                          <Input
+                            placeholder="搜索班级..."
+                            value={orgSearch}
+                            onChange={(e) => setOrgSearch(e.target.value)}
+                            className="pl-8"
+                          />
+                        </div>
                       </div>
-                    </div>
-                    <ScrollArea className="h-[240px] overflow-hidden">
-                      <div className="p-2">
-                        {mockOrgClasses.map(node => renderOrgNode(node, 0))}
-                      </div>
-                    </ScrollArea>
-                    {selectedClassIds.length > 0 && (
-                      <div className="border-t p-2">
-                        <div className="mb-1 text-xs text-muted-foreground">已选班级</div>
-                        <div className="flex flex-wrap gap-1">
-                          {selectedClassIds.map(id => (
+                      <ScrollArea className="h-[240px] overflow-hidden">
+                        <div className="p-2">
+                          {mockOrgClasses.map(node => renderOrgNode(node, 0))}
+                        </div>
+                      </ScrollArea>
+                      {selectedClassIds.length > 0 && (
+                        <div className="border-t p-2">
+                          <div className="mb-1 text-xs text-muted-foreground">已选班级</div>
+                          <div className="flex flex-wrap gap-1">
+                            {selectedClassIds.map(id => (
+                              <Badge key={id} variant="secondary" className="gap-1">
+                                {classNameMap.get(id) || id}
+                                <button
+                                  type="button"
+                                  onClick={() => handleToggleClass(id)}
+                                  className="ml-1 rounded-full hover:bg-muted"
+                                >
+                                  <X className="size-3" />
+                                </button>
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </PopoverContent>
+                  </Popover>
+                </Field>
+              )}
+
+              {targetAudience === 'teacher' && (
+                <Field>
+                  <FieldLabel>参考人员</FieldLabel>
+                  <div className="space-y-2">
+                    {selectedTeacherIds.length > 0 && (
+                      <div className="flex flex-wrap gap-1">
+                        {selectedTeacherIds.map(id => {
+                          const teacher = mockUsers.find(u => u.id === id)
+                          return (
                             <Badge key={id} variant="secondary" className="gap-1">
-                              {classNameMap.get(id) || id}
+                              {teacher?.name || id}
                               <button
                                 type="button"
-                                onClick={() => handleToggleClass(id)}
+                                onClick={() => setSelectedTeacherIds(prev => prev.filter(tid => tid !== id))}
                                 className="ml-1 rounded-full hover:bg-muted"
                               >
                                 <X className="size-3" />
                               </button>
                             </Badge>
-                          ))}
-                        </div>
+                          )
+                        })}
                       </div>
                     )}
-                  </PopoverContent>
-                </Popover>
-              </Field>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full justify-start font-normal"
+                      onClick={() => setTeacherDialogOpen(true)}
+                    >
+                      <Users className="mr-2 size-4 text-muted-foreground" />
+                      {selectedTeacherIds.length === 0 ? "请选择参考人员" : `已选 ${selectedTeacherIds.length} 人`}
+                    </Button>
+                  </div>
+                </Field>
+              )}
 
               <Field>
                 <FieldLabel>考试时间</FieldLabel>
@@ -835,6 +907,16 @@ export default function ExamUsagePage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* 选择参考人员弹窗 */}
+      <CoBuilderDialog
+        open={teacherDialogOpen}
+        onOpenChange={setTeacherDialogOpen}
+        title="选择参考人员"
+        description="选择参加考试的教师"
+        selectedIds={selectedTeacherIds}
+        onChange={setSelectedTeacherIds}
+      />
 
       {/* 分享考试弹窗 */}
       <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>

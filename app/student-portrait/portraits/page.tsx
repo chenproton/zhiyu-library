@@ -36,6 +36,7 @@ import { Switch } from "@/components/ui/switch"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useData } from "@/components/providers/data-provider"
 import { useToast } from "@/hooks/use-toast"
+import { StudentPortraitModal } from "@/components/shared/student-portrait-modal"
 import type { StudentAbilityPortrait, EvaluationGrade, AbilityDomainScore } from "@/lib/types"
 
 export default function StudentAbilityPortraitsPage() {
@@ -44,6 +45,8 @@ export default function StudentAbilityPortraitsPage() {
 
   const [search, setSearch] = useState("")
   const [gradeFilter, setGradeFilter] = useState<string>("all")
+  const [selectedClass, setSelectedClass] = useState<string>("all")
+  const [navSearch, setNavSearch] = useState("")
 
   const [viewPortrait, setViewPortrait] = useState<StudentAbilityPortrait | null>(null)
   const [editPortrait, setEditPortrait] = useState<StudentAbilityPortrait | null>(null)
@@ -53,13 +56,31 @@ export default function StudentAbilityPortraitsPage() {
   const [compareOpen, setCompareOpen] = useState(false)
   const [recommendOpen, setRecommendOpen] = useState(false)
   const [generateOpen, setGenerateOpen] = useState(false)
+  const [portraitModalOpen, setPortraitModalOpen] = useState(false)
+  const [moduleConfigOpen, setModuleConfigOpen] = useState(false)
 
   const filteredPortraits = useMemo(() => {
     let list = [...studentAbilityPortraits]
     if (gradeFilter !== "all") list = list.filter((p) => p.overallGrade === gradeFilter)
+    if (selectedClass !== "all") list = list.filter((p) => p.className === selectedClass)
     if (search.trim()) { const q = search.toLowerCase(); list = list.filter((p) => p.studentName.toLowerCase().includes(q) || p.studentId.toLowerCase().includes(q) || p.className.toLowerCase().includes(q) || p.positionName.toLowerCase().includes(q)) }
     return list
-  }, [studentAbilityPortraits, gradeFilter, search])
+  }, [studentAbilityPortraits, gradeFilter, selectedClass, search])
+
+  const groupedMajors = useMemo(() => {
+    const majorMap = new Map<string, Set<string>>()
+    studentAbilityPortraits.forEach((p) => {
+      if (!majorMap.has(p.majorName)) majorMap.set(p.majorName, new Set())
+      majorMap.get(p.majorName)!.add(p.className)
+    })
+    const result: { major: string; classes: string[] }[] = []
+    majorMap.forEach((classes, major) => {
+      if (!navSearch.trim() || major.toLowerCase().includes(navSearch.toLowerCase()) || Array.from(classes).some((c) => c.toLowerCase().includes(navSearch.toLowerCase()))) {
+        result.push({ major, classes: Array.from(classes).sort() })
+      }
+    })
+    return result.sort((a, b) => a.major.localeCompare(b.major))
+  }, [studentAbilityPortraits, navSearch])
 
   const stats = useMemo(() => {
     const total = studentAbilityPortraits.length
@@ -92,59 +113,85 @@ export default function StudentAbilityPortraitsPage() {
   return (
     <div className="px-8 py-6">
       <div className="mb-4 flex items-center justify-between">
-        <div><h1 className="text-2xl font-bold tracking-tight">学生能力画像管理</h1><p className="text-muted-foreground">基于课程任务、实践场景、毕设评价、档案材料等全量数据，自动生成学生能力画像</p></div>
+        <div><h1 className="text-2xl font-bold tracking-tight">学生画像管理</h1><p className="text-muted-foreground">基于课程任务、实践场景、毕设评价、档案材料等全量数据，自动生成学生能力画像</p></div>
         <div className="flex items-center gap-2">
           <Button variant="outline" onClick={() => setGenerateOpen(true)}><RefreshCw className="mr-2 size-4" />重新生成画像</Button>
           <Button variant="outline" onClick={() => setConfigOpen(true)}><Settings className="mr-2 size-4" />频次配置</Button>
-          <Button variant="outline" onClick={() => setCompareOpen(true)}><BarChart3 className="mr-2 size-4" />画像对比分析</Button>
+          <Button variant="outline" onClick={() => setModuleConfigOpen(true)}><SlidersHorizontal className="mr-2 size-4" />学生画像模块配置</Button>
         </div>
       </div>
-      <div className="mb-4 flex gap-3">
-        <div className="flex flex-1 items-center gap-3 rounded-lg border bg-white px-4 py-3">
-          <div className="flex size-8 items-center justify-center rounded-md bg-blue-50"><Users className="size-4 text-blue-600" /></div>
-          <div className="min-w-0 flex-1"><div className="text-xs text-muted-foreground">画像总数</div><div className="flex items-center gap-2 text-xs"><span>总画像 <strong className="text-foreground">{stats.total}</strong></span></div></div>
+
+      <div className="grid grid-cols-12 gap-6">
+        {/* 左侧专业-班级导航 */}
+        <div className="col-span-3">
+          <div className="rounded-lg border bg-white">
+            <div className="border-b p-3">
+              <div className="relative">
+                <Search className="absolute left-2 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
+                <Input placeholder="搜索专业或班级..." value={navSearch} onChange={(e) => setNavSearch(e.target.value)} className="h-8 pl-7 text-xs" />
+              </div>
+            </div>
+            <div className="max-h-[calc(100vh-280px)] overflow-y-auto p-2">
+              <button
+                onClick={() => setSelectedClass("all")}
+                className={`flex w-full items-center rounded-md px-2 py-1.5 text-left text-sm transition-colors ${selectedClass === 'all' ? 'bg-blue-50 text-blue-700 font-medium' : 'hover:bg-muted'}`}
+              >
+                <span>全部班级</span>
+                <span className="ml-auto text-xs text-muted-foreground">{studentAbilityPortraits.length}</span>
+              </button>
+              {groupedMajors.map(({ major, classes }) => (
+                <div key={major} className="mb-2">
+                  <div className="px-2 py-1 text-xs font-semibold text-muted-foreground">{major}</div>
+                  <div className="space-y-1">
+                    {classes.map((cls) => {
+                      const count = studentAbilityPortraits.filter((p) => p.className === cls).length
+                      const isActive = selectedClass === cls
+                      return (
+                        <button
+                          key={cls}
+                          onClick={() => setSelectedClass(cls)}
+                          className={`flex w-full items-center justify-between rounded-md px-2 py-1.5 text-left text-sm transition-colors ${isActive ? 'bg-blue-50 text-blue-700 font-medium' : 'hover:bg-muted'}`}
+                        >
+                          <span>{cls}</span>
+                          <span className="text-xs text-muted-foreground">{count}</span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
-        <div className="flex flex-1 items-center gap-3 rounded-lg border bg-white px-4 py-3">
-          <div className="flex size-8 items-center justify-center rounded-md bg-emerald-50"><Award className="size-4 text-emerald-600" /></div>
-          <div className="min-w-0 flex-1"><div className="text-xs text-muted-foreground">等级分布</div><div className="flex items-center gap-2 text-xs"><span>A <strong className="text-emerald-600">{stats.gradeA}</strong></span><span className="text-gray-300">|</span><span>B <strong className="text-blue-600">{stats.gradeB}</strong></span><span className="text-gray-300">|</span><span>C <strong className="text-amber-600">{stats.gradeC}</strong></span><span className="text-gray-300">|</span><span>D <strong className="text-red-600">{stats.gradeD}</strong></span></div></div>
-        </div>
-        <div className="flex flex-1 items-center gap-3 rounded-lg border bg-white px-4 py-3">
-          <div className="flex size-8 items-center justify-center rounded-md bg-amber-50"><TrendingUp className="size-4 text-amber-600" /></div>
-          <div className="min-w-0 flex-1"><div className="text-xs text-muted-foreground">平均能力分</div><div className="flex items-center gap-2 text-xs"><span>均分 <strong className="text-amber-600">{stats.avgScore}</strong></span></div></div>
-        </div>
-      </div>
-      <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center">
-        <div className="relative flex-1 sm:max-w-xs"><Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" /><Input placeholder="搜索姓名、学号、班级或岗位..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" /></div>
-        <Select value={gradeFilter} onValueChange={setGradeFilter}><SelectTrigger className="w-[140px]"><SelectValue placeholder="全部等级" /></SelectTrigger><SelectContent><SelectGroup><SelectItem value="all">全部等级</SelectItem><SelectItem value="A">A - 优秀</SelectItem><SelectItem value="B">B - 良好</SelectItem><SelectItem value="C">C - 中等</SelectItem><SelectItem value="D">D - 及格</SelectItem><SelectItem value="E">E - 不及格</SelectItem></SelectGroup></SelectContent></Select>
-      </div>
-      <div className="rounded-lg border bg-white px-4 py-3">
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader><TableRow><TableHead className="w-[100px]">学号</TableHead><TableHead className="w-[100px]">姓名</TableHead><TableHead className="w-[160px]">班级</TableHead><TableHead className="w-[140px]">专业</TableHead><TableHead className="w-[140px]">岗位方向</TableHead><TableHead className="w-[100px]">综合等级</TableHead><TableHead className="w-[200px]">能力领域得分</TableHead><TableHead className="w-[120px]">班级排名</TableHead><TableHead className="w-[120px]">专业排名</TableHead><TableHead className="w-[180px]">推荐岗位</TableHead><TableHead className="sticky right-0 w-[160px] bg-white text-right">操作</TableHead></TableRow></TableHeader>
-            <TableBody>
-              {filteredPortraits.length === 0 ? (<TableRow><TableCell colSpan={11} className="h-24 text-center text-muted-foreground">暂无画像记录</TableCell></TableRow>) : (filteredPortraits.map((portrait) => (
-                <TableRow key={portrait.id}>
-                  <TableCell><span className="text-sm text-muted-foreground">{portrait.studentId}</span></TableCell>
-                  <TableCell><span className="text-sm font-medium">{portrait.studentName}</span></TableCell>
-                  <TableCell><span className="text-sm">{portrait.className}</span></TableCell>
-                  <TableCell><span className="text-sm text-muted-foreground">{portrait.majorName}</span></TableCell>
-                  <TableCell><div className="flex items-center gap-1.5"><Target className="size-3.5 text-blue-500" /><span className="text-sm">{portrait.positionName}</span></div></TableCell>
-                  <TableCell>{getGradeBadge(portrait.overallGrade)}</TableCell>
-                  <TableCell><div className="flex flex-col gap-1">{portrait.domainScores.map((domain) => (<div key={domain.domain} className="flex items-center gap-2"><span className="w-14 text-[11px] text-muted-foreground">{domain.domainLabel}</span><Progress value={domain.score} className="h-1.5 w-16" /><span className="text-[11px] font-medium">{domain.score}</span></div>))}</div></TableCell>
-                  <TableCell><span className="text-sm"><strong className="text-emerald-600">{portrait.classRank}</strong><span className="text-muted-foreground"> / {portrait.classTotal}</span></span></TableCell>
-                  <TableCell><span className="text-sm"><strong className="text-blue-600">{portrait.majorRank}</strong><span className="text-muted-foreground"> / {portrait.majorTotal}</span></span></TableCell>
-                  <TableCell><div className="flex flex-col gap-0.5">{portrait.recommendPositions.slice(0, 2).map((rec, i) => (<div key={i} className="flex items-center gap-1.5"><span className="text-xs">{rec.positionName}</span><Badge variant="outline" className="text-[10px] font-normal">{rec.matchRate}%</Badge></div>))}</div></TableCell>
-                  <TableCell className="sticky right-0 bg-white text-right">
-                    <div className="flex items-center justify-end gap-1">
-                      <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs" onClick={() => setViewPortrait(portrait)}><Eye className="size-3" />查看</Button>
-                      <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs" onClick={() => openEdit(portrait)}><Pencil className="size-3" />维护</Button>
-                      <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs text-blue-600" onClick={() => { setViewPortrait(portrait); setRecommendOpen(true) }}><Briefcase className="size-3" />推荐</Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              )))}
-            </TableBody>
-          </Table>
+
+        {/* 右侧学生列表 */}
+        <div className="col-span-9 space-y-4">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+            <div className="relative flex-1 sm:max-w-xs"><Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" /><Input placeholder="搜索姓名、学号、班级或岗位..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" /></div>
+            <Select value={gradeFilter} onValueChange={setGradeFilter}><SelectTrigger className="w-[140px]"><SelectValue placeholder="全部等级" /></SelectTrigger><SelectContent><SelectGroup><SelectItem value="all">全部等级</SelectItem><SelectItem value="A">A - 优秀</SelectItem><SelectItem value="B">B - 良好</SelectItem><SelectItem value="C">C - 中等</SelectItem><SelectItem value="D">D - 及格</SelectItem><SelectItem value="E">E - 不及格</SelectItem></SelectGroup></SelectContent></Select>
+          </div>
+          <div className="rounded-lg border bg-white px-4 py-3">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader><TableRow><TableHead className="w-[100px]">学号</TableHead><TableHead className="w-[100px]">姓名</TableHead><TableHead className="w-[160px]">班级</TableHead><TableHead className="w-[140px]">专业</TableHead><TableHead className="w-[120px]">班级排名</TableHead><TableHead className="w-[120px]">专业排名</TableHead><TableHead className="sticky right-0 w-[140px] bg-white text-right">操作</TableHead></TableRow></TableHeader>
+                <TableBody>
+                  {filteredPortraits.length === 0 ? (<TableRow><TableCell colSpan={7} className="h-24 text-center text-muted-foreground">暂无画像记录</TableCell></TableRow>) : (filteredPortraits.map((portrait) => (
+                    <TableRow key={portrait.id}>
+                      <TableCell><span className="text-sm text-muted-foreground">{portrait.studentId}</span></TableCell>
+                      <TableCell><span className="text-sm font-medium">{portrait.studentName}</span></TableCell>
+                      <TableCell><span className="text-sm">{portrait.className}</span></TableCell>
+                      <TableCell><span className="text-sm text-muted-foreground">{portrait.majorName}</span></TableCell>
+                      <TableCell><span className="text-sm"><strong className="text-emerald-600">{portrait.classRank}</strong><span className="text-muted-foreground"> / {portrait.classTotal}</span></span></TableCell>
+                      <TableCell><span className="text-sm"><strong className="text-blue-600">{portrait.majorRank}</strong><span className="text-muted-foreground"> / {portrait.majorTotal}</span></span></TableCell>
+                      <TableCell className="sticky right-0 bg-white text-right">
+                        <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs" onClick={() => { setViewPortrait(portrait); setPortraitModalOpen(true) }}><Eye className="size-3" />查看学生画像</Button>
+                      </TableCell>
+                    </TableRow>
+                  )))}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -462,6 +509,50 @@ export default function StudentAbilityPortraitsPage() {
             </div>
           </div>
           <DialogFooter><Button variant="outline" onClick={() => setGenerateOpen(false)}>取消</Button><Button onClick={handleGenerate}><RefreshCw className="mr-2 size-4" />确认重新生成</Button></DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* 学生画像详情弹窗（HTML） */}
+      <StudentPortraitModal
+        open={portraitModalOpen}
+        onOpenChange={setPortraitModalOpen}
+        studentName={viewPortrait?.studentName}
+        className={viewPortrait?.className}
+      />
+
+      {/* 学生画像模块配置弹窗 */}
+      <Dialog open={moduleConfigOpen} onOpenChange={(open) => !open && setModuleConfigOpen(false)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader><DialogTitle>学生画像模块配置</DialogTitle></DialogHeader>
+          <div className="py-4 space-y-4">
+            <div className="rounded-lg border p-4 space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-sm font-medium">课程成绩</div>
+                  <div className="text-xs text-muted-foreground">在学生画像中展示课程成绩模块</div>
+                </div>
+                <Switch defaultChecked />
+              </div>
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-sm font-medium">毕业设计</div>
+                  <div className="text-xs text-muted-foreground">在学生画像中展示毕业设计模块</div>
+                </div>
+                <Switch defaultChecked />
+              </div>
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-sm font-medium">荣誉</div>
+                  <div className="text-xs text-muted-foreground">在学生画像中展示获得荣誉模块</div>
+                </div>
+                <Switch defaultChecked />
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setModuleConfigOpen(false)}>取消</Button>
+            <Button onClick={() => { toast({ title: '模块配置已保存' }); setModuleConfigOpen(false) }}><Settings className="mr-2 size-4" />保存配置</Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

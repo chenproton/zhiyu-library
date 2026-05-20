@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { Search, Eye, Briefcase, User, Calendar, TrendingUp, AlertCircle, GraduationCap, Building2, BookOpen, Award } from "lucide-react"
+import { Search, Briefcase, User, Calendar, TrendingUp, AlertCircle, GraduationCap, Building2, BookOpen, Award } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -133,7 +133,7 @@ export default function JobAbilityResultsPage() {
           description={
             selectedPositionId === "all"
               ? "查看所有岗位的认定结果"
-              : `查看 ${positionsList.find(p => p.id === selectedPositionId)?.name || ''} 的测评结果`
+              : `查看 ${positionsList.find(p => p.id === selectedPositionId)?.name || ''} 的认定结果`
           }
           className="mb-4"
         />
@@ -162,17 +162,16 @@ export default function JobAbilityResultsPage() {
                   <TableHead className="w-[120px]">班级</TableHead>
                   <TableHead className="w-[100px]">专业</TableHead>
                   <TableHead className="w-[100px]">院系</TableHead>
-                  <TableHead className="w-[140px]">岗位胜任达成率</TableHead>
+                  <TableHead className="w-[140px]">岗位能力达标率</TableHead>
                   <TableHead className="w-[80px]">岗位能力认定结果</TableHead>
-                  <TableHead className="w-[140px]">测评时间</TableHead>
-                  <TableHead className="sticky right-0 w-[140px] bg-white text-right">操作</TableHead>
+                  <TableHead className="w-[140px]">更新时间</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredResults.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={9} className="h-24 text-center text-muted-foreground">
-                      {jobAbilityResults.length === 0 ? "暂无测评结果" : "没有找到匹配的测评结果"}
+                    <TableCell colSpan={8} className="h-24 text-center text-muted-foreground">
+                      {jobAbilityResults.length === 0 ? "暂无认定结果" : "没有找到匹配的认定结果"}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -196,12 +195,6 @@ export default function JobAbilityResultsPage() {
                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground">
                         {formatDateTime(result.evaluationTime)}
-                      </TableCell>
-                      <TableCell className="sticky right-0 bg-white text-right">
-                        <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs" onClick={() => { setSelectedStudent(result); setPortraitOpen(true) }}>
-                          <Eye className="size-3.5" />
-                          查看能力画像详情
-                        </Button>
                       </TableCell>
                     </TableRow>
                   ))

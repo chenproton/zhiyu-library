@@ -197,7 +197,7 @@ export function PositionListPage() {
   return (
     <div className="px-8 py-6">
       <PageHeaderCard
-        title="岗位能力认定规则"
+        title="岗位能力认定规则配置"
         description="管理各岗位的能力认定规则配置"
         className="mb-4"
       />
@@ -262,6 +262,7 @@ export function PositionListPage() {
                 <TableHead>岗位编码</TableHead>
                 <TableHead>所属行业</TableHead>
                 <TableHead className="text-center">关联能力数</TableHead>
+                <TableHead>最后更新者</TableHead>
                 <TableHead>更新时间</TableHead>
                 <TableHead className="text-right">操作</TableHead>
               </TableRow>
@@ -269,7 +270,7 @@ export function PositionListPage() {
             <TableBody>
               {filteredPositions.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-32 text-center">
+                  <TableCell colSpan={7} className="h-32 text-center">
                     <p className="text-muted-foreground">暂无数据</p>
                   </TableCell>
                 </TableRow>
@@ -295,6 +296,9 @@ export function PositionListPage() {
                     </TableCell>
                     <TableCell className="text-center">
                       {position.relatedAbilityCount}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {position.updatedBy || '-'}
                     </TableCell>
                     <TableCell className="text-muted-foreground">
                       {position.lastUpdated}

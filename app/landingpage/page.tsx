@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import {
   BookOpen,
   FileText,
@@ -43,7 +43,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Input } from "@/components/ui/input"
@@ -159,6 +159,7 @@ export default function LandingHomePage() {
   const [previewBank, setPreviewBank] = useState<typeof questionBanks[0] | null>(null)
   const [activeTab, setActiveTab] = useState<'my' | 'interested'>('my')
   const [examCenterTab, setExamCenterTab] = useState<'my' | 'all'>('my')
+  const [methodTab, setMethodTab] = useState<string>("")
   const { evaluationCategories, evaluationMethods } = useData()
 
   const enabledMethods = useMemo(() => {
@@ -176,6 +177,13 @@ export default function LandingHomePage() {
       .map((c) => ({ category: c, methods: groups.get(c.id) || [] }))
       .filter((g) => g.methods.length > 0)
   }, [enabledMethods, evaluationCategories])
+
+  // default method tab
+  useEffect(() => {
+    if (groupedMethods.length > 0 && !methodTab) {
+      setMethodTab(groupedMethods[0].category.id)
+    }
+  }, [groupedMethods, methodTab])
 
   return (
     <div>
@@ -251,47 +259,45 @@ export default function LandingHomePage() {
               </Button>
             </Link>
           </div>
-          <div className="space-y-6">
-            {groupedMethods.map(({ category, methods }) => {
-              const CategoryIcon = categoryIcons[category.name] || Lightbulb
-              return (
-                <div key={category.id}>
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="flex h-6 w-6 items-center justify-center rounded-md bg-primary/10">
-                      <CategoryIcon className="h-3.5 w-3.5 text-primary" />
-                    </div>
-                    <h3 className="text-sm font-semibold">{category.name}</h3>
-                    <span className="text-xs text-muted-foreground">({methods.length})</span>
-                  </div>
-                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                    {methods.map((method) => (
-                      <Card key={method.id} className="transition-shadow hover:shadow-sm">
-                        <CardContent className="p-4">
-                          <div className="flex items-start justify-between gap-2">
-                            <h4 className="text-sm font-medium">{method.name}</h4>
-                            {method.docLink && (
-                              <a
-                                href={method.docLink}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="shrink-0 text-muted-foreground hover:text-primary transition-colors"
-                                title="查看文档"
-                              >
-                                <ExternalLink className="h-3 w-3" />
-                              </a>
-                            )}
-                          </div>
-                          <p className="mt-1.5 text-xs text-muted-foreground line-clamp-2">
-                            {method.description || '暂无说明'}
-                          </p>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
+          <Tabs value={methodTab} onValueChange={setMethodTab}>
+            <TabsList className="mb-4 flex-wrap h-auto py-1">
+              {groupedMethods.map(({ category, methods }) => (
+                <TabsTrigger key={category.id} value={category.id} className="text-sm">
+                  {category.name}
+                  <span className="ml-1 text-xs text-muted-foreground">({methods.length})</span>
+                </TabsTrigger>
+              ))}
+            </TabsList>
+            {groupedMethods.map(({ category, methods }) => (
+              <TabsContent key={category.id} value={category.id} className="mt-0">
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {methods.map((method) => (
+                    <Card key={method.id} className="transition-shadow hover:shadow-sm">
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between gap-2">
+                          <h4 className="text-sm font-medium">{method.name}</h4>
+                          {method.docLink && (
+                            <a
+                              href={method.docLink}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="shrink-0 text-muted-foreground hover:text-primary transition-colors"
+                              title="查看文档"
+                            >
+                              <ExternalLink className="h-3 w-3" />
+                            </a>
+                          )}
+                        </div>
+                        <p className="mt-1.5 text-xs text-muted-foreground line-clamp-2">
+                          {method.description || '暂无说明'}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
-              )
-            })}
-          </div>
+              </TabsContent>
+            ))}
+          </Tabs>
         </div>
       </section>
 

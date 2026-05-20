@@ -35,11 +35,11 @@ export const evaluationNavigationConfig: PlatformNavigationConfig = {
     },
     {
       id: "job-ability",
-      label: "岗位能力测评管理",
+      label: "岗位能力认定管理",
       icon: "briefcase",
       children: [
-        { id: "job-ability-rules", label: "岗位能力认证规则管理", href: "/job-ability", matchers: ["/job-ability$"] },
-        { id: "job-ability-results", label: "岗位能力测评结果", href: "/job-ability/results", matchers: ["/job-ability/results"] },
+        { id: "job-ability-rules", label: "岗位能力认定规则配置", href: "/job-ability", matchers: ["/job-ability$"] },
+        { id: "job-ability-results", label: "岗位能力认定结果查看", href: "/job-ability/results", matchers: ["/job-ability/results"] },
       ],
     },
     {
@@ -64,11 +64,11 @@ export const evaluationNavigationConfig: PlatformNavigationConfig = {
     },
     {
       id: "student-portrait",
-      label: "学生能力画像管理",
+      label: "学生画像管理",
       icon: "userCircle",
       children: [
-        { id: "sp-archives", label: "学生能力档案管理", href: "/student-portrait/archives", matchers: ["/student-portrait/archives"] },
-        { id: "sp-portraits", label: "学生能力画像管理", href: "/student-portrait/portraits", matchers: ["/student-portrait/portraits"] },
+        { id: "sp-archives", label: "学生档案管理", href: "/student-portrait/archives", matchers: ["/student-portrait/archives"] },
+        { id: "sp-portraits", label: "学生画像管理", href: "/student-portrait/portraits", matchers: ["/student-portrait/portraits"] },
       ],
     },
   ],

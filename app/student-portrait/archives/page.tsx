@@ -231,25 +231,9 @@ export default function StudentAbilityArchivesPage() {
   return (
     <div className="px-8 py-6">
       <div className="mb-4 flex items-center justify-between">
-        <div><h1 className="text-2xl font-bold tracking-tight">学生能力档案管理</h1><p className="text-muted-foreground">管理学生正向/负向档案材料，审核学分转换，记录能力认定依据</p></div>
+        <div><h1 className="text-2xl font-bold tracking-tight">学生档案管理</h1><p className="text-muted-foreground">管理学生正向/负向档案材料，审核学分转换，记录能力认定依据</p></div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => window.open('/student-portrait/student/archives', '_blank')}><GraduationCap className="mr-2 size-4" />学生上报入口</Button>
           <Button variant="outline" onClick={openConfig}><Settings className="mr-2 size-4" />学分转换配置</Button>
-        </div>
-      </div>
-
-      <div className="mb-4 flex gap-3">
-        <div className="flex flex-1 items-center gap-3 rounded-lg border bg-white px-4 py-3">
-          <div className="flex size-8 items-center justify-center rounded-md bg-blue-50"><FileText className="size-4 text-blue-600" /></div>
-          <div className="min-w-0 flex-1"><div className="text-xs text-muted-foreground">档案概况</div><div className="flex items-center gap-2 text-xs"><span>总数 <strong className="text-foreground">{stats.total}</strong></span></div></div>
-        </div>
-        <div className="flex flex-1 items-center gap-3 rounded-lg border bg-white px-4 py-3">
-          <div className="flex size-8 items-center justify-center rounded-md bg-emerald-50"><CheckCircle2 className="size-4 text-emerald-600" /></div>
-          <div className="min-w-0 flex-1"><div className="text-xs text-muted-foreground">审核状态</div><div className="flex items-center gap-2 text-xs"><span>已审核 <strong className="text-emerald-600">{stats.approved}</strong></span><span className="text-gray-300">|</span><span>待审核 <strong className="text-amber-600">{stats.pending}</strong></span><span className="text-gray-300">|</span><span>已驳回 <strong className="text-red-600">{stats.rejected}</strong></span></div></div>
-        </div>
-        <div className="flex flex-1 items-center gap-3 rounded-lg border bg-white px-4 py-3">
-          <div className="flex size-8 items-center justify-center rounded-md bg-amber-50"><Award className="size-4 text-amber-600" /></div>
-          <div className="min-w-0 flex-1"><div className="text-xs text-muted-foreground">已转换学分</div><div className="flex items-center gap-2 text-xs"><span>总学分 <strong className="text-amber-600">{stats.totalCredit.toFixed(1)}</strong></span></div></div>
         </div>
       </div>
 

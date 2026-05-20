@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>学生画像 - 赵江威</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: #f0f2f5;
+    min-height: 100vh;
+    padding: 16px;
+    color: #333;
+    font-size: 13px;
+}
+.container {
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+/* 顶部标题栏 */
+.page-header {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+    color: #fff;
+    padding: 16px 24px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 12px rgba(30, 58, 138, 0.2);
+}
+.page-header h1 {
+    font-size: 20px;
+    font-weight: 600;
+}
+.breadcrumb {
+    font-size: 13px;
+    opacity: 0.9;
+}
+
+/* 主体网格 */
+.main-grid {
+    display: grid;
+    grid-template-columns: 280px 1fr 380px;
+    gap: 16px;
+}
+
+/* 卡片通用 */
+.card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    margin-bottom: 16px;
+}
+.card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f0f0f0;
+    margin-bottom: 14px;
+}
+.card-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1f2937;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.card-title::before {
+    content: '';
+    width: 3px;
+    height: 14px;
+    background: #3b82f6;
+    border-radius: 2px;
+}
+
+/* === 左侧 === */
+.student-card {
+    background: linear-gradient(160deg, #1e40af 0%, #3b82f6 60%, #60a5fa 100%);
+    border-radius: 8px;
+    padding: 20px;
+    color: #fff;
+    text-align: center;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.25);
+}
+.student-avatar {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    border: 3px solid rgba(255,255,255,0.5);
+    margin: 0 auto 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 42px;
+    backdrop-filter: blur(10px);
+}
+.student-name {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+.student-meta {
+    font-size: 12px;
+    opacity: 0.9;
+    margin-bottom: 14px;
+}
+.student-tags {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.s-tag {
+    background: rgba(255,255,255,0.25);
+    padding: 3px 10px;
+    border-radius: 10px;
+    font-size: 11px;
+    backdrop-filter: blur(10px);
+}
+
+.info-list .info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 9px 0;
+    border-bottom: 1px dashed #f0f0f0;
+    font-size: 13px;
+}
+.info-list .info-row:last-child { border-bottom: none; }
+.info-row .label {
+    color: #6b7280;
+}
+.info-row .value {
+    color: #1f2937;
+    font-weight: 500;
+}
+.value-success { color: #10b981 !important; }
+.value-warning { color: #f59e0b !important; }
+.value-rank {
+    color: #ef4444 !important;
+    font-weight: 700 !important;
+}
+
+/* 学业概况方块 */
+.summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+.summary-box {
+    background: linear-gradient(135deg, #eff6ff, #dbeafe);
+    border-radius: 6px;
+    padding: 12px 10px;
+    text-align: center;
+    border: 1px solid #bfdbfe;
+}
+.summary-box .num {
+    font-size: 22px;
+    font-weight: 700;
+    color: #2563eb;
+    line-height: 1.2;
+}
+.summary-box .lbl {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 2px;
+}
+.summary-box.green {
+    background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+    border-color: #a7f3d0;
+}
+.summary-box.green .num { color: #059669; }
+.summary-box.orange {
+    background: linear-gradient(135deg, #fffbeb, #fef3c7);
+    border-color: #fcd34d;
+}
+.summary-box.orange .num { color: #d97706; }
+.summary-box.purple {
+    background: linear-gradient(135deg, #faf5ff, #ede9fe);
+    border-color: #c4b5fd;
+}
+.summary-box.purple .num { color: #7c3aed; }
+
+/* === 中间 === */
+.tab-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+    border-bottom: 2px solid #f0f0f0;
+}
+.tab-item {
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #6b7280;
+    position: relative;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+.tab-item.active {
+    color: #2563eb;
+    font-weight: 600;
+}
+.tab-item.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #2563eb;
+}
+
+/* 雷达 + 评分 */
+.radar-wrap {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 16px;
+    align-items: center;
+}
+#radarChart { height: 300px; }
+
+.score-overview {
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+    border-radius: 8px;
+    padding: 18px;
+    border: 1px solid #bbf7d0;
+}
+.score-big {
+    text-align: center;
+    margin-bottom: 14px;
+}
+.score-big .pct {
+    font-size: 44px;
+    font-weight: 800;
+    color: #059669;
+    line-height: 1;
+}
+.score-big .desc {
+    font-size: 13px;
+    color: #047857;
+    margin-top: 4px;
+    font-weight: 600;
+}
+.score-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+.score-stat-item {
+    background: #fff;
+    border-radius: 6px;
+    padding: 8px;
+    text-align: center;
+}
+.score-stat-item .v {
+    font-size: 18px;
+    font-weight: 700;
+    color: #059669;
+}
+.score-stat-item .l {
+    font-size: 11px;
+    color: #6b7280;
+    margin-top: 2px;
+}
+
+/* 能力点表格 */
+.ability-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+.ability-table th {
+    background: #f9fafb;
+    padding: 10px 8px;
+    text-align: center;
+    color: #4b5563;
+    font-weight: 600;
+    border: 1px solid #e5e7eb;
+    font-size: 12px;
+}
+.ability-table td {
+    padding: 10px 8px;
+    text-align: center;
+    border: 1px solid #e5e7eb;
+    color: #374151;
+}
+.ability-table tr:hover td { background: #f9fafb; }
+.cat-cell {
+    background: #eff6ff !important;
+    color: #1e40af !important;
+    font-weight: 600;
+    font-size: 12px;
+}
+.score-pill {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 12px;
+}
+.s-high { background: #dbeafe; color: #1d4ed8; }
+.s-mid { background: #fef3c7; color: #b45309; }
+.lvl {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+}
+.lvl-shu { background: #fce7f3; color: #be185d; }
+.lvl-zhang { background: #e0e7ff; color: #4338ca; }
+.res-pass { color: #059669; font-weight: 600; }
+.res-fail { color: #dc2626; font-weight: 600; }
+
+/* === 右侧 === */
+.recommend-item {
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    background: linear-gradient(135deg, #eff6ff, #f5f3ff);
+    border-left: 3px solid #3b82f6;
+}
+.recommend-item:last-child { margin-bottom: 0; }
+.rec-row1 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+.rec-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1f2937;
+}
+.match-tag {
+    background: linear-gradient(135deg, #3b82f6, #6366f1);
+    color: #fff;
+    padding: 2px 10px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+}
+.rec-progress {
+    height: 6px;
+    background: #e5e7eb;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 6px;
+}
+.rec-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #6366f1);
+    border-radius: 3px;
+}
+.rec-detail {
+    font-size: 11px;
+    color: #6b7280;
+}
+
+/* 课程列表 */
+.course-table {
+    width: 100%;
+    font-size: 12px;
+}
+.course-table th {
+    background: #f9fafb;
+    padding: 8px;
+    color: #4b5563;
+    font-weight: 600;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+}
+.course-table td {
+    padding: 9px 8px;
+    border-bottom: 1px solid #f0f0f0;
+    color: #1f2937;
+}
+.course-table tr:hover td { background: #f9fafb; }
+.score-num {
+    color: #2563eb;
+    font-weight: 700;
+}
+.grade-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 500;
+    background: #dcfce7;
+    color: #15803d;
+}
+
+/* 荣誉 */
+.honor-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+.honor-item {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border: 1px solid #fcd34d;
+    padding: 10px;
+    border-radius: 6px;
+    text-align: center;
+    font-size: 12px;
+    color: #92400e;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.honor-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(252, 211, 77, 0.4);
+}
+.honor-item .icon {
+    font-size: 20px;
+    display: block;
+    margin-bottom: 4px;
+}
+
+/* 能力认定 */
+.cert-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    background: #f9fafb;
+    border-radius: 6px;
+    margin-bottom: 8px;
+}
+.cert-row .name { font-weight: 500; color: #1f2937; }
+.cert-tag {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: #fff;
+    padding: 2px 10px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+}
+.cert-grades {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin-top: 8px;
+}
+.cert-grade-item {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 8px 4px;
+    text-align: center;
+}
+.cert-grade-item .l {
+    font-size: 11px;
+    color: #6b7280;
+    margin-bottom: 2px;
+}
+
+</style>
+</head>
+<body>
+<div class="container">
+    <!-- 顶部 -->
+    <div class="page-header">
+        <h1>👤 学生画像详情</h1>
+        <div class="breadcrumb">首页 / 学生管理 / 学生画像</div>
+    </div>
+
+    <div class="main-grid">
+        <!-- 左侧 -->
+        <div class="left-col">
+            <!-- 学生基本信息卡 -->
+            <div class="student-card">
+                <div class="student-avatar">👨‍🎓</div>
+                <div class="student-name">赵江威</div>
+                <div class="student-meta">学号：25301 | 男</div>
+                <div class="student-tags">
+                    <span class="s-tag">物流学院</span>
+                    <span class="s-tag">智能物流</span>
+                </div>
+            </div>
+
+            <!-- 基础信息 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">基础信息</div>
+                </div>
+                <div class="info-list">
+                    <div class="info-row"><span class="label">所属院系</span><span class="value">物流学院</span></div>
+                    <div class="info-row"><span class="label">所属专业</span><span class="value">智能物流</span></div>
+                    <div class="info-row"><span class="label">所属班级</span><span class="value">25301班</span></div>
+                    <div class="info-row"><span class="label">所属年级</span><span class="value">2025级</span></div>
+                    <div class="info-row"><span class="label">专业排名</span><span class="value value-rank">第 3 名</span></div>
+                    <div class="info-row"><span class="label">违纪记录</span><span class="value value-success">无</span></div>
+                    <div class="info-row"><span class="label">体测情况</span><span class="value value-success">合格</span></div>
+                    <div class="info-row"><span class="label">党员身份</span><span class="value value-warning">预备党员</span></div>
+                </div>
+            </div>
+
+            <!-- 学业概况方块 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">学业概况</div>
+                </div>
+                <div class="summary-grid">
+                    <div class="summary-box">
+                        <div class="num">54</div>
+                        <div class="lbl">毕业学分</div>
+                    </div>
+                    <div class="summary-box orange">
+                        <div class="num">4</div>
+                        <div class="lbl">奖学金</div>
+                    </div>
+                    <div class="summary-box green">
+                        <div class="num">12</div>
+                        <div class="lbl">主修课程</div>
+                    </div>
+                    <div class="summary-box purple">
+                        <div class="num">234</div>
+                        <div class="lbl">知识点</div>
+                    </div>
+                    <div class="summary-box">
+                        <div class="num">34</div>
+                        <div class="lbl">实践场数</div>
+                    </div>
+                    <div class="summary-box green">
+                        <div class="num">89</div>
+                        <div class="lbl">实践任务</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 中间 -->
+        <div class="middle-col">
+            <!-- 目标岗位 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">🎯 目标岗位 - 能力雷达</div>
+                </div>
+                <div class="tab-bar">
+                    <div class="tab-item active" onclick="switchTab(this,'前端开发工程师')">前端开发工程师</div>
+                    <div class="tab-item" onclick="switchTab(this,'后端开发工程师')">后端开发工程师</div>
+                    <div class="tab-item" onclick="switchTab(this,'产品经理')">产品经理</div>
+                    <div class="tab-item" onclick="switchTab(this,'UI设计师')">UI设计师</div>
+                </div>
+                <div class="radar-wrap">
+                    <div id="radarChart"></div>
+                    <div class="score-overview">
+                        <div class="score-big">
+                            <div class="pct">86%</div>
+                            <div class="desc">岗位能力达标率</div>
+                        </div>
+                        <div class="score-stats">
+                            <div class="score-stat-item">
+                                <div class="v" style="color:#059669;">8</div>
+                                <div class="l">通过项</div>
+                            </div>
+                            <div class="score-stat-item">
+                                <div class="v" style="color:#dc2626;">1</div>
+                                <div class="l">不通过</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 能力画像表 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">📋 职业岗位能力画像</div>
+                    <span style="font-size:12px;color:#6b7280;">认定结果统计</span>
+                </div>
+                <table class="ability-table">
+                    <thead>
+                        <tr>
+                            <th style="width:130px;">能力点认定明细</th>
+                            <th>能力点</th>
+                            <th style="width:70px;">得分</th>
+                            <th style="width:80px;">掌握度</th>
+                            <th style="width:80px;">所需</th>
+                            <th style="width:90px;">认定结果</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="cat-cell" rowspan="2">岗位与行业认知</td>
+                            <td style="text-align:left;">行业发展趋势理解</td>
+                            <td><span class="score-pill s-high">65</span></td>
+                            <td><span class="lvl lvl-zhang">掌握</span></td>
+                            <td><span class="lvl lvl-shu">熟练</span></td>
+                            <td><span class="res-pass">✓ 通过</span></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:left;">岗位职责认知</td>
+                            <td><span class="score-pill s-high">72</span></td>
+                            <td><span class="lvl lvl-zhang">掌握</span></td>
+                            <td><span class="lvl lvl-shu">熟练</span></td>
+                            <td><span class="res-fail">✗ 不通过</span></td>
+                        </tr>
+                        <tr>
+                            <td class="cat-cell" rowspan="3">专业技能</td>
+                            <td style="text-align:left;">JavaScript 高级能力</td>
+                            <td><span class="score-pill s-high">79</span></td>
+                            <td><span class="lvl lvl-shu">熟练</span></td>
+                            <td><span class="lvl lvl-shu">熟练</span></td>
+                            <td><span class="res-pass">✓ 通过</span></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:left;">React 框架开发</td>
+                            <td><span class="score-pill s-high">86</span></td>
+                            <td><span class="lvl lvl-shu">熟练</span></td>
+                            <td><span class="lvl lvl-shu">熟练</span></td>
+                            <td><span class="res-pass">✓ 通过</span></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:left;">CSS 布局能力</td>
+                            <td><span class="score-pill s-high">93</span></td>
+                            <td><span class="lvl lvl-zhang">掌握</span></td>
+                            <td><span class="lvl lvl-zhang">掌握</span></td>
+                            <td><span class="res-pass">✓ 通过</span></td>
+                        </tr>
+                        <tr>
+                            <td class="cat-cell" rowspan="2">软技能</td>
+                            <td style="text-align:left;">团队协作能力</td>
+                            <td><span class="score-pill s-high">85</span></td>
+                            <td><span class="lvl lvl-zhang">掌握</span></td>
+                            <td><span class="lvl lvl-zhang">掌握</span></td>
+                            <td><span class="res-pass">✓ 通过</span></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:left;">技术文档能力</td>
+                            <td><span class="score-pill s-high">72</span></td>
+                            <td><span class="lvl lvl-zhang">掌握</span></td>
+                            <td><span class="lvl lvl-shu">熟练</span></td>
+                            <td><span class="res-pass">✓ 通过</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 课程成绩 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">📚 课程成绩</div>
+                </div>
+                <table class="course-table">
+                    <thead>
+                        <tr>
+                            <th>课程名称</th>
+                            <th style="width:80px;text-align:center;">分数</th>
+                            <th style="width:80px;text-align:center;">等级</th>
+                            <th style="width:90px;text-align:center;">到课率</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>物流系统工程</td><td style="text-align:center;"><span class="score-num">93</span></td><td style="text-align:center;"><span class="grade-tag">优秀</span></td><td style="text-align:center;">98%</td></tr>
+                        <tr><td>供应链管理</td><td style="text-align:center;"><span class="score-num">91</span></td><td style="text-align:center;"><span class="grade-tag">优秀</span></td><td style="text-align:center;">98%</td></tr>
+                        <tr><td>运输与配送</td><td style="text-align:center;"><span class="score-num">95</span></td><td style="text-align:center;"><span class="grade-tag">优秀</span></td><td style="text-align:center;">98%</td></tr>
+                        <tr><td>仓储管理</td><td style="text-align:center;"><span class="score-num">90</span></td><td style="text-align:center;"><span class="grade-tag">优秀</span></td><td style="text-align:center;">98%</td></tr>
+                        <tr><td>数据分析</td><td style="text-align:center;"><span class="score-num">93</span></td><td style="text-align:center;"><span class="grade-tag">优秀</span></td><td style="text-align:center;">98%</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 右侧 -->
+        <div class="right-col">
+            <!-- 推荐就业方向 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">💼 推荐就业方向</div>
+                </div>
+                <div class="recommend-item">
+                    <div class="rec-row1">
+                        <div class="rec-name">物流工程师</div>
+                        <div class="match-tag">匹配 70%</div>
+                    </div>
+                    <div class="rec-progress"><div class="rec-progress-bar" style="width:70%;"></div></div>
+                    <div class="rec-detail">优秀 · 适合智能物流方向核心岗位</div>
+                </div>
+                <div class="recommend-item" style="border-left-color:#8b5cf6;background:linear-gradient(135deg,#f5f3ff,#ede9fe);">
+                    <div class="rec-row1">
+                        <div class="rec-name">供应链分析师</div>
+                        <div class="match-tag" style="background:linear-gradient(135deg,#8b5cf6,#a78bfa);">匹配 65%</div>
+                    </div>
+                    <div class="rec-progress"><div class="rec-progress-bar" style="width:65%;background:linear-gradient(90deg,#8b5cf6,#a78bfa);"></div></div>
+                    <div class="rec-detail">良好 · 数据分析能力突出</div>
+                </div>
+                <div class="recommend-item" style="border-left-color:#10b981;background:linear-gradient(135deg,#ecfdf5,#d1fae5);">
+                    <div class="rec-row1">
+                        <div class="rec-name">推荐企业</div>
+                        <div class="match-tag" style="background:linear-gradient(135deg,#10b981,#34d399);">3 家</div>
+                    </div>
+                    <div class="rec-detail">🏢 顺丰科技 · 京东物流 · 菜鸟网络</div>
+                </div>
+            </div>
+
+            <!-- 能力认定 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">🎖️ 能力认定</div>
+                    <span style="font-size:12px;color:#6b7280;">2 个</span>
+                </div>
+                <div class="cert-row">
+                    <span class="name">物流工程师</span>
+                    <span class="cert-tag">A+ 达标</span>
+                </div>
+                <div class="cert-grades">
+                    <div class="cert-grade-item">
+                        <div class="l">综合评价</div>
+                        <span class="cert-tag">A+</span>
+                    </div>
+                    <div class="cert-grade-item">
+                        <div class="l">知识</div>
+                        <span class="cert-tag">A+</span>
+                    </div>
+                    <div class="cert-grade-item">
+                        <div class="l">技能</div>
+                        <span class="cert-tag">A+</span>
+                    </div>
+                    <div class="cert-grade-item">
+                        <div class="l">素养</div>
+                        <span class="cert-tag">A+</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 获得荣誉 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">🏆 获得荣誉</div>
+                    <span style="font-size:12px;color:#6b7280;">4 项</span>
+                </div>
+                <div class="honor-list">
+                    <div class="honor-item">
+                        <span class="icon">🥇</span>
+                        国家奖学金
+                    </div>
+                    <div class="honor-item">
+                        <span class="icon">🏅</span>
+                        三好学生
+                    </div>
+                    <div class="honor-item">
+                        <span class="icon">⭐</span>
+                        优秀干部
+                    </div>
+                    <div class="honor-item">
+                        <span class="icon">🎖️</span>
+                        竞赛一等奖
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const radarChart = echarts.init(document.getElementById('radarChart'));
+const dataMap = {
+    '前端开发工程师': [70, 86, 85, 78, 82],
+    '后端开发工程师': [75, 78, 80, 72, 76],
+    '产品经理': [82, 65, 90, 80, 70],
+    'UI设计师': [68, 72, 78, 85, 88]
+};
+function renderRadar(data) {
+    radarChart.setOption({
+        tooltip: { trigger: 'item' },
+        radar: {
+            indicator: [
+                { name: '岗位认知', max: 100 },
+                { name: '专业技能', max: 100 },
+                { name: '软技能', max: 100 },
+                { name: '项目经验', max: 100 },
+                { name: '工具应用', max: 100 }
+            ],
+            radius: 100,
+            splitNumber: 4,
+            axisName: { color: '#475569', fontSize: 12, fontWeight: 500 },
+            splitArea: {
+                areaStyle: { color: ['rgba(59,130,246,0.03)','rgba(59,130,246,0.07)','rgba(59,130,246,0.10)','rgba(59,130,246,0.14)'] }
+            },
+            splitLine: { lineStyle: { color: 'rgba(59,130,246,0.2)' } },
+            axisLine: { lineStyle: { color: 'rgba(59,130,246,0.3)' } }
+        },
+        series: [{
+            type: 'radar',
+            data: [{
+                value: data,
+                name: '当前能力',
+                areaStyle: {
+                    color: { type: 'radial', x: 0.5, y: 0.5, r: 0.5,
+                        colorStops: [
+                            { offset: 0, color: 'rgba(59,130,246,0.6)' },
+                            { offset: 1, color: 'rgba(99,102,241,0.3)' }
+                        ]}
+                },
+                lineStyle: { color: '#3b82f6', width: 2 },
+                itemStyle: { color: '#2563eb' },
+                symbol: 'circle',
+                symbolSize: 6
+            }]
+        }]
+    });
+}
+renderRadar(dataMap['前端开发工程师']);
+window.addEventListener('resize', () => radarChart.resize());
+
+function switchTab(el, key) {
+    document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    renderRadar(dataMap[key]);
+}
+</script>
+</body>
+</html>

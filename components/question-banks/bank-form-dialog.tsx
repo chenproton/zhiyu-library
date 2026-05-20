@@ -22,10 +22,10 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-import { X, Upload, ImageIcon } from "lucide-react"
+import { X, Upload, ImageIcon, UserPlus } from "lucide-react"
 import type { QuestionBank, QuestionBankFormData } from "@/lib/types"
-import { mockUsers, mockDepartments, mockBatches } from "@/lib/mock-data"
+import { mockUsers, mockBatches } from "@/lib/mock-data"
+import { CoBuilderDialog } from "@/components/shared/co-builder-dialog"
 
 interface BankFormDialogProps {
   open: boolean
@@ -44,9 +44,8 @@ export function BankFormDialog({
   const [description, setDescription] = useState("")
   const [coverUrl, setCoverUrl] = useState<string>("")
   const [collaboratorIds, setCollaboratorIds] = useState<string[]>([])
-  const [collaboratorDeptIds, setCollaboratorDeptIds] = useState<string[]>([])
   const [batchId, setBatchId] = useState<string>("")
-  const [collaboratorTab, setCollaboratorTab] = useState<"user" | "dept">("user")
+  const [collaboratorDialogOpen, setCollaboratorDialogOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -55,14 +54,12 @@ export function BankFormDialog({
       setDescription(bank.description)
       setCoverUrl(bank.coverUrl || "")
       setCollaboratorIds(bank.collaboratorIds || [])
-      setCollaboratorDeptIds(bank.collaboratorDeptIds || [])
       setBatchId(bank.batchId || "")
     } else {
       setName("")
       setDescription("")
       setCoverUrl("")
       setCollaboratorIds([])
-      setCollaboratorDeptIds([])
       setBatchId("")
     }
   }, [bank, open])
@@ -75,7 +72,6 @@ export function BankFormDialog({
       description: description.trim(),
       coverUrl: coverUrl || undefined,
       collaboratorIds: collaboratorIds.length > 0 ? collaboratorIds : undefined,
-      collaboratorDeptIds: collaboratorDeptIds.length > 0 ? collaboratorDeptIds : undefined,
       batchId: batchId || undefined,
     })
     onOpenChange(false)
@@ -85,19 +81,16 @@ export function BankFormDialog({
     const file = e.target.files?.[0]
     if (!file) return
 
-    // 检查文件大小 (5MB)
     if (file.size > 5 * 1024 * 1024) {
       alert("文件大小不能超过 5MB")
       return
     }
 
-    // 检查文件类型
     if (!file.type.startsWith("image/")) {
       alert("请上传图片文件")
       return
     }
 
-    // 创建预览 URL
     const url = URL.createObjectURL(file)
     setCoverUrl(url)
   }
@@ -109,28 +102,11 @@ export function BankFormDialog({
     }
   }
 
-  const addCollaborator = (userId: string) => {
-    if (!collaboratorIds.includes(userId)) {
-      setCollaboratorIds([...collaboratorIds, userId])
-    }
-  }
-
   const removeCollaborator = (userId: string) => {
     setCollaboratorIds(collaboratorIds.filter(id => id !== userId))
   }
 
-  const addDepartment = (deptId: string) => {
-    if (!collaboratorDeptIds.includes(deptId)) {
-      setCollaboratorDeptIds([...collaboratorDeptIds, deptId])
-    }
-  }
-
-  const removeDepartment = (deptId: string) => {
-    setCollaboratorDeptIds(collaboratorDeptIds.filter(id => id !== deptId))
-  }
-
   const getUserName = (id: string) => mockUsers.find(u => u.id === id)?.name || id
-  const getDeptName = (id: string) => mockDepartments.find(d => d.id === id)?.name || id
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -154,12 +130,12 @@ export function BankFormDialog({
               />
             </Field>
             <Field>
-              <FieldLabel htmlFor="description">题库描述</FieldLabel>
+              <FieldLabel htmlFor="description">题库简介</FieldLabel>
               <Textarea
                 id="description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="请输入题库描述（可选）"
+                placeholder="请输入题库简介（可选）"
                 rows={3}
               />
             </Field>
@@ -201,51 +177,9 @@ export function BankFormDialog({
               )}
             </Field>
             <Field>
-              <FieldLabel>共建人/共建部门</FieldLabel>
-              <FieldDescription>选择可以共同维护此题库的用户或部门</FieldDescription>
-              <Tabs value={collaboratorTab} onValueChange={(v) => setCollaboratorTab(v as "user" | "dept")} className="mt-2">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="user">按用户</TabsTrigger>
-                  <TabsTrigger value="dept">按部门</TabsTrigger>
-                </TabsList>
-                <TabsContent value="user" className="mt-2">
-                  <Select onValueChange={addCollaborator}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="选择共建人" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        {mockUsers
-                          .filter(u => !collaboratorIds.includes(u.id))
-                          .map(user => (
-                            <SelectItem key={user.id} value={user.id}>
-                              {user.name} ({user.department})
-                            </SelectItem>
-                          ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </TabsContent>
-                <TabsContent value="dept" className="mt-2">
-                  <Select onValueChange={addDepartment}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="选择共建部门" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectGroup>
-                        {mockDepartments
-                          .filter(d => !collaboratorDeptIds.includes(d.id))
-                          .map(dept => (
-                            <SelectItem key={dept.id} value={dept.id}>
-                              {dept.name}
-                            </SelectItem>
-                          ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </TabsContent>
-              </Tabs>
-              {(collaboratorIds.length > 0 || collaboratorDeptIds.length > 0) && (
+              <FieldLabel>共建人</FieldLabel>
+              <FieldDescription>选择可以共同维护此题库的用户</FieldDescription>
+              {collaboratorIds.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-2">
                   {collaboratorIds.map(id => (
                     <Badge key={id} variant="secondary" className="gap-1">
@@ -259,20 +193,18 @@ export function BankFormDialog({
                       </button>
                     </Badge>
                   ))}
-                  {collaboratorDeptIds.map(id => (
-                    <Badge key={id} variant="outline" className="gap-1">
-                      {getDeptName(id)}
-                      <button
-                        type="button"
-                        onClick={() => removeDepartment(id)}
-                        className="ml-1 rounded-full hover:bg-muted"
-                      >
-                        <X className="size-3" />
-                      </button>
-                    </Badge>
-                  ))}
                 </div>
               )}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="mt-2"
+                onClick={() => setCollaboratorDialogOpen(true)}
+              >
+                <UserPlus className="mr-1 size-3.5" />
+                选择共建人
+              </Button>
             </Field>
             <Field>
               <FieldLabel>所属批次</FieldLabel>
@@ -311,6 +243,15 @@ export function BankFormDialog({
           </DialogFooter>
         </form>
       </DialogContent>
+
+      <CoBuilderDialog
+        open={collaboratorDialogOpen}
+        onOpenChange={setCollaboratorDialogOpen}
+        title="选择共建人"
+        description="选择可以共同维护此题库的用户"
+        selectedIds={collaboratorIds}
+        onChange={setCollaboratorIds}
+      />
     </Dialog>
   )
 }

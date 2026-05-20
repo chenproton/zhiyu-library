@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { Search, Eye, Briefcase, User, Target, Calendar, TrendingUp, CheckCircle2, AlertCircle, BarChart3, GraduationCap, Building2, BookOpen, Award } from "lucide-react"
+import { Search, Eye, Briefcase, User, Calendar, TrendingUp, AlertCircle, GraduationCap, Building2, BookOpen, Award } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -15,6 +15,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useData } from "@/components/providers/data-provider"
 import { StudentPortraitModal } from "@/components/shared/student-portrait-modal"
+import { PageHeaderCard } from "@/components/shared/page-header-card"
 
 export default function JobAbilityResultsPage() {
   const { jobAbilityResults, positionsList } = useData()
@@ -60,18 +61,6 @@ export default function JobAbilityResultsPage() {
 
     return results.sort((a, b) => b.evaluationTime.getTime() - a.evaluationTime.getTime())
   }, [jobAbilityResults, selectedPositionId, rateFilter, search])
-
-  const stats = useMemo(() => {
-    const total = filteredResults.length
-    const excellent = filteredResults.filter((r) => r.achievementRate >= 90).length
-    const good = filteredResults.filter((r) => r.achievementRate >= 80 && r.achievementRate < 90).length
-    const pass = filteredResults.filter((r) => r.achievementRate >= 60 && r.achievementRate < 80).length
-    const fail = filteredResults.filter((r) => r.achievementRate < 60).length
-    const avgRate = total > 0
-      ? Math.round(filteredResults.reduce((sum, r) => sum + r.achievementRate, 0) / total)
-      : 0
-    return { total, excellent, good, pass, fail, avgRate }
-  }, [filteredResults])
 
   const getGradeLabel = (grade?: string) => {
     if (!grade || grade === '-') return '-'
@@ -139,59 +128,15 @@ export default function JobAbilityResultsPage() {
 
       {/* 右侧结果列表 */}
       <div className="flex-1 overflow-auto px-8 py-6">
-        <div className="mb-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">岗位能力测评结果</h1>
-            <p className="text-muted-foreground">
-              {selectedPositionId === "all"
-                ? "查看所有岗位的测评结果"
-                : `查看 ${positionsList.find(p => p.id === selectedPositionId)?.name || ''} 的测评结果`}
-            </p>
-          </div>
-        </div>
-
-        {/* 统计 */}
-        <div className="mb-4 flex gap-3">
-          <div className="flex flex-1 items-center gap-3 rounded-lg border bg-white px-4 py-3">
-            <div className="flex size-8 items-center justify-center rounded-md bg-blue-50">
-              <Target className="size-4 text-blue-600" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="text-xs text-muted-foreground">测评概况</div>
-              <div className="flex items-center gap-2 text-xs">
-                <span>人次 <strong className="text-foreground">{stats.total}</strong></span>
-                <span className="text-gray-300">|</span>
-                <span>平均达成率 <strong className="text-emerald-600">{stats.avgRate}%</strong></span>
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-1 items-center gap-3 rounded-lg border bg-white px-4 py-3">
-            <div className="flex size-8 items-center justify-center rounded-md bg-emerald-50">
-              <CheckCircle2 className="size-4 text-emerald-600" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="text-xs text-muted-foreground">达标分布</div>
-              <div className="flex items-center gap-2 text-xs">
-                <span>优秀 <strong className="text-emerald-600">{stats.excellent}</strong></span>
-                <span className="text-gray-300">|</span>
-                <span>良好 <strong className="text-blue-600">{stats.good}</strong></span>
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-1 items-center gap-3 rounded-lg border bg-white px-4 py-3">
-            <div className="flex size-8 items-center justify-center rounded-md bg-amber-50">
-              <BarChart3 className="size-4 text-amber-600" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="text-xs text-muted-foreground">未达标分布</div>
-              <div className="flex items-center gap-2 text-xs">
-                <span>合格 <strong className="text-amber-600">{stats.pass}</strong></span>
-                <span className="text-gray-300">|</span>
-                <span>不合格 <strong className="text-red-600">{stats.fail}</strong></span>
-              </div>
-            </div>
-          </div>
-        </div>
+        <PageHeaderCard
+          title="岗位能力认定结果"
+          description={
+            selectedPositionId === "all"
+              ? "查看所有岗位的认定结果"
+              : `查看 ${positionsList.find(p => p.id === selectedPositionId)?.name || ''} 的测评结果`
+          }
+          className="mb-4"
+        />
 
         {/* 筛选栏 */}
         <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center">
@@ -218,7 +163,7 @@ export default function JobAbilityResultsPage() {
                   <TableHead className="w-[100px]">专业</TableHead>
                   <TableHead className="w-[100px]">院系</TableHead>
                   <TableHead className="w-[140px]">岗位胜任达成率</TableHead>
-                  <TableHead className="w-[80px]">评价赋分</TableHead>
+                  <TableHead className="w-[80px]">岗位能力认定结果</TableHead>
                   <TableHead className="w-[140px]">测评时间</TableHead>
                   <TableHead className="sticky right-0 w-[140px] bg-white text-right">操作</TableHead>
                 </TableRow>

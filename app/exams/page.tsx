@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
-import { Plus, Search, Settings, FolderTree, Upload, List, LayoutGrid } from "lucide-react"
+import { Plus, Search, Settings, FolderTree, Upload, List, LayoutGrid, FileText, RotateCcw, GitBranch, ArrowUpFromLine, CheckCircle2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -25,14 +25,14 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { StatusBadge } from "@/components/shared/status-badge"
-import { StatsCards } from "@/components/shared/stats-cards"
+import { PageHeaderCard } from "@/components/shared/page-header-card"
 import { ExamFormDialog } from "@/components/exams/exam-form-dialog"
 import { ExamStatusActions } from "@/components/exams/exam-status-actions"
 import { InviteCollaboratorDialog } from "@/components/shared/invite-collaborator-dialog"
 import { useData } from "@/components/providers/data-provider"
 import type { Exam, Status, ExamFormData } from "@/lib/types"
 import { STATUS_LABELS } from "@/lib/types"
-import { mockUsers, mockDepartments, mockBatches } from "@/lib/mock-data"
+import { mockUsers, mockBatches } from "@/lib/mock-data"
 
 type OwnerTab = 'mine' | 'collaborate' | 'public'
 type ViewMode = 'list' | 'batch'
@@ -69,6 +69,22 @@ export default function ExamsPage() {
       })
       .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime())
   }, [exams, search, statusFilter, batchFilter, ownerTab])
+
+  const stats = useMemo(() => {
+    const total = exams.length
+    const draftCount = exams.filter(e => e.status === 'draft' || e.status === 'unsubmitted').length
+    const pendingCount = exams.filter(e => e.status === 'pending').length
+    const toPublishCount = exams.filter(e => e.status === 'toPublish').length
+    const publishedCount = exams.filter(e => e.status === 'published').length
+
+    return [
+      { label: "试卷总数", value: total, icon: <FileText className="size-3.5 text-blue-600" />, iconClassName: "bg-blue-50" },
+      { label: "草稿", value: draftCount, icon: <RotateCcw className="size-3.5 text-gray-600" />, iconClassName: "bg-gray-50" },
+      { label: "审批中", value: pendingCount, icon: <GitBranch className="size-3.5 text-yellow-600" />, iconClassName: "bg-yellow-50" },
+      { label: "待发布", value: toPublishCount, icon: <ArrowUpFromLine className="size-3.5 text-amber-600" />, iconClassName: "bg-amber-50" },
+      { label: "已发布", value: publishedCount, icon: <CheckCircle2 className="size-3.5 text-green-600" />, iconClassName: "bg-green-50" },
+    ]
+  }, [exams])
 
   const handleFormSubmit = (data: ExamFormData) => {
     if (editingExam) {
@@ -111,9 +127,7 @@ export default function ExamsPage() {
 
   const getCollaborators = (exam: Exam) => {
     const users = (exam.collaboratorIds || []).map(id => mockUsers.find(u => u.id === id)?.name).filter(Boolean)
-    const depts = (exam.collaboratorDeptIds || []).map(id => mockDepartments.find(d => d.id === id)?.name).filter(Boolean)
-    const all = [...users, ...depts]
-    return all.length > 0 ? all.join('、') : '-'
+    return users.length > 0 ? users.join('、') : '-'
   }
 
   const getBatchName = (exam: Exam) => {
@@ -122,33 +136,32 @@ export default function ExamsPage() {
 
   return (
     <div className="px-8 py-6">
-      <div className="mb-4 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">试卷管理</h1>
-          <p className="text-muted-foreground">管理所有试卷，进行组卷操作</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline">
-            <Settings className="mr-2 size-4" />
-            配置审批流程
-          </Button>
-          <Button variant="outline">
-            <FolderTree className="mr-2 size-4" />
-            配置批次分组
-          </Button>
-          <Button variant="outline">
-            <Upload className="mr-2 size-4" />
-            导入试卷
-          </Button>
-          <Button onClick={() => { setEditingExam(null); setFormOpen(true) }}>
-            <Plus className="mr-2 size-4" />
-            新建试卷
-          </Button>
-        </div>
-      </div>
-
-      {/* 统计卡片 */}
-      <StatsCards items={exams} type="exam" />
+      <PageHeaderCard
+        title="试卷管理"
+        description="管理所有试卷，进行组卷操作"
+        stats={stats}
+        actions={
+          <>
+            <Button variant="outline">
+              <Settings className="mr-2 size-4" />
+              配置审批流程
+            </Button>
+            <Button variant="outline">
+              <FolderTree className="mr-2 size-4" />
+              配置批次分组
+            </Button>
+            <Button variant="outline">
+              <Upload className="mr-2 size-4" />
+              导入试卷
+            </Button>
+            <Button onClick={() => { setEditingExam(null); setFormOpen(true) }}>
+              <Plus className="mr-2 size-4" />
+              新建试卷
+            </Button>
+          </>
+        }
+        className="mb-4"
+      />
 
       {/* Tab 切换与视图切换 */}
       <div className="mb-4 flex items-center justify-between">
@@ -222,14 +235,14 @@ export default function ExamsPage() {
               <TableRow>
                 <TableHead className="w-[180px]">试卷名称</TableHead>
                 <TableHead className="w-[200px]">试卷简介</TableHead>
-                <TableHead className="w-[80px]">题目数</TableHead>
+                <TableHead className="w-[80px]">题目数量</TableHead>
                 <TableHead className="w-[80px]">总分</TableHead>
-                <TableHead className="w-[100px]">状态</TableHead>
-                <TableHead className="w-[100px]">创建人</TableHead>
-                <TableHead className="w-[140px]">共建人/单位</TableHead>
                 <TableHead className="w-[120px]">所属批次</TableHead>
+                <TableHead className="w-[100px]">创建人</TableHead>
+                <TableHead className="w-[140px]">共建人</TableHead>
+                <TableHead className="w-[100px]">状态</TableHead>
                 <TableHead className="w-[130px]">创建时间</TableHead>
-                <TableHead className="w-[130px]">最后更新时间</TableHead>
+                <TableHead className="w-[130px]">更新时间</TableHead>
                 <TableHead className="sticky right-0 w-[80px] bg-white text-right">操作</TableHead>
               </TableRow>
             </TableHeader>
@@ -246,7 +259,7 @@ export default function ExamsPage() {
                   <TableCell>
                     <span
                       className="cursor-pointer font-medium hover:underline"
-                      onClick={() => router.push(`/exams/${exam.id}`)}
+                      onClick={() => router.push(`/exams/${exam.id}?mode=preview`)}
                     >
                       {exam.name}
                     </span>
@@ -260,12 +273,12 @@ export default function ExamsPage() {
                   </TableCell>
                   <TableCell>{exam.questions.length}</TableCell>
                   <TableCell>{exam.totalScore} 分</TableCell>
+                  <TableCell className="text-sm text-muted-foreground">{getBatchName(exam)}</TableCell>
+                  <TableCell>{getCreatorName(exam)}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground">{getCollaborators(exam)}</TableCell>
                   <TableCell>
                     <StatusBadge status={exam.status} />
                   </TableCell>
-                  <TableCell>{getCreatorName(exam)}</TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{getCollaborators(exam)}</TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{getBatchName(exam)}</TableCell>
                   <TableCell className="text-muted-foreground">{formatDate(exam.createdAt)}</TableCell>
                   <TableCell className="text-muted-foreground">{formatDate(exam.updatedAt)}</TableCell>
                   <TableCell className="sticky right-0 bg-white text-right">
@@ -276,6 +289,7 @@ export default function ExamsPage() {
                       onStatusChange={(action) => updateExamStatus(exam.id, action)}
                       onView={() => router.push(`/exams/${exam.id}`)}
                       onPreview={() => router.push(`/exams/${exam.id}?mode=preview`)}
+                      onInvite={() => handleInvite(exam)}
                     />
                   </TableCell>
                 </TableRow>

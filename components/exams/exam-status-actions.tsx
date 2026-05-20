@@ -22,6 +22,7 @@ import {
   Rocket,
   Eye,
   MonitorPlay,
+  UserPlus,
 } from "lucide-react"
 import type { Status, StatusAction } from "@/lib/types"
 import { canPerformAction } from "@/lib/types"
@@ -84,6 +85,7 @@ export function ExamStatusActions({
   onStatusChange,
   onView,
   onPreview,
+  onInvite,
 }: ExamStatusActionsProps) {
   const [confirmType, setConfirmType] = useState<ConfirmType>(null)
 
@@ -136,10 +138,10 @@ export function ExamStatusActions({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuGroup>
-            {onView && (
+            {status === 'draft' && onView && (
               <DropdownMenuItem onClick={onView}>
                 <Eye />
-                进入试卷
+                配置试卷
               </DropdownMenuItem>
             )}
             {onPreview && (
@@ -152,6 +154,12 @@ export function ExamStatusActions({
               <DropdownMenuItem onClick={onEdit}>
                 <Edit />
                 修改试卷基本信息
+              </DropdownMenuItem>
+            )}
+            {onInvite && (
+              <DropdownMenuItem onClick={onInvite}>
+                <UserPlus />
+                邀请共建
               </DropdownMenuItem>
             )}
           </DropdownMenuGroup>

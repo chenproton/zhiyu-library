@@ -2146,48 +2146,50 @@ export const mockEvaluationCategories: EvaluationMethodCategory[] = [
 // 二级测评方式
 export const mockEvaluationMethods: EvaluationMethod[] = [
   // 知识测评
-  { id: 'method-1-1', categoryId: 'cat-1', name: '在线笔试', enabled: true, relatedTaskIds: ['st-1', 'st-2'] },
-  { id: 'method-1-2', categoryId: 'cat-1', name: '知识问答', enabled: true, relatedTaskIds: ['st-3'] },
-  { id: 'method-1-3', categoryId: 'cat-1', name: '开卷测验', enabled: false, relatedTaskIds: [] },
+  { id: 'method-1-1', categoryId: 'cat-1', name: '在线笔试', enabled: true, relatedTaskIds: ['st-1', 'st-2'], description: '通过在线考试系统对学生进行知识掌握程度的考核，支持客观题与主观题混合组卷。', docLink: 'https://www.baidu.com' },
+  { id: 'method-1-2', categoryId: 'cat-1', name: '知识问答', enabled: true, relatedTaskIds: ['st-3'], description: '以口头或书面的问答形式，快速检验学生对特定知识点的理解与记忆。', docLink: 'https://www.baidu.com' },
+  { id: 'method-1-3', categoryId: 'cat-1', name: '开卷测验', enabled: false, relatedTaskIds: [], description: '允许学生查阅资料进行的测验，侧重考察信息检索、分析与综合应用能力。', docLink: 'https://www.baidu.com' },
+  { id: 'method-1-4', categoryId: 'cat-1', name: '成果评价', enabled: true, relatedTaskIds: ['st-29'], description: '对学生在学习过程中产生的阶段性成果进行评价，包括小作品、实验记录等。', docLink: 'https://www.baidu.com' },
+  { id: 'method-1-5', categoryId: 'cat-1', name: '作业', enabled: true, relatedTaskIds: ['st-30'], description: '通过课后作业的完成质量，评估学生对课堂知识的巩固程度和应用能力。', docLink: 'https://www.baidu.com' },
   // 过程测评
-  { id: 'method-2-1', categoryId: 'cat-2', name: '课堂表现', enabled: true, relatedTaskIds: ['st-4', 'st-5'] },
-  { id: 'method-2-2', categoryId: 'cat-2', name: '学习日志', enabled: true, relatedTaskIds: ['st-5'] },
-  { id: 'method-2-3', categoryId: 'cat-2', name: '阶段检查', enabled: true, relatedTaskIds: ['st-6'] },
-  { id: 'method-2-4', categoryId: 'cat-2', name: '出勤记录', enabled: false, relatedTaskIds: [] },
+  { id: 'method-2-1', categoryId: 'cat-2', name: '课堂表现', enabled: true, relatedTaskIds: ['st-4', 'st-5'], description: '记录学生在课堂中的参与度、发言质量、互动表现等过程性指标。', docLink: 'https://www.baidu.com' },
+  { id: 'method-2-2', categoryId: 'cat-2', name: '学习日志', enabled: true, relatedTaskIds: ['st-5'], description: '学生定期提交的学习反思与总结，用于追踪学习轨迹与思维成长。', docLink: 'https://www.baidu.com' },
+  { id: 'method-2-3', categoryId: 'cat-2', name: '阶段检查', enabled: true, relatedTaskIds: ['st-6'], description: '在学习关键节点进行的阶段性能力检查，及时发现薄弱环节并调整教学策略。', docLink: 'https://www.baidu.com' },
+  { id: 'method-2-4', categoryId: 'cat-2', name: '出勤记录', enabled: false, relatedTaskIds: [], description: '统计学生的出勤、迟到、早退、请假等情况，作为学习态度的参考依据。', docLink: 'https://www.baidu.com' },
   // 实操测评
-  { id: 'method-3-1', categoryId: 'cat-3', name: '现场实操', enabled: true, relatedTaskIds: ['st-7', 'st-8'] },
-  { id: 'method-3-2', categoryId: 'cat-3', name: '仿真操作', enabled: true, relatedTaskIds: ['st-9'] },
-  { id: 'method-3-3', categoryId: 'cat-3', name: '上机测试', enabled: true, relatedTaskIds: ['st-10'] },
-  { id: 'method-3-4', categoryId: 'cat-3', name: 'SOP流程考核', enabled: false, relatedTaskIds: [] },
-  { id: 'method-3-5', categoryId: 'cat-3', name: '应急处置考核', enabled: true, relatedTaskIds: ['st-11'] },
+  { id: 'method-3-1', categoryId: 'cat-3', name: '现场实操', enabled: true, relatedTaskIds: ['st-7', 'st-8'], description: '在真实或模拟的工作环境中，对学生的实际操作技能进行观察与评分。', docLink: 'https://www.baidu.com' },
+  { id: 'method-3-2', categoryId: 'cat-3', name: '仿真操作', enabled: true, relatedTaskIds: ['st-9'], description: '利用虚拟仿真软件或设备进行技能训练与考核，降低安全风险与设备损耗。', docLink: 'https://www.baidu.com' },
+  { id: 'method-3-3', categoryId: 'cat-3', name: '上机测试', enabled: true, relatedTaskIds: ['st-10'], description: '在计算机实验室环境中进行的编程、设计、数据处理等实操能力测试。', docLink: 'https://www.baidu.com' },
+  { id: 'method-3-4', categoryId: 'cat-3', name: 'SOP流程考核', enabled: false, relatedTaskIds: [], description: '按照标准作业程序（SOP）对学生执行规范化操作流程的能力进行考核。', docLink: 'https://www.baidu.com' },
+  { id: 'method-3-5', categoryId: 'cat-3', name: '应急处置考核', enabled: true, relatedTaskIds: ['st-11'], description: '模拟突发状况，评估学生在紧急情况下的应变能力与规范处置水平。', docLink: 'https://www.baidu.com' },
   // 成果测评
-  { id: 'method-4-1', categoryId: 'cat-4', name: '项目作品', enabled: true, relatedTaskIds: ['st-12'] },
-  { id: 'method-4-2', categoryId: 'cat-4', name: '实验报告', enabled: true, relatedTaskIds: ['st-13'] },
-  { id: 'method-4-3', categoryId: 'cat-4', name: '设计方案', enabled: false, relatedTaskIds: [] },
-  { id: 'method-4-4', categoryId: 'cat-4', name: '论文撰写', enabled: true, relatedTaskIds: ['st-14'] },
+  { id: 'method-4-1', categoryId: 'cat-4', name: '项目作品', enabled: true, relatedTaskIds: ['st-12'], description: '对学生完成的综合性项目作品进行多维度评价，包括功能完整性、技术难度等。', docLink: 'https://www.baidu.com' },
+  { id: 'method-4-2', categoryId: 'cat-4', name: '实验报告', enabled: true, relatedTaskIds: ['st-13'], description: '通过实验报告评估学生的实验设计能力、数据分析能力与科学表达能力。', docLink: 'https://www.baidu.com' },
+  { id: 'method-4-3', categoryId: 'cat-4', name: '设计方案', enabled: false, relatedTaskIds: [], description: '对学生提交的技术方案、教学方案或商业策划书进行专业评审。', docLink: 'https://www.baidu.com' },
+  { id: 'method-4-4', categoryId: 'cat-4', name: '论文撰写', enabled: true, relatedTaskIds: ['st-14'], description: '从选题、文献综述、研究方法、数据分析到结论等方面评价学术论文质量。', docLink: 'https://www.baidu.com' },
   // 展示测评
-  { id: 'method-5-1', categoryId: 'cat-5', name: '汇报', enabled: true, relatedTaskIds: ['st-15', 'st-16'] },
-  { id: 'method-5-2', categoryId: 'cat-5', name: '答辩', enabled: true, relatedTaskIds: ['st-16'] },
-  { id: 'method-5-3', categoryId: 'cat-5', name: '路演', enabled: false, relatedTaskIds: [] },
-  { id: 'method-5-4', categoryId: 'cat-5', name: '说课', enabled: true, relatedTaskIds: ['st-17'] },
-  { id: 'method-5-5', categoryId: 'cat-5', name: '演示', enabled: true, relatedTaskIds: ['st-18'] },
+  { id: 'method-5-1', categoryId: 'cat-5', name: '汇报', enabled: true, relatedTaskIds: ['st-15', 'st-16'], description: '学生就学习成果或项目进展进行口头汇报，考察表达能力与逻辑组织能力。', docLink: 'https://www.baidu.com' },
+  { id: 'method-5-2', categoryId: 'cat-5', name: '答辩', enabled: true, relatedTaskIds: ['st-16'], description: '在评审专家面前进行成果陈述并回答提问，检验知识深度与临场应变能力。', docLink: 'https://www.baidu.com' },
+  { id: 'method-5-3', categoryId: 'cat-5', name: '路演', enabled: false, relatedTaskIds: [], description: '模拟真实商业路演场景，评价学生的项目展示能力与商业说服力。', docLink: 'https://www.baidu.com' },
+  { id: 'method-5-4', categoryId: 'cat-5', name: '说课', enabled: true, relatedTaskIds: ['st-17'], description: '师范类专业学生就教学设计进行阐述，考察教学理念与课堂组织能力。', docLink: 'https://www.baidu.com' },
+  { id: 'method-5-5', categoryId: 'cat-5', name: '演示', enabled: true, relatedTaskIds: ['st-18'], description: '对产品、系统或实验进行现场演示，评估操作熟练度与功能展示效果。', docLink: 'https://www.baidu.com' },
   // 情境模拟测评
-  { id: 'method-6-1', categoryId: 'cat-6', name: '角色扮演', enabled: true, relatedTaskIds: ['st-19'] },
-  { id: 'method-6-2', categoryId: 'cat-6', name: '案例分析', enabled: true, relatedTaskIds: ['st-20'] },
-  { id: 'method-6-3', categoryId: 'cat-6', name: '沙盘推演', enabled: false, relatedTaskIds: [] },
-  { id: 'method-6-4', categoryId: 'cat-6', name: '无领导小组讨论', enabled: true, relatedTaskIds: ['st-21'] },
+  { id: 'method-6-1', categoryId: 'cat-6', name: '角色扮演', enabled: true, relatedTaskIds: ['st-19'], description: '在设定情境中扮演特定角色，考察沟通技巧、职业素养与情境应对能力。', docLink: 'https://www.baidu.com' },
+  { id: 'method-6-2', categoryId: 'cat-6', name: '案例分析', enabled: true, relatedTaskIds: ['st-20'], description: '通过对真实或模拟案例的分析与解决方案设计，评估问题诊断与解决能力。', docLink: 'https://www.baidu.com' },
+  { id: 'method-6-3', categoryId: 'cat-6', name: '沙盘推演', enabled: false, relatedTaskIds: [], description: '利用沙盘模拟企业经营或项目管理过程，考察战略思维与决策能力。', docLink: 'https://www.baidu.com' },
+  { id: 'method-6-4', categoryId: 'cat-6', name: '无领导小组讨论', enabled: true, relatedTaskIds: ['st-21'], description: '在无指定领导的小组讨论中观察学生的团队协作、影响力与思辨能力。', docLink: 'https://www.baidu.com' },
   // 协作互评
-  { id: 'method-7-1', categoryId: 'cat-7', name: '小组互评', enabled: true, relatedTaskIds: ['st-22'] },
-  { id: 'method-7-2', categoryId: 'cat-7', name: '同伴评价', enabled: true, relatedTaskIds: ['st-23'] },
-  { id: 'method-7-3', categoryId: 'cat-7', name: '团队360度评估', enabled: false, relatedTaskIds: [] },
+  { id: 'method-7-1', categoryId: 'cat-7', name: '小组互评', enabled: true, relatedTaskIds: ['st-22'], description: '小组成员之间就合作过程中的贡献度、协作态度等进行相互评价。', docLink: 'https://www.baidu.com' },
+  { id: 'method-7-2', categoryId: 'cat-7', name: '同伴评价', enabled: true, relatedTaskIds: ['st-23'], description: '同学之间基于共同学习经历进行的匿名或实名评价，促进相互学习。', docLink: 'https://www.baidu.com' },
+  { id: 'method-7-3', categoryId: 'cat-7', name: '团队360度评估', enabled: false, relatedTaskIds: [], description: '从上级、同事、下属及自我多个角度对团队成员进行全方位能力评估。', docLink: 'https://www.baidu.com' },
   // 多元评价
-  { id: 'method-8-1', categoryId: 'cat-8', name: '企业导师评价', enabled: true, relatedTaskIds: ['st-24'] },
-  { id: 'method-8-2', categoryId: 'cat-8', name: '行业专家评分', enabled: true, relatedTaskIds: ['st-25'] },
-  { id: 'method-8-3', categoryId: 'cat-8', name: '用人单位反馈', enabled: false, relatedTaskIds: [] },
+  { id: 'method-8-1', categoryId: 'cat-8', name: '企业导师评价', enabled: true, relatedTaskIds: ['st-24'], description: '邀请企业导师根据学生实习表现，从岗位胜任力角度进行专业评价。', docLink: 'https://www.baidu.com' },
+  { id: 'method-8-2', categoryId: 'cat-8', name: '行业专家评分', enabled: true, relatedTaskIds: ['st-25'], description: '由行业资深专家对学生的技能水平或作品进行权威评审与打分。', docLink: 'https://www.baidu.com' },
+  { id: 'method-8-3', categoryId: 'cat-8', name: '用人单位反馈', enabled: false, relatedTaskIds: [], description: '收集用人单位对毕业生或实习生的综合评价，用于优化人才培养方案。', docLink: 'https://www.baidu.com' },
   // 综合考核
-  { id: 'method-9-1', categoryId: 'cat-9', name: '期末综合测评', enabled: true, relatedTaskIds: ['st-26'] },
-  { id: 'method-9-2', categoryId: 'cat-9', name: '项目答辩总评', enabled: true, relatedTaskIds: ['st-27'] },
-  { id: 'method-9-3', categoryId: 'cat-9', name: '职业能力认定', enabled: true, relatedTaskIds: ['st-28'] },
+  { id: 'method-9-1', categoryId: 'cat-9', name: '期末综合测评', enabled: true, relatedTaskIds: ['st-26'], description: '学期末对学生知识、技能、态度等多维度进行综合性的终结性评价。', docLink: 'https://www.baidu.com' },
+  { id: 'method-9-2', categoryId: 'cat-9', name: '项目答辩总评', enabled: true, relatedTaskIds: ['st-27'], description: '对项目型学习成果进行最终答辩评审，综合考察项目完成度与个人成长。', docLink: 'https://www.baidu.com' },
+  { id: 'method-9-3', categoryId: 'cat-9', name: '职业能力认定', enabled: true, relatedTaskIds: ['st-28'], description: '依据岗位能力模型，对学生的专业技能与职业素养进行标准化等级认定。', docLink: 'https://www.baidu.com' },
 ]
 
 // 场景任务
@@ -2220,6 +2222,8 @@ export const mockSceneTasks: SceneTask[] = [
   { id: 'st-26', name: '学期末综合能力考核', sceneName: '综合测评中心', methodIds: ['method-9-1'] },
   { id: 'st-27', name: '创新项目终期答辩', sceneName: '学术报告厅', methodIds: ['method-9-2'] },
   { id: 'st-28', name: '前端开发工程师认定', sceneName: '职业能力认定中心', methodIds: ['method-9-3'] },
+  { id: 'st-29', name: '阶段成果汇报', sceneName: '项目评审室', methodIds: ['method-1-4'] },
+  { id: 'st-30', name: '课后编程作业', sceneName: '在线学习平台', methodIds: ['method-1-5'] },
 ]
 
 // 场景任务测评结果

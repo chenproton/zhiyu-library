@@ -31,7 +31,7 @@ import { useData } from "@/components/providers/data-provider"
 
 // ==================== 在线课堂 Tab ====================
 
-function OnlineClassroomTab() {
+function OnlineClassroomTab({ activeTab, onTabChange }: { activeTab: string; onTabChange: (tab: string) => void }) {
   const { onlineClassrooms } = useData()
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedClassroomId, setSelectedClassroomId] = useState<string | null>(onlineClassrooms[0]?.id || null)
@@ -57,7 +57,45 @@ function OnlineClassroomTab() {
     <div className="h-full flex max-w-[1600px] mx-auto w-full">
       {/* Left sidebar */}
       <div className="w-72 shrink-0 bg-white border-r border-gray-200 flex flex-col">
-        <div className="p-4 border-b border-gray-100">
+        <div className="p-4 border-b border-gray-100 space-y-3">
+          <div className="flex gap-1.5">
+            <button
+              onClick={() => onTabChange("scene")}
+              className={cn(
+                "flex-1 flex items-center justify-center gap-1 rounded-md px-2 py-1.5 text-xs font-medium transition-colors border",
+                activeTab === "scene"
+                  ? "bg-primary/[0.06] text-primary border-primary/30"
+                  : "bg-white text-gray-500 border-gray-200 hover:bg-gray-50"
+              )}
+            >
+              <LayoutList className="h-3 w-3" />
+              场景任务
+            </button>
+            <button
+              onClick={() => onTabChange("online-classroom")}
+              className={cn(
+                "flex-1 flex items-center justify-center gap-1 rounded-md px-2 py-1.5 text-xs font-medium transition-colors border",
+                activeTab === "online-classroom"
+                  ? "bg-primary/[0.06] text-primary border-primary/30"
+                  : "bg-white text-gray-500 border-gray-200 hover:bg-gray-50"
+              )}
+            >
+              <Video className="h-3 w-3" />
+              智慧课堂
+            </button>
+            <button
+              onClick={() => onTabChange("smart-course")}
+              className={cn(
+                "flex-1 flex items-center justify-center gap-1 rounded-md px-2 py-1.5 text-xs font-medium transition-colors border",
+                activeTab === "smart-course"
+                  ? "bg-primary/[0.06] text-primary border-primary/30"
+                  : "bg-white text-gray-500 border-gray-200 hover:bg-gray-50"
+              )}
+            >
+              <Library className="h-3 w-3" />
+              在线课程
+            </button>
+          </div>
           <div className="relative w-full">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
             <Input
@@ -192,7 +230,7 @@ function OnlineClassroomTab() {
 
 // ==================== 智慧课程 Tab ====================
 
-function SmartCourseTab() {
+function SmartCourseTab({ activeTab, onTabChange }: { activeTab: string; onTabChange: (tab: string) => void }) {
   const { smartCourses } = useData()
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedCourseId, setSelectedCourseId] = useState<string | null>(smartCourses[0]?.id || null)
@@ -242,7 +280,45 @@ function SmartCourseTab() {
     <div className="h-full flex max-w-[1600px] mx-auto w-full">
       {/* Left sidebar */}
       <div className="w-72 shrink-0 bg-white border-r border-gray-200 flex flex-col">
-        <div className="p-4 border-b border-gray-100">
+        <div className="p-4 border-b border-gray-100 space-y-3">
+          <div className="flex gap-1.5">
+            <button
+              onClick={() => onTabChange("scene")}
+              className={cn(
+                "flex-1 flex items-center justify-center gap-1 rounded-md px-2 py-1.5 text-xs font-medium transition-colors border",
+                activeTab === "scene"
+                  ? "bg-primary/[0.06] text-primary border-primary/30"
+                  : "bg-white text-gray-500 border-gray-200 hover:bg-gray-50"
+              )}
+            >
+              <LayoutList className="h-3 w-3" />
+              场景任务
+            </button>
+            <button
+              onClick={() => onTabChange("online-classroom")}
+              className={cn(
+                "flex-1 flex items-center justify-center gap-1 rounded-md px-2 py-1.5 text-xs font-medium transition-colors border",
+                activeTab === "online-classroom"
+                  ? "bg-primary/[0.06] text-primary border-primary/30"
+                  : "bg-white text-gray-500 border-gray-200 hover:bg-gray-50"
+              )}
+            >
+              <Video className="h-3 w-3" />
+              智慧课堂
+            </button>
+            <button
+              onClick={() => onTabChange("smart-course")}
+              className={cn(
+                "flex-1 flex items-center justify-center gap-1 rounded-md px-2 py-1.5 text-xs font-medium transition-colors border",
+                activeTab === "smart-course"
+                  ? "bg-primary/[0.06] text-primary border-primary/30"
+                  : "bg-white text-gray-500 border-gray-200 hover:bg-gray-50"
+              )}
+            >
+              <Library className="h-3 w-3" />
+              在线课程
+            </button>
+          </div>
           <div className="relative w-full">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
             <Input
@@ -454,7 +530,7 @@ interface ScenarioGroup {
   scenarios: ScenarioItem[]
 }
 
-function SceneTaskTab() {
+function SceneTaskTab({ activeTab, onTabChange }: { activeTab: string; onTabChange: (tab: string) => void }) {
   const { sceneGradingScenarios, sceneGradingStudents, sceneGradingSubmissions } = useData()
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedScenarioId, setSelectedScenarioId] = useState<string | null>(sceneGradingScenarios[0]?.id || null)
@@ -728,7 +804,45 @@ function SceneTaskTab() {
     <div className="h-full flex max-w-[1600px] mx-auto w-full">
       {/* Left sidebar — Scenario tree */}
       <div className="w-72 shrink-0 bg-white border-r border-gray-200 flex flex-col">
-        <div className="p-4 border-b border-gray-100">
+        <div className="p-4 border-b border-gray-100 space-y-3">
+          <div className="flex gap-1.5">
+            <button
+              onClick={() => onTabChange("scene")}
+              className={cn(
+                "flex-1 flex items-center justify-center gap-1 rounded-md px-2 py-1.5 text-xs font-medium transition-colors border",
+                activeTab === "scene"
+                  ? "bg-primary/[0.06] text-primary border-primary/30"
+                  : "bg-white text-gray-500 border-gray-200 hover:bg-gray-50"
+              )}
+            >
+              <LayoutList className="h-3 w-3" />
+              场景任务
+            </button>
+            <button
+              onClick={() => onTabChange("online-classroom")}
+              className={cn(
+                "flex-1 flex items-center justify-center gap-1 rounded-md px-2 py-1.5 text-xs font-medium transition-colors border",
+                activeTab === "online-classroom"
+                  ? "bg-primary/[0.06] text-primary border-primary/30"
+                  : "bg-white text-gray-500 border-gray-200 hover:bg-gray-50"
+              )}
+            >
+              <Video className="h-3 w-3" />
+              智慧课堂
+            </button>
+            <button
+              onClick={() => onTabChange("smart-course")}
+              className={cn(
+                "flex-1 flex items-center justify-center gap-1 rounded-md px-2 py-1.5 text-xs font-medium transition-colors border",
+                activeTab === "smart-course"
+                  ? "bg-primary/[0.06] text-primary border-primary/30"
+                  : "bg-white text-gray-500 border-gray-200 hover:bg-gray-50"
+              )}
+            >
+              <Library className="h-3 w-3" />
+              在线课程
+            </button>
+          </div>
           <div className="relative w-full">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
             <Input
@@ -900,40 +1014,24 @@ function SceneTaskResultsContent() {
 
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="h-[calc(100vh-3.5rem)] flex flex-col bg-gray-50">
-      {/* Header with Tabs */}
+      {/* Header */}
       <div className="bg-white border-b border-gray-200 px-6 py-3 shrink-0">
-        <div className="max-w-[1600px] mx-auto w-full flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-semibold text-gray-800">测评结果管理</h1>
-            <p className="text-sm text-gray-500 mt-0.5">查看在线课堂、场景任务、智慧课程的测评结果并进行评分</p>
-          </div>
-          <TabsList className="grid w-full max-w-[360px] grid-cols-3">
-            <TabsTrigger value="online-classroom" className="text-sm">
-              <Video className="mr-1.5 h-3.5 w-3.5" />
-              在线课堂
-            </TabsTrigger>
-            <TabsTrigger value="scene" className="text-sm">
-              <LayoutList className="mr-1.5 h-3.5 w-3.5" />
-              场景任务
-            </TabsTrigger>
-            <TabsTrigger value="smart-course" className="text-sm">
-              <Library className="mr-1.5 h-3.5 w-3.5" />
-              智慧课程
-            </TabsTrigger>
-          </TabsList>
+        <div className="max-w-[1600px] mx-auto w-full">
+          <h1 className="text-xl font-semibold text-gray-800">测评结果管理</h1>
+          <p className="text-sm text-gray-500 mt-0.5">查看场景任务、智慧课堂、在线课程的测评结果并进行评分</p>
         </div>
       </div>
 
       {/* Tab Content */}
       <div className="flex-1 overflow-hidden">
         <TabsContent value="online-classroom" className="h-full mt-0">
-          <OnlineClassroomTab />
+          <OnlineClassroomTab activeTab={activeTab} onTabChange={setActiveTab} />
         </TabsContent>
         <TabsContent value="scene" className="h-full mt-0">
-          <SceneTaskTab />
+          <SceneTaskTab activeTab={activeTab} onTabChange={setActiveTab} />
         </TabsContent>
         <TabsContent value="smart-course" className="h-full mt-0">
-          <SmartCourseTab />
+          <SmartCourseTab activeTab={activeTab} onTabChange={setActiveTab} />
         </TabsContent>
       </div>
     </Tabs>

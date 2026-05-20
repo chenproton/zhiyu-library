@@ -18,6 +18,7 @@ import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { MultiSelectSearch } from "@/components/ui/multi-select-search"
 import { useData } from "@/components/providers/data-provider"
 import { mockKnowledgePoints } from "@/lib/mock-data"
 import type { Question, QuestionType, Difficulty } from "@/lib/types"
@@ -30,7 +31,7 @@ interface RandomQuestionDialogProps {
   onAddQuestions: (questions: Question[]) => void
 }
 
-const questionTypes: QuestionType[] = ['single', 'multiple', 'judge', 'fill', 'essay']
+const questionTypes: QuestionType[] = ['single', 'multiple', 'judge', 'fill', 'short_answer', 'essay']
 const difficulties: Difficulty[] = ['easy', 'medium', 'hard']
 
 export function RandomQuestionDialog({
@@ -89,14 +90,6 @@ export function RandomQuestionDialog({
     return pool
   }, [questions, questionBanks, selectedQuestionIds, selectedBankIds, selectedTypes, selectedDifficulties, selectedKnowledgePoints])
 
-  const toggleBank = (bankId: string) => {
-    setSelectedBankIds(prev => 
-      prev.includes(bankId) 
-        ? prev.filter(id => id !== bankId)
-        : [...prev, bankId]
-    )
-  }
-
   const toggleType = (type: QuestionType) => {
     setSelectedTypes(prev => 
       prev.includes(type)
@@ -110,14 +103,6 @@ export function RandomQuestionDialog({
       prev.includes(difficulty)
         ? prev.filter(d => d !== difficulty)
         : [...prev, difficulty]
-    )
-  }
-
-  const toggleKnowledgePoint = (kpId: string) => {
-    setSelectedKnowledgePoints(prev => 
-      prev.includes(kpId)
-        ? prev.filter(id => id !== kpId)
-        : [...prev, kpId]
     )
   }
 
@@ -172,21 +157,13 @@ export function RandomQuestionDialog({
                   <AlertDescription>暂无已发布的题库</AlertDescription>
                 </Alert>
               ) : (
-                <div className="flex flex-wrap gap-2">
-                  {publishedBanks.map((bank) => (
-                    <Badge
-                      key={bank.id}
-                      variant={selectedBankIds.includes(bank.id) ? "default" : "outline"}
-                      className="cursor-pointer"
-                      onClick={() => toggleBank(bank.id)}
-                    >
-                      {bank.name}
-                      <span className="ml-1 text-xs opacity-60">
-                        ({bank.questionCount})
-                      </span>
-                    </Badge>
-                  ))}
-                </div>
+                <MultiSelectSearch
+                  options={publishedBanks.map(b => ({ label: b.name, value: b.id, subtitle: `${b.questionCount}题` }))}
+                  selected={selectedBankIds}
+                  onChange={setSelectedBankIds}
+                  placeholder="选择题库"
+                  searchPlaceholder="搜索题库名称..."
+                />
               )}
             </div>
 
@@ -242,18 +219,13 @@ export function RandomQuestionDialog({
               <p className="mb-3 text-sm text-muted-foreground">
                 不选则包含全部知识点
               </p>
-              <div className="flex flex-wrap gap-2">
-                {mockKnowledgePoints.map((kp) => (
-                  <Badge
-                    key={kp.id}
-                    variant={selectedKnowledgePoints.includes(kp.id) ? "default" : "outline"}
-                    className="cursor-pointer"
-                    onClick={() => toggleKnowledgePoint(kp.id)}
-                  >
-                    {kp.name}
-                  </Badge>
-                ))}
-              </div>
+              <MultiSelectSearch
+                options={mockKnowledgePoints.map(kp => ({ label: kp.name, value: kp.id }))}
+                selected={selectedKnowledgePoints}
+                onChange={setSelectedKnowledgePoints}
+                placeholder="选择知识点"
+                searchPlaceholder="搜索知识点..."
+              />
             </div>
 
             <Separator />

@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import {
   BookOpen,
   FileText,
@@ -30,6 +30,16 @@ import {
   MonitorPlay,
   Eye,
   X,
+  Lightbulb,
+  Monitor,
+  Wrench,
+  FolderCheck,
+  Presentation,
+  Drama,
+  Handshake,
+  HeartHandshake,
+  ClipboardCheck,
+  ExternalLink,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -38,6 +48,7 @@ import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { useData } from "@/components/providers/data-provider"
 
 const platformStats = [
   { label: "题库数量", value: "8,500+", icon: Database },
@@ -132,10 +143,39 @@ const topics = [
   { id: 4, title: "基于物联网的温室环境监测", mentor: "陈教授", direction: "物联网", spots: 4, total: 5 },
 ]
 
+const categoryIcons: Record<string, React.ElementType> = {
+  '知识测评': Lightbulb,
+  '过程测评': Monitor,
+  '实操测评': Wrench,
+  '成果测评': FolderCheck,
+  '展示测评': Presentation,
+  '情境模拟测评': Drama,
+  '协作互评': Handshake,
+  '多元评价': HeartHandshake,
+  '综合考核': ClipboardCheck,
+}
+
 export default function LandingHomePage() {
   const [previewBank, setPreviewBank] = useState<typeof questionBanks[0] | null>(null)
   const [activeTab, setActiveTab] = useState<'my' | 'interested'>('my')
   const [examCenterTab, setExamCenterTab] = useState<'my' | 'all'>('my')
+  const { evaluationCategories, evaluationMethods } = useData()
+
+  const enabledMethods = useMemo(() => {
+    return evaluationMethods.filter((m) => m.enabled)
+  }, [evaluationMethods])
+
+  const groupedMethods = useMemo(() => {
+    const groups = new Map<string, typeof evaluationMethods>()
+    enabledMethods.forEach((m) => {
+      const list = groups.get(m.categoryId) || []
+      list.push(m)
+      groups.set(m.categoryId, list)
+    })
+    return evaluationCategories
+      .map((c) => ({ category: c, methods: groups.get(c.id) || [] }))
+      .filter((g) => g.methods.length > 0)
+  }, [enabledMethods, evaluationCategories])
 
   return (
     <div>
@@ -193,6 +233,64 @@ export default function LandingHomePage() {
                 <ArrowRight className="absolute right-3 top-3 h-4 w-4 opacity-0 transition-opacity group-hover:opacity-100" />
               </Link>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Evaluation Methods */}
+      <section className="border-t bg-white py-10">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="mb-5 flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-semibold">测评方式介绍</h2>
+              <p className="text-sm text-muted-foreground mt-0.5">平台支持多种科学测评方式，全面评估学生能力</p>
+            </div>
+            <Link href="/evaluation-methods">
+              <Button variant="ghost" size="sm" className="gap-1">
+                查看全部 <ChevronRight className="h-4 w-4" />
+              </Button>
+            </Link>
+          </div>
+          <div className="space-y-6">
+            {groupedMethods.map(({ category, methods }) => {
+              const CategoryIcon = categoryIcons[category.name] || Lightbulb
+              return (
+                <div key={category.id}>
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="flex h-6 w-6 items-center justify-center rounded-md bg-primary/10">
+                      <CategoryIcon className="h-3.5 w-3.5 text-primary" />
+                    </div>
+                    <h3 className="text-sm font-semibold">{category.name}</h3>
+                    <span className="text-xs text-muted-foreground">({methods.length})</span>
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    {methods.map((method) => (
+                      <Card key={method.id} className="transition-shadow hover:shadow-sm">
+                        <CardContent className="p-4">
+                          <div className="flex items-start justify-between gap-2">
+                            <h4 className="text-sm font-medium">{method.name}</h4>
+                            {method.docLink && (
+                              <a
+                                href={method.docLink}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="shrink-0 text-muted-foreground hover:text-primary transition-colors"
+                                title="查看文档"
+                              >
+                                <ExternalLink className="h-3 w-3" />
+                              </a>
+                            )}
+                          </div>
+                          <p className="mt-1.5 text-xs text-muted-foreground line-clamp-2">
+                            {method.description || '暂无说明'}
+                          </p>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              )
+            })}
           </div>
         </div>
       </section>

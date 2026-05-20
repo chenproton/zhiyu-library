@@ -2,7 +2,20 @@
 
 import { useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
-import { Plus, Search, FileText, CheckCircle, Pencil, Trash2, Eye, FolderOpen, Settings, FolderTree, Upload, List, LayoutGrid, Send, RotateCcw, Globe, Undo2 } from "lucide-react"
+import {
+  Plus,
+  Search,
+  FileText,
+  Settings,
+  FolderTree,
+  Upload,
+  List,
+  LayoutGrid,
+  RotateCcw,
+  GitBranch,
+  ArrowUpFromLine,
+  CheckCircle2,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -24,11 +37,13 @@ import {
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { StatusBadge } from "@/components/shared/status-badge"
+import { PageHeaderCard } from "@/components/shared/page-header-card"
 import { BankFormDialog } from "@/components/question-banks/bank-form-dialog"
+import { BankStatusActions } from "@/components/question-banks/bank-status-actions"
+import { InviteCollaboratorDialog } from "@/components/shared/invite-collaborator-dialog"
 import { useData } from "@/components/providers/data-provider"
-import type { QuestionBank, QuestionBankFormData, StatusAction } from "@/lib/types"
-import { canPerformAction } from "@/lib/types"
-import { mockUsers } from "@/lib/mock-data"
+import type { QuestionBank, QuestionBankFormData } from "@/lib/types"
+import { mockUsers, mockBatches } from "@/lib/mock-data"
 
 type OwnerTab = 'mine' | 'collaborate' | 'public'
 type ViewMode = 'list' | 'batch'
@@ -50,6 +65,8 @@ export default function QuestionBanksPage() {
   const [editingBank, setEditingBank] = useState<QuestionBank | null>(null)
   const [ownerTab, setOwnerTab] = useState<OwnerTab>('mine')
   const [viewMode, setViewMode] = useState<ViewMode>('list')
+  const [inviteOpen, setInviteOpen] = useState(false)
+  const [invitingBank, setInvitingBank] = useState<QuestionBank | null>(null)
 
   const filteredBanks = useMemo(() => {
     return questionBanks
@@ -71,8 +88,10 @@ export default function QuestionBanksPage() {
   const stats = useMemo(() => {
     const total = questionBanks.length
     const draft = questionBanks.filter((b) => b.status === 'draft').length
+    const pending = questionBanks.filter((b) => b.status === 'pending').length
+    const toPublish = questionBanks.filter((b) => b.status === 'toPublish').length
     const published = questionBanks.filter((b) => b.status === 'published').length
-    return { total, draft, published }
+    return { total, draft, pending, toPublish, published }
   }, [questionBanks])
 
   const handleFormSubmit = (data: QuestionBankFormData) => {
@@ -88,6 +107,16 @@ export default function QuestionBanksPage() {
   const handleEdit = (bank: QuestionBank) => {
     setEditingBank(bank)
     setFormOpen(true)
+  }
+
+  const handleInvite = (bank: QuestionBank) => {
+    setInvitingBank(bank)
+    setInviteOpen(true)
+  }
+
+  const handleInviteSubmit = (users: { userId: string; role: 'editor' | 'viewer' }[]) => {
+    console.log('邀请用户:', users, '到题库:', invitingBank?.name)
+    setInvitingBank(null)
   }
 
   const handleDelete = (bank: QuestionBank) => {
@@ -108,62 +137,69 @@ export default function QuestionBanksPage() {
     }).format(date)
   }
 
+  const getBatchName = (bank: QuestionBank) => {
+    return mockBatches.find(b => b.id === bank.batchId)?.name || '-'
+  }
+
   return (
     <div className="px-8 py-6">
-      <div className="mb-4 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">题库管理</h1>
-          <p className="text-muted-foreground">管理所有题库，点击进入题目列表进行管理</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline">
-            <Settings className="mr-2 size-4" />
-            配置审批流程
-          </Button>
-          <Button variant="outline">
-            <FolderTree className="mr-2 size-4" />
-            配置批次分组
-          </Button>
-          <Button variant="outline">
-            <Upload className="mr-2 size-4" />
-            导入题库
-          </Button>
-          <Button onClick={() => { setEditingBank(null); setFormOpen(true) }}>
-            <Plus className="mr-2 size-4" />
-            新建题库
-          </Button>
-        </div>
-      </div>
-
-      {/* 统计卡片 */}
-      <div className="mb-4 flex gap-3">
-        <div className="flex flex-1 items-center gap-3 rounded-lg border bg-white px-4 py-3">
-          <div className="flex size-8 items-center justify-center rounded-md bg-blue-50">
-            <FileText className="size-4 text-blue-600" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="text-xs text-muted-foreground">题库总数</div>
-            <div className="flex items-center gap-2 text-xs">
-              <span>全部 <strong className="text-foreground">{stats.total}</strong></span>
-              <span className="text-gray-300">|</span>
-              <span>草稿 <strong className="text-muted-foreground">{stats.draft}</strong></span>
-              <span className="text-gray-300">|</span>
-              <span>已发布 <strong className="text-emerald-600">{stats.published}</strong></span>
-            </div>
-          </div>
-        </div>
-        <div className="flex flex-1 items-center gap-3 rounded-lg border bg-white px-4 py-3">
-          <div className="flex size-8 items-center justify-center rounded-md bg-emerald-50">
-            <CheckCircle className="size-4 text-emerald-600" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="text-xs text-muted-foreground">题目总数</div>
-            <div className="flex items-center gap-2 text-xs">
-              <span>全部 <strong className="text-foreground">{questions.length}</strong></span>
-            </div>
-          </div>
-        </div>
-      </div>
+      <PageHeaderCard
+        title="题库管理"
+        description="管理所有题库，点击进入题目列表进行管理"
+        actions={
+          <>
+            <Button variant="outline">
+              <Settings className="mr-2 size-4" />
+              配置审批流程
+            </Button>
+            <Button variant="outline">
+              <FolderTree className="mr-2 size-4" />
+              配置批次分组
+            </Button>
+            <Button variant="outline">
+              <Upload className="mr-2 size-4" />
+              导入题库
+            </Button>
+            <Button onClick={() => { setEditingBank(null); setFormOpen(true) }}>
+              <Plus className="mr-2 size-4" />
+              新建题库
+            </Button>
+          </>
+        }
+        stats={[
+          {
+            label: "题库总数",
+            value: stats.total,
+            icon: <FileText className="size-3.5 text-blue-500" />,
+            iconClassName: "bg-blue-50",
+          },
+          {
+            label: "草稿",
+            value: stats.draft,
+            icon: <RotateCcw className="size-3.5 text-gray-500" />,
+            iconClassName: "bg-gray-50",
+          },
+          {
+            label: "审批中",
+            value: stats.pending,
+            icon: <GitBranch className="size-3.5 text-yellow-500" />,
+            iconClassName: "bg-yellow-50",
+          },
+          {
+            label: "待发布",
+            value: stats.toPublish,
+            icon: <ArrowUpFromLine className="size-3.5 text-amber-500" />,
+            iconClassName: "bg-amber-50",
+          },
+          {
+            label: "已发布",
+            value: stats.published,
+            icon: <CheckCircle2 className="size-3.5 text-green-500" />,
+            iconClassName: "bg-green-50",
+          },
+        ]}
+        className="mb-4"
+      />
 
       {/* Tab 切换与视图切换 */}
       <div className="mb-4 flex items-center justify-between">
@@ -217,20 +253,22 @@ export default function QuestionBanksPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[260px]">题库名称</TableHead>
+                <TableHead className="w-[200px]">题库名称</TableHead>
+                <TableHead className="w-[200px]">题库简介</TableHead>
                 <TableHead className="w-[100px]">题目数量</TableHead>
-                <TableHead className="w-[100px]">状态</TableHead>
+                <TableHead className="w-[120px]">所属批次</TableHead>
                 <TableHead className="w-[100px]">创建人</TableHead>
                 <TableHead className="w-[100px]">共建人</TableHead>
+                <TableHead className="w-[100px]">状态</TableHead>
                 <TableHead className="w-[120px]">创建时间</TableHead>
                 <TableHead className="w-[120px]">更新时间</TableHead>
-                <TableHead className="sticky right-0 w-[240px] bg-white text-right">操作</TableHead>
+                <TableHead className="sticky right-0 w-[80px] bg-white text-right">操作</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredBanks.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
+                  <TableCell colSpan={9} className="h-24 text-center text-muted-foreground">
                     暂无题库记录
                   </TableCell>
                 </TableRow>
@@ -250,10 +288,19 @@ export default function QuestionBanksPage() {
                         )}
                         <span className="text-sm font-medium">{bank.name}</span>
                       </div>
-                      <div className="text-xs text-muted-foreground line-clamp-1">{bank.description || '-'}</div>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm text-muted-foreground line-clamp-2">{bank.description || '-'}</span>
                     </TableCell>
                     <TableCell>
                       <span className="text-sm">{bank.questionCount} 题</span>
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">{getBatchName(bank)}</TableCell>
+                    <TableCell>
+                      <span className="text-sm text-muted-foreground">张三</span>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm text-muted-foreground">{bank.isDraftPool ? '李四、王五' : (bank.collaboratorIds?.length ? bank.collaboratorIds.map(id => mockUsers.find(u => u.id === id)?.name).filter(Boolean).join('、') || '-' : '-')}</span>
                     </TableCell>
                     <TableCell>
                       {bank.isDraftPool ? (
@@ -263,72 +310,20 @@ export default function QuestionBanksPage() {
                       )}
                     </TableCell>
                     <TableCell>
-                      <span className="text-sm text-muted-foreground">{bank.isDraftPool ? '张三' : '张三'}</span>
-                    </TableCell>
-                    <TableCell>
-                      <span className="text-sm text-muted-foreground">{bank.isDraftPool ? '李四、王五' : (bank.collaboratorIds?.length ? bank.collaboratorIds.map(id => mockUsers.find(u => u.id === id)?.name).filter(Boolean).join('、') || '-' : '-')}</span>
-                    </TableCell>
-                    <TableCell>
                       <span className="text-sm text-muted-foreground">{formatDate(bank.createdAt)}</span>
                     </TableCell>
                     <TableCell>
                       <span className="text-sm text-muted-foreground">{formatDate(bank.updatedAt)}</span>
                     </TableCell>
                     <TableCell className="sticky right-0 bg-white text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-7 gap-1 text-xs text-blue-600"
-                          onClick={(e) => { e.stopPropagation(); router.push(`/question-banks/${bank.id}`) }}
-                        >
-                          <FolderOpen className="size-3" />
-                          管理题目
-                        </Button>
-                        {bank.isDraftPool && (
-                          <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs text-emerald-600" onClick={(e) => { e.stopPropagation(); updateQuestionBankStatus(bank.id, 'submit') }}>
-                            <Send className="size-3" />提交审批
-                          </Button>
-                        )}
-                        {!bank.isDraftPool && canPerformAction(bank.status, 'submit') && (
-                          <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs text-emerald-600" onClick={(e) => { e.stopPropagation(); updateQuestionBankStatus(bank.id, 'submit') }}>
-                            <Send className="size-3" />提交审批
-                          </Button>
-                        )}
-                        {!bank.isDraftPool && canPerformAction(bank.status, 'withdraw') && (
-                          <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs text-amber-600" onClick={(e) => { e.stopPropagation(); updateQuestionBankStatus(bank.id, 'withdraw') }}>
-                            <RotateCcw className="size-3" />撤回审批
-                          </Button>
-                        )}
-                        {!bank.isDraftPool && canPerformAction(bank.status, 'publish') && (
-                          <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs text-blue-600" onClick={(e) => { e.stopPropagation(); updateQuestionBankStatus(bank.id, 'publish') }}>
-                            <Globe className="size-3" />发布
-                          </Button>
-                        )}
-                        {!bank.isDraftPool && canPerformAction(bank.status, 'unpublish') && (
-                          <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs text-destructive" onClick={(e) => { e.stopPropagation(); updateQuestionBankStatus(bank.id, 'unpublish') }}>
-                            <Undo2 className="size-3" />撤回发布
-                          </Button>
-                        )}
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="size-7"
-                          onClick={(e) => { e.stopPropagation(); handleEdit(bank) }}
-                        >
-                          <Pencil className="size-3.5" />
-                        </Button>
-                        {!bank.isDraftPool && (
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="size-7 text-destructive"
-                            onClick={(e) => { e.stopPropagation(); handleDelete(bank) }}
-                          >
-                            <Trash2 className="size-3.5" />
-                          </Button>
-                        )}
-                      </div>
+                      <BankStatusActions
+                        status={bank.status}
+                        onView={() => router.push(`/question-banks/${bank.id}`)}
+                        onEdit={() => handleEdit(bank)}
+                        onDelete={() => handleDelete(bank)}
+                        onStatusChange={(action) => updateQuestionBankStatus(bank.id, action)}
+                        onInvite={() => handleInvite(bank)}
+                      />
                     </TableCell>
                   </TableRow>
                 ))
@@ -344,6 +339,15 @@ export default function QuestionBanksPage() {
         onOpenChange={setFormOpen}
         bank={editingBank}
         onSubmit={handleFormSubmit}
+      />
+
+      {/* 邀请共建弹窗 */}
+      <InviteCollaboratorDialog
+        open={inviteOpen}
+        onOpenChange={setInviteOpen}
+        title={`邀请共建「${invitingBank?.name || ''}」`}
+        description="邀请其他用户一起维护此题库"
+        onInvite={handleInviteSubmit}
       />
     </div>
   )

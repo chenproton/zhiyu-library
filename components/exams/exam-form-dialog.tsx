@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import {
   Dialog,
   DialogContent,
@@ -22,9 +22,10 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import { X, ImageIcon, Upload } from "lucide-react"
+import { X, Upload, ImageIcon, UserPlus } from "lucide-react"
 import type { Exam, ExamFormData } from "@/lib/types"
-import { mockUsers, mockDepartments, mockBatches } from "@/lib/mock-data"
+import { mockUsers, mockBatches } from "@/lib/mock-data"
+import { CoBuilderDialog } from "@/components/shared/co-builder-dialog"
 
 interface ExamFormDialogProps {
   open: boolean
@@ -42,23 +43,22 @@ export function ExamFormDialog({
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
   const [collaboratorIds, setCollaboratorIds] = useState<string[]>([])
-  const [collaboratorDeptIds, setCollaboratorDeptIds] = useState<string[]>([])
   const [batchId, setBatchId] = useState<string>("")
   const [coverUrl, setCoverUrl] = useState<string>("")
+  const [collaboratorDialogOpen, setCollaboratorDialogOpen] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (exam) {
       setName(exam.name)
       setDescription(exam.description)
       setCollaboratorIds(exam.collaboratorIds || [])
-      setCollaboratorDeptIds(exam.collaboratorDeptIds || [])
       setBatchId(exam.batchId || "")
       setCoverUrl(exam.coverUrl || "")
     } else {
       setName("")
       setDescription("")
       setCollaboratorIds([])
-      setCollaboratorDeptIds([])
       setBatchId("")
       setCoverUrl("")
     }
@@ -73,15 +73,33 @@ export function ExamFormDialog({
       duration: 60,
       coverUrl: coverUrl || undefined,
       collaboratorIds: collaboratorIds.length > 0 ? collaboratorIds : undefined,
-      collaboratorDeptIds: collaboratorDeptIds.length > 0 ? collaboratorDeptIds : undefined,
       batchId: batchId || undefined,
     })
     onOpenChange(false)
   }
 
-  const addCollaborator = (userId: string) => {
-    if (!collaboratorIds.includes(userId)) {
-      setCollaboratorIds([...collaboratorIds, userId])
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("文件大小不能超过 5MB")
+      return
+    }
+
+    if (!file.type.startsWith("image/")) {
+      alert("请上传图片文件")
+      return
+    }
+
+    const url = URL.createObjectURL(file)
+    setCoverUrl(url)
+  }
+
+  const removeCover = () => {
+    setCoverUrl("")
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ""
     }
   }
 
@@ -89,18 +107,7 @@ export function ExamFormDialog({
     setCollaboratorIds(collaboratorIds.filter(id => id !== userId))
   }
 
-  const addDepartment = (deptId: string) => {
-    if (!collaboratorDeptIds.includes(deptId)) {
-      setCollaboratorDeptIds([...collaboratorDeptIds, deptId])
-    }
-  }
-
-  const removeDepartment = (deptId: string) => {
-    setCollaboratorDeptIds(collaboratorDeptIds.filter(id => id !== deptId))
-  }
-
   const getUserName = (id: string) => mockUsers.find(u => u.id === id)?.name || id
-  const getDeptName = (id: string) => mockDepartments.find(d => d.id === id)?.name || id
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -134,61 +141,45 @@ export function ExamFormDialog({
               />
             </Field>
             <Field>
-              <FieldLabel>封面图片</FieldLabel>
-              <div className="flex items-center gap-4">
-                {coverUrl ? (
-                  <div className="relative">
-                    <img src={coverUrl} alt="封面" className="h-20 w-32 rounded-lg object-cover" />
-                    <button
-                      type="button"
-                      onClick={() => setCoverUrl("")}
-                      className="absolute -right-2 -top-2 flex size-5 items-center justify-center rounded-full bg-destructive text-white"
-                    >
-                      <X className="size-3" />
-                    </button>
-                  </div>
-                ) : (
-                  <div className="flex h-20 w-32 items-center justify-center rounded-lg border border-dashed bg-muted">
-                    <ImageIcon className="size-6 text-muted-foreground" />
-                  </div>
-                )}
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    const urls = [
-                      '/placeholder-logo.png',
-                      '/placeholder.jpg',
-                      '/placeholder.svg',
-                    ]
-                    setCoverUrl(urls[Math.floor(Math.random() * urls.length)])
-                  }}
+              <FieldLabel>封面</FieldLabel>
+              <FieldDescription>支持上传 5MB 以内的图片文件</FieldDescription>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="hidden"
+              />
+              {coverUrl ? (
+                <div className="relative mt-2 w-full overflow-hidden rounded-lg border">
+                  <img
+                    src={coverUrl}
+                    alt="封面预览"
+                    className="h-32 w-full object-cover"
+                  />
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="icon"
+                    className="absolute right-2 top-2 size-6"
+                    onClick={removeCover}
+                  >
+                    <X className="size-3" />
+                  </Button>
+                </div>
+              ) : (
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  className="mt-2 flex h-32 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/25 transition-colors hover:border-muted-foreground/50"
                 >
-                  <Upload className="mr-1 size-3.5" />
-                  上传封面
-                </Button>
-              </div>
+                  <ImageIcon className="mb-2 size-8 text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">点击上传封面</span>
+                </div>
+              )}
             </Field>
             <Field>
               <FieldLabel>共建人</FieldLabel>
               <FieldDescription>选择可以共同维护此试卷的用户</FieldDescription>
-              <Select onValueChange={addCollaborator}>
-                <SelectTrigger>
-                  <SelectValue placeholder="选择共建人" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    {mockUsers
-                      .filter(u => !collaboratorIds.includes(u.id))
-                      .map(user => (
-                        <SelectItem key={user.id} value={user.id}>
-                          {user.name} ({user.department})
-                        </SelectItem>
-                      ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
               {collaboratorIds.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-2">
                   {collaboratorIds.map(id => (
@@ -205,42 +196,16 @@ export function ExamFormDialog({
                   ))}
                 </div>
               )}
-            </Field>
-            <Field>
-              <FieldLabel>共建部门</FieldLabel>
-              <FieldDescription>选择可以共同维护此试卷的部门</FieldDescription>
-              <Select onValueChange={addDepartment}>
-                <SelectTrigger>
-                  <SelectValue placeholder="选择共建部门" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    {mockDepartments
-                      .filter(d => !collaboratorDeptIds.includes(d.id))
-                      .map(dept => (
-                        <SelectItem key={dept.id} value={dept.id}>
-                          {dept.name}
-                        </SelectItem>
-                      ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-              {collaboratorDeptIds.length > 0 && (
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {collaboratorDeptIds.map(id => (
-                    <Badge key={id} variant="secondary" className="gap-1">
-                      {getDeptName(id)}
-                      <button
-                        type="button"
-                        onClick={() => removeDepartment(id)}
-                        className="ml-1 rounded-full hover:bg-muted"
-                      >
-                        <X className="size-3" />
-                      </button>
-                    </Badge>
-                  ))}
-                </div>
-              )}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="mt-2"
+                onClick={() => setCollaboratorDialogOpen(true)}
+              >
+                <UserPlus className="mr-1 size-3.5" />
+                选择共建人
+              </Button>
             </Field>
             <Field>
               <FieldLabel>所属批次</FieldLabel>
@@ -279,6 +244,15 @@ export function ExamFormDialog({
           </DialogFooter>
         </form>
       </DialogContent>
+
+      <CoBuilderDialog
+        open={collaboratorDialogOpen}
+        onOpenChange={setCollaboratorDialogOpen}
+        title="选择共建人"
+        description="选择可以共同维护此试卷的用户"
+        selectedIds={collaboratorIds}
+        onChange={setCollaboratorIds}
+      />
     </Dialog>
   )
 }

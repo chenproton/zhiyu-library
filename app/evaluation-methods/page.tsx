@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { Search, Power, CheckCircle2, Link as LinkIcon, FileText, Pencil, ExternalLink } from "lucide-react"
+import { Search, Link as LinkIcon, FileText, Pencil, ExternalLink } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
@@ -17,6 +17,7 @@ import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Textarea } from "@/components/ui/textarea"
 import { useData } from "@/components/providers/data-provider"
+import { PageHeaderCard } from "@/components/shared/page-header-card"
 import type { EvaluationMethod } from "@/lib/types"
 
 export default function EvaluationMethodsPage() {
@@ -37,9 +38,6 @@ export default function EvaluationMethodsPage() {
     }
     return methods
   }, [evaluationMethods, search])
-
-  const enabledCount = evaluationMethods.filter((m) => m.enabled).length
-  const disabledCount = evaluationMethods.filter((m) => !m.enabled).length
 
   const getCategoryName = (categoryId: string) => {
     return evaluationCategories.find((c) => c.id === categoryId)?.name || '-'
@@ -96,39 +94,11 @@ export default function EvaluationMethodsPage() {
 
   return (
     <div className="px-8 py-6">
-      {/* 页面标题 */}
-      <div className="mb-4">
-        <h1 className="text-2xl font-bold tracking-tight">测评方式管理</h1>
-        <p className="text-muted-foreground">管理测评方式分类与前台展示状态</p>
-      </div>
-
-      {/* 统计 */}
-      <div className="mb-4 flex gap-3">
-        <div className="flex flex-1 items-center gap-3 rounded-lg border bg-white px-4 py-3">
-          <div className="flex size-8 items-center justify-center rounded-md bg-emerald-50">
-            <CheckCircle2 className="size-4 text-emerald-600" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="text-xs text-muted-foreground">测评方式</div>
-            <div className="flex items-center gap-2 text-xs">
-              <span>已启用 <strong className="text-emerald-600">{enabledCount}</strong></span>
-              <span className="text-gray-300">|</span>
-              <span>未启用 <strong className="text-foreground">{disabledCount}</strong></span>
-            </div>
-          </div>
-        </div>
-        <div className="flex flex-1 items-center gap-3 rounded-lg border bg-white px-4 py-3">
-          <div className="flex size-8 items-center justify-center rounded-md bg-blue-50">
-            <Power className="size-4 text-blue-600" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="text-xs text-muted-foreground">一级分类</div>
-            <div className="flex items-center gap-2 text-xs">
-              <span>共 <strong className="text-foreground">{evaluationCategories.length}</strong> 个分类</span>
-            </div>
-          </div>
-        </div>
-      </div>
+      <PageHeaderCard
+        title="测评方式管理"
+        description="管理测评方式分类与前台展示状态"
+        className="mb-4"
+      />
 
       {/* 搜索 */}
       <div className="mb-4">

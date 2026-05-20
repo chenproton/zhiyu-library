@@ -126,6 +126,7 @@ export interface Exam {
   totalScore: number
   duration: number // 分钟
   questions: ExamQuestion[]
+  coverUrl?: string
   collaboratorIds?: string[]
   collaboratorDeptIds?: string[]
   batchId?: string
@@ -352,11 +353,11 @@ export const statusConfig: Record<
 // 默认等级映射表
 export const defaultLevelMapping: LevelMapping[] = [
   { level: '不合格', min: 0, max: 60 },
-  { level: '了解', min: 61, max: 70 },
-  { level: '理解', min: 71, max: 80 },
-  { level: '掌握', min: 81, max: 85 },
-  { level: '熟练', min: 86, max: 95 },
-  { level: '精通', min: 96, max: 100 },
+  { level: '了解L1', min: 61, max: 70 },
+  { level: '理解L2', min: 71, max: 80 },
+  { level: '掌握L3', min: 81, max: 85 },
+  { level: '熟练L4', min: 86, max: 95 },
+  { level: '精通L5', min: 96, max: 100 },
 ]
 
 // 根据分数计算等级

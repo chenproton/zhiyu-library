@@ -6,12 +6,9 @@ import Link from "next/link"
 import {
   ArrowLeft,
   Search,
-  BookOpen,
-  Video,
   GraduationCap,
   PlayCircle,
   User,
-  Calendar,
   Award,
   CheckCircle2,
   XCircle,
@@ -35,10 +32,13 @@ import { mockUsages, type ExamUsage } from "../page"
 interface ExamStudentResult {
   id: string
   studentName: string
+  studentId: string
+  className: string
+  grade: string
+  major: string
   score: number
   totalScore: number
-  startTime: Date
-  endTime: Date
+  submitTime: Date
   isPass: boolean
 }
 
@@ -49,6 +49,10 @@ const mockStudentNames = [
   "陈静", "刘洋", "杨帆", "黄磊", "林娜",
   "徐峰", "马云", "朱婷", "曹操", "孙权",
 ]
+
+const mockClassNames = ['前端开发1班', '前端开发2班', '后端开发1班', '全栈开发班']
+const mockGrades = ['2024级', '2023级']
+const mockMajors = ['计算机科学与技术', '软件工程', '网络工程']
 
 function getUsageById(usageId: string): ExamUsage | undefined {
   return mockUsages.find((u) => u.id === usageId)
@@ -61,31 +65,24 @@ function generateMockResults(usage: ExamUsage): ExamStudentResult[] {
   const passScore = 60
   const examStartTime = usage.startTime || new Date()
   const examEndTime = usage.endTime || new Date(examStartTime.getTime() + 120 * 60000)
+  const timeRange = examEndTime.getTime() - examStartTime.getTime()
   const results: ExamStudentResult[] = []
   for (let i = 0; i < count; i++) {
     const score = Math.floor(Math.random() * 55) + 45 // 45-100分
     results.push({
       id: `result-${usage.id}-${i}`,
       studentName: mockStudentNames[i % mockStudentNames.length],
+      studentId: `2024010${i + 1}`,
+      className: mockClassNames[Math.floor(Math.random() * mockClassNames.length)],
+      grade: mockGrades[Math.floor(Math.random() * mockGrades.length)],
+      major: mockMajors[Math.floor(Math.random() * mockMajors.length)],
       score,
       totalScore,
-      startTime: examStartTime,
-      endTime: examEndTime,
+      submitTime: new Date(examStartTime.getTime() + Math.random() * timeRange),
       isPass: score >= passScore,
     })
   }
   return results.sort((a, b) => b.score - a.score)
-}
-
-function getDisplayTypeIcon(usage: ExamUsage) {
-  switch (usage.displayType) {
-    case '场景':
-      return <BookOpen className="size-4" />
-    case '课程':
-      return <Video className="size-4" />
-    case '在线考试':
-      return <GraduationCap className="size-4" />
-  }
 }
 
 function getUsageIcon(usage: ExamUsage) {
@@ -174,26 +171,12 @@ function ExamResultsContent() {
           </Link>
         </Button>
         <div className="flex items-center justify-between">
-          <div>
-            <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-bold tracking-tight">{usage.examName}</h1>
-              <Badge variant="outline" className="gap-1">
-                {getUsageIcon(usage)}
-                {USAGE_TYPE_LABELS[usage.usageType]}
-              </Badge>
-            </div>
-            <div className="mt-1 flex items-center gap-4 text-sm text-muted-foreground">
-              <span className="flex items-center gap-1">
-                {getDisplayTypeIcon(usage)}
-                {usage.displayType}：{usage.sceneName}
-              </span>
-              {usage.startTime && usage.endTime && (
-                <span className="flex items-center gap-1">
-                  <Calendar className="size-3.5" />
-                  {formatDateTime(usage.startTime)} 至 {formatDateTime(usage.endTime)}
-                </span>
-              )}
-            </div>
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-bold tracking-tight">{usage.examName}</h1>
+            <Badge variant="outline" className="gap-1">
+              {getUsageIcon(usage)}
+              {USAGE_TYPE_LABELS[usage.usageType]}
+            </Badge>
           </div>
           <Button variant="outline">
             <Download className="mr-2 size-4" />
@@ -298,15 +281,17 @@ function ExamResultsContent() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[200px]">试卷名称</TableHead>
-                <TableHead className="w-[120px]">使用类型</TableHead>
                 <TableHead className="w-[120px]">
                   <div className="flex items-center gap-1">
                     <User className="size-3.5" />
                     学生名称
                   </div>
                 </TableHead>
-                <TableHead className="w-[180px]">考试时间</TableHead>
+                <TableHead className="w-[120px]">学号</TableHead>
+                <TableHead className="w-[120px]">班级</TableHead>
+                <TableHead className="w-[100px]">年级</TableHead>
+                <TableHead className="w-[140px]">专业</TableHead>
+                <TableHead className="w-[160px]">考试时间</TableHead>
                 <TableHead className="w-[100px]">
                   <div className="flex items-center gap-1">
                     <Award className="size-3.5" />
@@ -320,31 +305,25 @@ function ExamResultsContent() {
             <TableBody>
               {filteredResults.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
+                  <TableCell colSpan={9} className="h-24 text-center text-muted-foreground">
                     {results.length === 0 ? "暂无考试结果" : "没有找到匹配的结果"}
                   </TableCell>
                 </TableRow>
               ) : (
                 filteredResults.map((result) => (
                   <TableRow key={result.id}>
-                    <TableCell className="font-medium">{usage.examName}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        {getUsageIcon(usage)}
-                        <span className="text-sm">{USAGE_TYPE_LABELS[usage.usageType]}</span>
-                      </div>
-                    </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1.5">
                         <User className="size-3.5 text-blue-500" />
                         <span className="text-sm">{result.studentName}</span>
                       </div>
                     </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">{result.studentId}</TableCell>
+                    <TableCell className="text-sm text-muted-foreground">{result.className}</TableCell>
+                    <TableCell className="text-sm text-muted-foreground">{result.grade}</TableCell>
+                    <TableCell className="text-sm text-muted-foreground">{result.major}</TableCell>
                     <TableCell className="text-sm text-muted-foreground">
-                      <div className="text-xs">
-                        <div>{formatDateTime(result.startTime)}</div>
-                        <div>至 {formatDateTime(result.endTime)}</div>
-                      </div>
+                      {formatDateTime(result.submitTime)}
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">

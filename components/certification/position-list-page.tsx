@@ -55,6 +55,7 @@ import {
   XCircle,
   CheckCircle,
 } from "lucide-react"
+import { PageHeaderCard } from "@/components/shared/page-header-card"
 
 export function PositionListPage() {
   const router = useRouter()
@@ -193,58 +194,13 @@ export function PositionListPage() {
     return actionConfig[action]?.showInStatus.includes(status)
   }
 
-  // 统计数据
-  const stats = {
-    total: positions.length,
-    notSubmitted: positions.filter((p) => p.ruleStatus === "not_submitted").length,
-    reviewing: positions.filter((p) => p.ruleStatus === "reviewing").length,
-    rejected: positions.filter((p) => p.ruleStatus === "rejected").length,
-    published: positions.filter((p) => p.ruleStatus === "published").length,
-  }
-
   return (
     <div className="px-8 py-6">
-      {/* 页面标题 */}
-      <div className="mb-4 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">
-            岗位能力认定规则
-          </h1>
-          <p className="text-muted-foreground">
-            管理各岗位的能力认定规则配置
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          {/* 操作按钮区域 */}
-        </div>
-      </div>
-        {/* 精简统计卡片 */}
-        <div className="mb-4 flex gap-3">
-          <div className="flex flex-1 items-center gap-3 rounded-lg border bg-white px-4 py-3">
-            <div className="flex size-8 items-center justify-center rounded-md bg-blue-50">
-              <FileText className="size-4 text-blue-600" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="text-xs text-muted-foreground">规则指标</div>
-              <div className="flex items-center gap-2 text-xs">
-                <span>总数 <strong className="text-foreground">{stats.total}</strong></span>
-                <span className="text-gray-300">|</span>
-                <span>已配置 <strong className="text-emerald-600">{stats.published}</strong></span>
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-1 items-center gap-3 rounded-lg border bg-white px-4 py-3">
-            <div className="flex size-8 items-center justify-center rounded-md bg-emerald-50">
-              <CheckCircle className="size-4 text-emerald-600" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="text-xs text-muted-foreground">审批结果</div>
-              <div className="flex items-center gap-2 text-xs">
-                <span>待配置 <strong className="text-amber-600">{stats.total - stats.published}</strong></span>
-              </div>
-            </div>
-          </div>
-        </div>
+      <PageHeaderCard
+        title="岗位能力认定规则"
+        description="管理各岗位的能力认定规则配置"
+        className="mb-4"
+      />
 
         {/* 搜索和筛选 */}
         <div className="flex items-center gap-3 mb-4">

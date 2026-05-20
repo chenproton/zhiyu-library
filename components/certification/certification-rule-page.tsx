@@ -40,7 +40,6 @@ import {
   defaultLevelMapping,
 } from '@/lib/types'
 import { initialRule, positionsList } from '@/lib/mock-data'
-import { StatusBadge } from './status-badge'
 import { ActionBar } from './action-bar'
 import { LevelMappingDialog } from './level-mapping-dialog'
 import { cn } from '@/lib/utils'
@@ -53,10 +52,22 @@ interface CertificationRulePageProps {
   positionId?: string
 }
 
+// 格式化等级标签（添加 L1-L5 后缀）
+function formatLevelLabel(level: string): string {
+  const mapping: Record<string, string> = {
+    '了解': '了解L1',
+    '理解': '理解L2',
+    '掌握': '掌握L3',
+    '熟练': '熟练L4',
+    '精通': '精通L5',
+  }
+  return mapping[level] || level
+}
+
 // 格式化等级映射为字符串
 function formatLevelMapping(mapping: LevelMapping[]): string {
   return mapping
-    .map((level) => `${level.level}：${level.min}~${level.max}分`)
+    .map((level) => `${formatLevelLabel(level.level)}：${level.min}~${level.max}分`)
     .join('，')
 }
 
@@ -80,15 +91,12 @@ interface TaskRowData {
   customMapping?: LevelMapping[]
 }
 
-function ScoringRuleCard() {
-  const [rules, setRules] = useState([
-    { min: 95, max: 100, label: 'A+' },
-    { min: 85, max: 95, label: 'A' },
-    { min: 75, max: 85, label: 'B+' },
-    { min: 60, max: 75, label: 'B' },
-    { min: 0, max: 60, label: 'C' },
-  ])
+interface ScoringRuleCardProps {
+  rules: { min: number; max: number; label: string }[]
+  setRules: React.Dispatch<React.SetStateAction<{ min: number; max: number; label: string }[]>>
+}
 
+function ScoringRuleCard({ rules, setRules }: ScoringRuleCardProps) {
   const addRule = () => {
     setRules([...rules, { min: 0, max: 0, label: '' }])
   }
@@ -158,12 +166,22 @@ export function CertificationRulePage({
     : null
 
   const pageTitle = isGlobal
-    ? '全局能力认证规则配置'
+    ? '全局能力认定规则配置'
     : positionInfo?.name || '前端开发工程师'
   const [rule, setRule] = useState<CertificationRule>(initialRule)
   const [globalMapping, setGlobalMapping] = useState<LevelMapping[]>(defaultLevelMapping)
   const [globalConfigDialogOpen, setGlobalConfigDialogOpen] = useState(false)
   const { toast } = useToast()
+
+  // 赋分规则状态
+  const [scoringRules, setScoringRules] = useState([
+    { min: 95, max: 100, label: 'A+' },
+    { min: 85, max: 95, label: 'A' },
+    { min: 75, max: 85, label: 'B+' },
+    { min: 60, max: 75, label: 'B' },
+    { min: 0, max: 60, label: 'C' },
+  ])
+  const [scoringDialogOpen, setScoringDialogOpen] = useState(false)
 
   // 编辑权重状态
   const [editingTask, setEditingTask] = useState<{
@@ -533,24 +551,26 @@ export function CertificationRulePage({
                 返回岗位列表
               </Button>
             </Link>
-            <Button
-              variant="outline"
-              size="sm"
-              className={cn('gap-2', isReadOnly && 'pointer-events-auto')}
-              onClick={() => setGlobalConfigDialogOpen(true)}
-            >
-              <Settings className="size-4" />
-              配置全局等级映射
-            </Button>
-            <Button
-              variant="default"
-              size="sm"
-              className={cn('gap-2', isReadOnly && 'pointer-events-auto')}
-              onClick={() => toast({ title: '保存成功', description: '规则已保存' })}
-            >
-              <Check className="size-4" />
-              保存规则
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className={cn('gap-2', isReadOnly && 'pointer-events-auto')}
+                onClick={() => setGlobalConfigDialogOpen(true)}
+              >
+                <Settings className="size-4" />
+                配置全局等级映射
+              </Button>
+              <Button
+                variant="default"
+                size="sm"
+                className={cn('gap-2', isReadOnly && 'pointer-events-auto')}
+                onClick={() => toast({ title: '保存成功', description: '规则已保存' })}
+              >
+                <Check className="size-4" />
+                保存规则
+              </Button>
+            </div>
           </div>
         </header>
 
@@ -560,10 +580,9 @@ export function CertificationRulePage({
           <div className="mb-6">
             <div className="flex items-center gap-4">
               <h1 className="text-2xl font-bold text-foreground">{pageTitle}</h1>
-              <StatusBadge status={rule.status} />
             </div>
             <p className="mt-2 text-muted-foreground">
-              配置能力认证规则 · 为每个能力点选择关联任务并分配权重
+              配置能力认定规则 · 为每个能力点选择关联任务并分配权重
             </p>
           </div>
 
@@ -592,6 +611,7 @@ export function CertificationRulePage({
                     </div>
                   </TableHead>
                   <TableHead className="w-[110px] text-center font-medium">岗位所需掌握度</TableHead>
+                  <TableHead className="w-[150px] text-center font-medium">岗位能力认定结果</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -709,8 +729,24 @@ export function CertificationRulePage({
                         className="text-center align-top"
                       >
                         <span className="inline-flex items-center px-2 py-1 rounded-md bg-blue-50 text-blue-700 text-sm font-medium">
-                          {row.requiredLevel}
+                          {formatLevelLabel(row.requiredLevel)}
                         </span>
+                      </TableCell>
+                    )}
+                    {index === 0 && (
+                      <TableCell
+                        rowSpan={tableRows.length}
+                        className="text-center align-middle cursor-pointer hover:bg-secondary/50 border-l border-border"
+                        onClick={() => setScoringDialogOpen(true)}
+                      >
+                        <div className="space-y-1">
+                          {scoringRules.map((r) => (
+                            <div key={r.label} className="text-sm">
+                              {r.label}: {r.min}~{r.max}分
+                            </div>
+                          ))}
+                        </div>
+                        <div className="mt-2 text-xs text-muted-foreground">点击配置</div>
                       </TableCell>
                     )}
                   </TableRow>
@@ -718,15 +754,6 @@ export function CertificationRulePage({
               </TableBody>
             </Table>
           </div>
-        </main>
-
-        {/* 配置赋分规则模块 */}
-        <main className="mx-auto px-6 py-8">
-          <div className="mb-4">
-            <h2 className="text-lg font-semibold">配置赋分规则</h2>
-            <p className="text-sm text-muted-foreground">为岗位能力认定配置得分与等级的映射关系</p>
-          </div>
-          <ScoringRuleCard />
         </main>
 
         {/* 编辑任务映射弹窗 */}
@@ -747,7 +774,7 @@ export function CertificationRulePage({
                   key={level.level}
                   className="flex items-center gap-3 p-3 rounded-md bg-secondary/50 border border-border"
                 >
-                  <span className="w-16 font-medium text-sm">{level.level}</span>
+                  <span className="w-16 font-medium text-sm">{formatLevelLabel(level.level)}</span>
                   <div className="flex items-center gap-2 flex-1">
                     <Input
                       type="number"
@@ -784,6 +811,20 @@ export function CertificationRulePage({
                 取消
               </Button>
               <Button onClick={handleSaveTaskMapping}>保存</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* 岗位能力认定结果配置弹窗 */}
+        <Dialog open={scoringDialogOpen} onOpenChange={setScoringDialogOpen}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle>岗位能力认定结果</DialogTitle>
+              <DialogDescription>为岗位能力认定配置得分与等级的映射关系</DialogDescription>
+            </DialogHeader>
+            <ScoringRuleCard rules={scoringRules} setRules={setScoringRules} />
+            <DialogFooter>
+              <Button onClick={() => setScoringDialogOpen(false)}>确定</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

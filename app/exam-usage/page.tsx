@@ -1,8 +1,8 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useRef } from "react"
 import { useRouter } from "next/navigation"
-import { Plus, Search, BookOpen, Video, GraduationCap, PlayCircle, X, ChevronDown, Check, MoreHorizontal, Eye, Pencil, Trash2, Clock, CheckCircle2, XCircle, Share2, Link as LinkIcon } from "lucide-react"
+import { Plus, Search, BookOpen, Video, GraduationCap, PlayCircle, X, ChevronDown, MoreHorizontal, Eye, Pencil, Trash2, Clock, CheckCircle2, XCircle, Share2, ImageIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -41,8 +41,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
 import { useData } from "@/components/providers/data-provider"
+import { PageHeaderCard } from "@/components/shared/page-header-card"
 
 // 使用类型：随堂测、在线考试
 type UsageType = 'quiz' | 'exam'
@@ -76,6 +78,66 @@ export const mockClasses = [
   { id: 'class-6', name: '2024级测试工程班' },
   { id: 'class-7', name: '2024级产品设计班' },
   { id: 'class-8', name: '2023级前端开发1班' },
+]
+
+export interface OrgNode {
+  id: string
+  name: string
+  type: 'department' | 'grade' | 'class'
+  children?: OrgNode[]
+}
+
+export const mockOrgClasses: OrgNode[] = [
+  {
+    id: 'dept-1',
+    name: '计算机学院',
+    type: 'department',
+    children: [
+      {
+        id: 'grade-1-1',
+        name: '2024级',
+        type: 'grade',
+        children: [
+          { id: 'class-1', name: '2024级前端开发1班', type: 'class' },
+          { id: 'class-2', name: '2024级前端开发2班', type: 'class' },
+          { id: 'class-3', name: '2024级后端开发1班', type: 'class' },
+        ]
+      },
+      {
+        id: 'grade-1-2',
+        name: '2023级',
+        type: 'grade',
+        children: [
+          { id: 'class-8', name: '2023级前端开发1班', type: 'class' },
+        ]
+      }
+    ]
+  },
+  {
+    id: 'dept-2',
+    name: '软件工程学院',
+    type: 'department',
+    children: [
+      {
+        id: 'grade-2-1',
+        name: '2024级',
+        type: 'grade',
+        children: [
+          { id: 'class-4', name: '2024级后端开发2班', type: 'class' },
+          { id: 'class-5', name: '2024级全栈开发班', type: 'class' },
+          { id: 'class-6', name: '2024级测试工程班', type: 'class' },
+        ]
+      },
+      {
+        id: 'grade-2-2',
+        name: '2023级',
+        type: 'grade',
+        children: [
+          { id: 'class-7', name: '2023级产品设计班', type: 'class' },
+        ]
+      }
+    ]
+  }
 ]
 
 // 模拟使用记录数据
@@ -196,7 +258,10 @@ export default function ExamUsagePage() {
   const [sceneFilter, setSceneFilter] = useState<SceneType | "all">("all")
   const [usageFilter, setUsageFilter] = useState<UsageType | "all">("all")
   const [createDialogOpen, setCreateDialogOpen] = useState(false)
-  
+  const [shareDialogOpen, setShareDialogOpen] = useState(false)
+  const [sharingUsage, setSharingUsage] = useState<ExamUsage | null>(null)
+  const [copied, setCopied] = useState(false)
+
   // 创建在线考试表单
   const [selectedExamId, setSelectedExamId] = useState<string>("")
   const [examName, setExamName] = useState("")
@@ -206,8 +271,11 @@ export default function ExamUsagePage() {
   const [examOpenType, setExamOpenType] = useState<'anytime' | 'scheduled' | 'manual'>("anytime")
   const [startTime, setStartTime] = useState<string>("")
   const [endTime, setEndTime] = useState<string>("")
-  const [publishToFront, setPublishToFront] = useState(false)
-  const [examLink, setExamLink] = useState("")
+  const [publishToFront, setPublishToFront] = useState(true)
+  const [coverUrl, setCoverUrl] = useState("")
+  const coverFileInputRef = useRef<HTMLInputElement>(null)
+  const [orgPopoverOpen, setOrgPopoverOpen] = useState(false)
+  const [orgSearch, setOrgSearch] = useState("")
 
   const selectedExam = exams.find(e => e.id === selectedExamId)
 
@@ -239,6 +307,11 @@ export default function ExamUsagePage() {
     )
   }
 
+  const openCreateDialog = () => {
+    setCreateDialogOpen(true)
+    setPublishToFront(true)
+  }
+
   const handleCreateExam = () => {
     if (!selectedExamId || !examName) return
     setCreateDialogOpen(false)
@@ -252,13 +325,21 @@ export default function ExamUsagePage() {
     setStartTime("")
     setEndTime("")
     setPublishToFront(false)
-    setExamLink("")
+    setCoverUrl("")
+    setOrgSearch("")
   }
 
-  const handleShareExam = (usage: ExamUsage) => {
-    const url = `https://exam.example.com/e/${usage.id}`
+  const openShareDialog = (usage: ExamUsage) => {
+    setSharingUsage(usage)
+    setCopied(false)
+    setShareDialogOpen(true)
+  }
+
+  const handleCopyLink = () => {
+    if (!sharingUsage) return
+    const url = `https://exam.example.com/e/${sharingUsage.id}`
     navigator.clipboard.writeText(url)
-    alert(`已复制考试链接：${url}`)
+    setCopied(true)
   }
 
   const formatDate = (date: Date) => {
@@ -282,6 +363,10 @@ export default function ExamUsagePage() {
     }
   }
 
+  const getDisplayTypeLabel = (displayType: ExamUsage['displayType']) => {
+    return displayType === '教学考试' ? '考试' : displayType
+  }
+
   const getStatusBadge = (status: ExamUsage['status']) => {
     switch (status) {
       case 'pending':
@@ -295,52 +380,123 @@ export default function ExamUsagePage() {
 
   const isFormValid = selectedExamId && examName
 
+  const handleCoverFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("文件大小不能超过 5MB")
+      return
+    }
+
+    if (!file.type.startsWith("image/")) {
+      alert("请上传图片文件")
+      return
+    }
+
+    const url = URL.createObjectURL(file)
+    setCoverUrl(url)
+  }
+
+  const removeCover = () => {
+    setCoverUrl("")
+    if (coverFileInputRef.current) {
+      coverFileInputRef.current.value = ""
+    }
+  }
+
+  const getDescendantClassIds = (node: OrgNode): string[] => {
+    if (node.type === 'class') return [node.id]
+    return (node.children || []).flatMap(getDescendantClassIds)
+  }
+
+  const isNodeFullySelected = (node: OrgNode): boolean => {
+    const classIds = getDescendantClassIds(node)
+    return classIds.length > 0 && classIds.every(id => selectedClassIds.includes(id))
+  }
+
+  const toggleNode = (node: OrgNode) => {
+    const classIds = getDescendantClassIds(node)
+    const allSelected = classIds.every(id => selectedClassIds.includes(id))
+    if (allSelected) {
+      setSelectedClassIds(prev => prev.filter(id => !classIds.includes(id)))
+    } else {
+      setSelectedClassIds(prev => Array.from(new Set([...prev, ...classIds])))
+    }
+  }
+
+  const nodeMatchesSearch = (node: OrgNode, query: string): boolean => {
+    if (!query) return true
+    const q = query.toLowerCase()
+    if (node.name.toLowerCase().includes(q)) return true
+    return (node.children || []).some(child => nodeMatchesSearch(child, q))
+  }
+
+  const renderOrgNode = (node: OrgNode, depth: number) => {
+    if (!nodeMatchesSearch(node, orgSearch)) return null
+    const checked = isNodeFullySelected(node)
+    const indentClass = depth === 0 ? 'pl-2' : depth === 1 ? 'pl-6' : 'pl-10'
+
+    return (
+      <div key={node.id}>
+        <label className={`flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 hover:bg-muted ${indentClass}`}>
+          <Checkbox checked={checked} onCheckedChange={() => toggleNode(node)} />
+          <span className="text-sm">{node.name}</span>
+        </label>
+        {node.children?.map(child => renderOrgNode(child, depth + 1))}
+      </div>
+    )
+  }
+
+  const classNameMap = useMemo(() => {
+    const map = new Map<string, string>()
+    const traverse = (node: OrgNode) => {
+      if (node.type === 'class') map.set(node.id, node.name)
+      node.children?.forEach(traverse)
+    }
+    mockOrgClasses.forEach(traverse)
+    return map
+  }, [])
+
   return (
     <div className="px-8 py-6">
-      <div className="mb-4 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">考试管理</h1>
-          <p className="text-muted-foreground">查看试卷在各模块的使用情况</p>
-        </div>
-        <Button onClick={() => setCreateDialogOpen(true)}>
-          <Plus className="mr-2 size-4" />
-          添加考试
-        </Button>
-      </div>
-
-      {/* 精简统计 */}
-      <div className="mb-4 flex gap-3">
-        <div className="flex flex-1 items-center gap-3 rounded-lg border bg-white px-4 py-3">
-          <div className="flex size-8 items-center justify-center rounded-md bg-blue-50">
-            <GraduationCap className="size-4 text-blue-600" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="text-xs text-muted-foreground">考试类型分布</div>
-            <div className="flex items-center gap-2 text-xs">
-              <span>课程 <strong className="text-foreground">{stats.courseCount}</strong></span>
-              <span className="text-gray-300">|</span>
-              <span>场景 <strong className="text-foreground">{stats.sceneCount}</strong></span>
-              <span className="text-gray-300">|</span>
-              <span>教学考试 <strong className="text-emerald-600">{stats.onlineExamCount}</strong></span>
-            </div>
-          </div>
-        </div>
-        <div className="flex flex-1 items-center gap-3 rounded-lg border bg-white px-4 py-3">
-          <div className="flex size-8 items-center justify-center rounded-md bg-amber-50">
-            <Clock className="size-4 text-amber-600" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="text-xs text-muted-foreground">考试状态分布</div>
-            <div className="flex items-center gap-2 text-xs">
-              <span>未开始 <strong className="text-amber-600">{stats.pendingCount}</strong></span>
-              <span className="text-gray-300">|</span>
-              <span>进行中 <strong className="text-green-600">{stats.activeCount}</strong></span>
-              <span className="text-gray-300">|</span>
-              <span>已结束 <strong className="text-foreground">{stats.endedCount}</strong></span>
-            </div>
-          </div>
-        </div>
-      </div>
+      <PageHeaderCard
+        title="考试管理"
+        description="查看试卷在各模块的使用情况"
+        className="mb-4"
+        actions={
+          <Button onClick={openCreateDialog}>
+            <Plus className="mr-2 size-4" />
+            添加考试
+          </Button>
+        }
+        stats={[
+          {
+            label: "考试总数",
+            value: mockUsages.length,
+            icon: <GraduationCap className="size-4 text-blue-500" />,
+            iconClassName: "bg-blue-50",
+          },
+          {
+            label: "未开始",
+            value: stats.pendingCount,
+            icon: <Clock className="size-4 text-amber-500" />,
+            iconClassName: "bg-amber-50",
+          },
+          {
+            label: "进行中",
+            value: stats.activeCount,
+            icon: <PlayCircle className="size-4 text-green-500" />,
+            iconClassName: "bg-green-50",
+          },
+          {
+            label: "已结束",
+            value: stats.endedCount,
+            icon: <CheckCircle2 className="size-4 text-gray-500" />,
+            iconClassName: "bg-gray-50",
+          },
+        ]}
+      />
 
       {/* 筛选栏 */}
       <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center">
@@ -410,7 +566,7 @@ export default function ExamUsagePage() {
                     <TableCell>
                       <div className="flex items-center gap-2">
                         {getDisplayTypeIcon(usage.displayType)}
-                        <span className="text-sm">{usage.displayType}</span>
+                        <span className="text-sm">{getDisplayTypeLabel(usage.displayType)}</span>
                       </div>
                     </TableCell>
                     <TableCell>
@@ -439,19 +595,38 @@ export default function ExamUsagePage() {
                     </TableCell>
                     <TableCell>{getStatusBadge(usage.status)}</TableCell>
                     <TableCell className="sticky right-0 bg-white text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs text-emerald-600" onClick={() => handleShareExam(usage)}>
-                          <Share2 className="size-3" />分享考试
-                        </Button>
-                        {usage.status === 'ended' && (
-                          <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs text-blue-600" onClick={() => router.push(`/exam-usage/results?usageId=${usage.id}`)}>
-                            <Eye className="size-3" />查看考试结果
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <MoreHorizontal className="size-4" />
                           </Button>
-                        )}
-                        {usage.status !== 'ended' && (
-                          <span className="text-xs text-muted-foreground">-</span>
-                        )}
-                      </div>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => openShareDialog(usage)}>
+                            <Share2 className="size-4" />
+                            分享考试
+                          </DropdownMenuItem>
+                          {usage.status === 'ended' && (
+                            <DropdownMenuItem onClick={() => router.push(`/exam-usage/results?usageId=${usage.id}`)}>
+                              <Eye className="size-4" />
+                              查看考试结果
+                            </DropdownMenuItem>
+                          )}
+                          <DropdownMenuSeparator />
+                          {usage.displayType === '教学考试' && (
+                            <>
+                              <DropdownMenuItem onClick={() => alert('编辑功能开发中')}>
+                                <Pencil className="size-4" />
+                                编辑
+                              </DropdownMenuItem>
+                              <DropdownMenuItem variant="destructive" onClick={() => alert('删除功能开发中')}>
+                                <Trash2 className="size-4" />
+                                删除
+                              </DropdownMenuItem>
+                            </>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </TableCell>
                   </TableRow>
                 ))
@@ -504,13 +679,51 @@ export default function ExamUsagePage() {
               </Field>
 
               <Field>
-                <FieldLabel>考试描述</FieldLabel>
+                <FieldLabel>考试简介</FieldLabel>
                 <Textarea
                   value={examDesc}
                   onChange={(e) => setExamDesc(e.target.value)}
-                  placeholder="请输入考试描述（可选）"
+                  placeholder="请输入考试简介（可选）"
                   rows={2}
                 />
+              </Field>
+
+              <Field>
+                <FieldLabel>考试封面</FieldLabel>
+                <FieldDescription>支持上传 5MB 以内的图片文件</FieldDescription>
+                <input
+                  ref={coverFileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleCoverFileChange}
+                  className="hidden"
+                />
+                {coverUrl ? (
+                  <div className="relative mt-2 w-full overflow-hidden rounded-lg border">
+                    <img
+                      src={coverUrl}
+                      alt="封面预览"
+                      className="h-32 w-full object-cover"
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="icon"
+                      className="absolute right-2 top-2 size-6"
+                      onClick={removeCover}
+                    >
+                      <X className="size-3" />
+                    </Button>
+                  </div>
+                ) : (
+                  <div
+                    onClick={() => coverFileInputRef.current?.click()}
+                    className="mt-2 flex h-32 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/25 transition-colors hover:border-muted-foreground/50"
+                  >
+                    <ImageIcon className="mb-2 size-8 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground">点击上传封面</span>
+                  </div>
+                )}
               </Field>
 
               <Field>
@@ -526,7 +739,7 @@ export default function ExamUsagePage() {
 
               <Field>
                 <FieldLabel>参考班级</FieldLabel>
-                <Popover>
+                <Popover open={orgPopoverOpen} onOpenChange={setOrgPopoverOpen}>
                   <PopoverTrigger asChild>
                     <Button variant="outline" className="w-full justify-between font-normal">
                       <span className="truncate">
@@ -539,25 +752,41 @@ export default function ExamUsagePage() {
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-[320px] p-0" align="start">
-                    <ScrollArea className="h-[200px] overflow-hidden">
+                    <div className="border-b p-2">
+                      <div className="relative">
+                        <Search className="absolute left-2 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                        <Input
+                          placeholder="搜索班级..."
+                          value={orgSearch}
+                          onChange={(e) => setOrgSearch(e.target.value)}
+                          className="pl-8"
+                        />
+                      </div>
+                    </div>
+                    <ScrollArea className="h-[240px] overflow-hidden">
                       <div className="p-2">
-                        {mockClasses.map((cls) => (
-                          <label
-                            key={cls.id}
-                            className="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 hover:bg-muted"
-                          >
-                            <Checkbox
-                              checked={selectedClassIds.includes(cls.id)}
-                              onCheckedChange={() => handleToggleClass(cls.id)}
-                            />
-                            <span className="text-sm">{cls.name}</span>
-                            {selectedClassIds.includes(cls.id) && (
-                              <Check className="ml-auto size-3.5 text-primary" />
-                            )}
-                          </label>
-                        ))}
+                        {mockOrgClasses.map(node => renderOrgNode(node, 0))}
                       </div>
                     </ScrollArea>
+                    {selectedClassIds.length > 0 && (
+                      <div className="border-t p-2">
+                        <div className="mb-1 text-xs text-muted-foreground">已选班级</div>
+                        <div className="flex flex-wrap gap-1">
+                          {selectedClassIds.map(id => (
+                            <Badge key={id} variant="secondary" className="gap-1">
+                              {classNameMap.get(id) || id}
+                              <button
+                                type="button"
+                                onClick={() => handleToggleClass(id)}
+                                className="ml-1 rounded-full hover:bg-muted"
+                              >
+                                <X className="size-3" />
+                              </button>
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </PopoverContent>
                 </Popover>
               </Field>
@@ -594,18 +823,6 @@ export default function ExamUsagePage() {
                   <span className="text-sm text-muted-foreground">{publishToFront ? '已发布' : '未发布'}</span>
                 </div>
               </Field>
-
-              <Field>
-                <FieldLabel>考试说明链接</FieldLabel>
-                <div className="flex items-center gap-2">
-                  <LinkIcon className="size-4 text-muted-foreground" />
-                  <Input
-                    value={examLink}
-                    onChange={(e) => setExamLink(e.target.value)}
-                    placeholder="https://..."
-                  />
-                </div>
-              </Field>
             </FieldGroup>
           </ScrollArea>
           <DialogFooter>
@@ -615,6 +832,28 @@ export default function ExamUsagePage() {
             <Button onClick={handleCreateExam} disabled={!isFormValid}>
               创建考试
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* 分享考试弹窗 */}
+      <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>分享考试</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            {sharingUsage && (
+              <p className="text-sm text-muted-foreground">
+                你的考试 {sharingUsage.examName} 开放时间为 {sharingUsage.startTime ? formatDate(sharingUsage.startTime) : '-'}-{sharingUsage.endTime ? formatDate(sharingUsage.endTime) : '-'}，请尽快点击下面链接参加考试吧 https://exam.example.com/e/{sharingUsage.id}
+              </p>
+            )}
+            <Button onClick={handleCopyLink} className="w-full">
+              {copied ? '已复制' : '复制到剪贴板'}
+            </Button>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setShareDialogOpen(false)}>关闭</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

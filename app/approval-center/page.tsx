@@ -45,12 +45,14 @@ import {
 } from "@/components/ui/dialog"
 import { Textarea } from "@/components/ui/textarea"
 import { useData } from "@/components/providers/data-provider"
+import { PageHeaderCard } from "@/components/shared/page-header-card"
 import { APPROVAL_TYPE_LABELS, APPROVAL_STATUS_LABELS } from "@/lib/types"
 import type { ApprovalType, ApprovalItem, ApprovalStatus } from "@/lib/types"
+
 const typeTabs: { value: ApprovalType; label: string }[] = [
   { value: "questionBank", label: "题库" },
   { value: "exam", label: "试卷" },
-  { value: "onlineExam", label: "在线考试" },
+  { value: "onlineExam", label: "考试" },
 ]
 
 const typeIcons: Record<ApprovalType, React.ReactNode> = {
@@ -160,43 +162,37 @@ export default function ApprovalCenterPage() {
 
   return (
     <div className="px-8 py-6">
-      {/* 页面标题 */}
-      <div className="mb-4 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">审批中心</h1>
-          <p className="text-muted-foreground">统一审批题目、题库、试卷、在线考试的提交申请</p>
-        </div>
-      </div>
-
-      {/* 精简统计 */}
-      <div className="mb-4 flex gap-3">
-        <div className="flex flex-1 items-center gap-3 rounded-lg border bg-white px-4 py-3">
-          <div className="flex size-8 items-center justify-center rounded-md bg-blue-50">
-            <ClipboardCheck className="size-4 text-blue-600" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="text-xs text-muted-foreground">审批概况</div>
-            <div className="flex items-center gap-2 text-xs">
-              <span>总数 <strong className="text-foreground">{stats.total}</strong></span>
-              <span className="text-gray-300">|</span>
-              <span>待审批 <strong className="text-amber-600">{stats.pending}</strong></span>
-            </div>
-          </div>
-        </div>
-        <div className="flex flex-1 items-center gap-3 rounded-lg border bg-white px-4 py-3">
-          <div className="flex size-8 items-center justify-center rounded-md bg-emerald-50">
-            <CheckCircle2 className="size-4 text-emerald-600" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="text-xs text-muted-foreground">已通过</div>
-            <div className="flex items-center gap-2 text-xs">
-              <span>已通过 <strong className="text-emerald-600">{stats.approved}</strong></span>
-              <span className="text-gray-300">|</span>
-              <span>已驳回 <strong className="text-red-600">{stats.rejected}</strong></span>
-            </div>
-          </div>
-        </div>
-      </div>
+      <PageHeaderCard
+        title="审批中心"
+        description="统一审批题目、题库、试卷、在线考试的提交申请"
+        stats={[
+          {
+            label: "审批总数",
+            value: stats.total,
+            icon: <ClipboardCheck className="size-4 text-blue-500" />,
+            iconClassName: "bg-blue-50",
+          },
+          {
+            label: "待审批",
+            value: stats.pending,
+            icon: <Clock className="size-4 text-yellow-500" />,
+            iconClassName: "bg-yellow-50",
+          },
+          {
+            label: "已通过",
+            value: stats.approved,
+            icon: <CheckCircle2 className="size-4 text-green-500" />,
+            iconClassName: "bg-green-50",
+          },
+          {
+            label: "已驳回",
+            value: stats.rejected,
+            icon: <XCircle className="size-4 text-red-500" />,
+            iconClassName: "bg-red-50",
+          },
+        ]}
+        className="mb-4"
+      />
 
       {/* Tab 切换 */}
       <div className="mb-4">

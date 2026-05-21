@@ -1,579 +1,554 @@
 "use client"
 
 import Link from "next/link"
-import { useState, useMemo, useEffect } from "react"
+import { useState, useMemo } from "react"
 import {
-  BookOpen,
-  FileText,
-  Award,
-  GraduationCap,
-  UserCircle,
-  Search,
-  Layers,
-  Database,
-  ClipboardList,
-  ChevronRight,
-  Clock,
-  Users,
-  Star,
-  MapPin,
-  Briefcase,
-  BarChart3,
-  Target,
-  ArrowRight,
-  PlayCircle,
-  AlertCircle,
-  CheckCircle2,
-  TrendingUp,
-  Bell,
-  Calendar,
-  MonitorPlay,
-  Eye,
-  X,
-  Lightbulb,
-  Monitor,
-  Wrench,
-  FolderCheck,
-  Presentation,
-  Drama,
-  Handshake,
-  HeartHandshake,
-  ClipboardCheck,
-  ExternalLink,
+  Clock, Calendar, FileText, BookOpen, Users, Award,
+  BarChart3, Target, TrendingUp, Layers, Star, CheckCircle2,
+  MapPin, Zap, Eye, Search,
 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
-import { Input } from "@/components/ui/input"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { useData } from "@/components/providers/data-provider"
 
-const platformStats = [
-  { label: "题库数量", value: "8,500+", icon: Database },
-  { label: "试卷数量", value: "1,200+", icon: ClipboardList },
-  { label: "认证项目", value: "45", icon: Award },
-  { label: "毕设选题", value: "320", icon: Layers },
-]
-
-const serviceEntries = [
-  {
-    title: "测评资源",
-    desc: "海量题库与试卷，覆盖多专业方向",
-    icon: BookOpen,
-    color: "from-blue-500 to-blue-600",
-    href: "/landingpage/resources",
-  },
-  {
-    title: "能力认证",
-    desc: "岗位能力测评与职业资格证书",
-    icon: Award,
-    color: "from-amber-500 to-amber-600",
-    href: "/landingpage/certifications",
-  },
-  {
-    title: "毕业设计",
-    desc: "选题广场与作品全流程管理",
-    icon: GraduationCap,
-    color: "from-emerald-500 to-emerald-600",
-    href: "/landingpage/graduation",
-  },
-  {
-    title: "学生画像",
-    desc: "能力档案与多维画像分析",
-    icon: UserCircle,
-    color: "from-purple-500 to-purple-600",
-    href: "/landingpage/portrait",
-  },
-]
-
-const workspacePreview = {
-  name: "张同学",
-  todos: [
-    { id: 1, title: "《Python程序设计》期末统考", time: "今天 14:00", type: "exam", urgent: true },
-    { id: 2, title: "毕业设计选题截止", time: "3天后", type: "graduation", urgent: false },
-    { id: 3, title: '岗位认定"Java开发工程师"作品待提交', time: "5天后", type: "cert", urgent: false },
-  ],
-  stats: [
-    { label: "进行中的考试", value: 2, icon: PlayCircle },
-    { label: "已获得认定", value: 3, icon: Award },
-    { label: "画像完成度", value: "78%", icon: UserCircle },
-  ],
+function SectionHeader({ title, subtitle, moreHref = "#" }: { title: string; subtitle?: string; moreHref?: string }) {
+  return (
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 20 }}>
+      <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
+        <h2 style={{ fontSize: 20, fontWeight: "bold", color: "#1e293b", position: "relative", paddingLeft: 12 }}>
+          <span style={{ position: "absolute", left: 0, top: "50%", transform: "translateY(-50%)", width: 4, height: 20, background: "linear-gradient(180deg, #2563eb, #3b82f6)", borderRadius: 2 }} />
+          {title}
+        </h2>
+        {subtitle && <span style={{ color: "#94a3b8", fontSize: 13 }}>{subtitle}</span>}
+      </div>
+      <Link href={moreHref} style={{ color: "#2563eb", fontSize: 13, textDecoration: "none" }}
+        onMouseEnter={(e) => { e.currentTarget.style.textDecoration = "underline" }}
+        onMouseLeave={(e) => { e.currentTarget.style.textDecoration = "none" }}>
+        查看全部 ›
+      </Link>
+    </div>
+  )
 }
 
-const questionBanks = [
-  { id: 1, title: "Python程序设计基础题库", category: "计算机", questions: 1280, hot: true },
-  { id: 2, title: "会计基础实务题库", category: "经管", questions: 856, hot: false },
-  { id: 3, title: "电子电路分析题库", category: "电子信息", questions: 642, hot: false },
-  { id: 4, title: "机械制图与CAD题库", category: "机械制造", questions: 528, hot: false },
-]
+const examStatusMap: Record<string, { bg: string; color: string; label: string }> = {
+  published: { bg: "#dcfce7", color: "#16a34a", label: "进行中" },
+  draft: { bg: "#f1f5f9", color: "#64748b", label: "草稿" },
+  pending: { bg: "#dbeafe", color: "#2563eb", label: "审核中" },
+}
 
-const exams = [
-  { id: 'exam-1', title: "2024年春季《数据结构》期末统考", type: "期末考", duration: 120, questions: 40, participants: 2340 },
-  { id: 'exam-2', title: "全国计算机等级考试二级Python真题", type: "真题", duration: 120, questions: 40, participants: 2840 },
-  { id: 'exam-3', title: "2024年春季《数据结构》模拟测试卷", type: "模拟卷", duration: 90, questions: 35, participants: 1256 },
-]
-
-const myExams = [
-  { id: 1, examId: 'exam-1', name: "前端基础测试", status: "进行中", type: "随堂测", time: "2024-03-15 14:00", duration: 60, questionCount: 20 },
-  { id: 2, examId: 'exam-2', name: "TypeScript 能力测试", status: "未开始", type: "教学考试", time: "2024-03-20 10:00", duration: 90, questionCount: 30 },
-]
-
-const allExams = [
-  { id: 1, examId: 'exam-1', name: "前端基础测试", status: "进行中", type: "随堂测", time: "2024-03-15 14:00", duration: 60, questionCount: 20 },
-  { id: 2, examId: 'exam-2', name: "TypeScript 能力测试", status: "未开始", type: "教学考试", time: "2024-03-20 10:00", duration: 90, questionCount: 30 },
-  { id: 3, examId: 'exam-3', name: "React 进阶考核", status: "已结束", type: "期末考", time: "2024-03-10 09:00", duration: 120, questionCount: 40 },
-  { id: 4, examId: 'exam-4', name: "Node.js 后端测试", status: "进行中", type: "随堂测", time: "2024-02-28 14:00", duration: 60, questionCount: 25 },
-  { id: 5, examId: 'exam-5', name: "Vue.js 进阶考核", status: "未开始", type: "期末考", time: "2024-04-05 10:00", duration: 120, questionCount: 35 },
-  { id: 6, examId: 'exam-6', name: "全栈开发综合测试", status: "已结束", type: "综合考", time: "2024-03-25 09:00", duration: 150, questionCount: 50 },
-]
-
-const certifications = [
-  { id: 1, name: "Java开发工程师", level: "中级", org: "软件学院", enrolled: 156, passing: "76%", tags: ["热门", "就业导向"] },
-  { id: 2, name: "数据库工程师", level: "初级", org: "计算机学院", enrolled: 128, passing: "82%", tags: ["基础"] },
-  { id: 3, name: "云计算架构师", level: "高级", org: "网络中心", enrolled: 89, passing: "68%", tags: ["新兴"] },
-  { id: 4, name: "前端开发工程师", level: "中级", org: "软件学院", enrolled: 203, passing: "79%", tags: ["热门"] },
-]
-
-const topics = [
-  { id: 1, title: "基于深度学习的图像识别系统", mentor: "王教授", direction: "人工智能", spots: 3, total: 5 },
-  { id: 2, title: "校园二手交易小程序设计与实现", mentor: "李老师", direction: "移动开发", spots: 5, total: 8 },
-  { id: 3, title: "智慧图书馆管理系统", mentor: "张老师", direction: "Web开发", spots: 2, total: 6 },
-  { id: 4, title: "基于物联网的温室环境监测", mentor: "陈教授", direction: "物联网", spots: 4, total: 5 },
-]
-
-const categoryIcons: Record<string, React.ElementType> = {
-  '知识测评': Lightbulb,
-  '过程测评': Monitor,
-  '实操测评': Wrench,
-  '成果测评': FolderCheck,
-  '展示测评': Presentation,
-  '情境模拟测评': Drama,
-  '协作互评': Handshake,
-  '多元评价': HeartHandshake,
-  '综合考核': ClipboardCheck,
+const certStatusMap: Record<string, string> = {
+  published: "进行中", ready: "待发布", reviewing: "审核中",
+  rejected: "已驳回", draft: "草稿", none: "无规则",
 }
 
 export default function LandingHomePage() {
-  const [previewBank, setPreviewBank] = useState<typeof questionBanks[0] | null>(null)
-  const [activeTab, setActiveTab] = useState<'my' | 'interested'>('my')
-  const [examCenterTab, setExamCenterTab] = useState<'my' | 'all'>('my')
-  const [methodTab, setMethodTab] = useState<string>("")
-  const { evaluationCategories, evaluationMethods } = useData()
+  const {
+    exams, questionBanks, evaluationCategories, evaluationMethods,
+    graduationProjectTopics, studentAbilityPortraits, positionsList,
+  } = useData()
 
-  const enabledMethods = useMemo(() => {
-    return evaluationMethods.filter((m) => m.enabled)
-  }, [evaluationMethods])
+  const [activeMethodTab, setActiveMethodTab] = useState("全部")
+  const [activeResourceTab, setActiveResourceTab] = useState("题库")
+  const [portraitMajor, setPortraitMajor] = useState("全部")
+  const [portraitPosition, setPortraitPosition] = useState("全部")
 
-  const groupedMethods = useMemo(() => {
-    const groups = new Map<string, typeof evaluationMethods>()
-    enabledMethods.forEach((m) => {
-      const list = groups.get(m.categoryId) || []
-      list.push(m)
-      groups.set(m.categoryId, list)
-    })
-    return evaluationCategories
-      .map((c) => ({ category: c, methods: groups.get(c.id) || [] }))
-      .filter((g) => g.methods.length > 0)
-  }, [enabledMethods, evaluationCategories])
+  /* ── 统计数据 ── */
+  const stats = useMemo(() => [
+    { num: evaluationMethods.length, label: "测评方式" },
+    { num: questionBanks.length, label: "题库数量" },
+    { num: exams.length, label: "试卷数量" },
+    { num: exams.filter((e) => e.status === "published").length, label: "考试场次" },
+    { num: positionsList.length, label: "岗位认证项目" },
+    { num: graduationProjectTopics.length, label: "毕业选题" },
+  ], [evaluationMethods, questionBanks, exams, positionsList, graduationProjectTopics])
 
-  // default method tab
-  useEffect(() => {
-    if (groupedMethods.length > 0 && !methodTab) {
-      setMethodTab(groupedMethods[0].category.id)
-    }
-  }, [groupedMethods, methodTab])
+  /* ── 考试中心 ── */
+  const publishedExams = exams.filter((e) => e.status === "published").slice(0, 4)
+
+  /* ── 测评方式 ── */
+  const methodTabs = ["全部", ...evaluationCategories.map((c) => c.name)]
+  const filteredMethods = activeMethodTab === "全部"
+    ? evaluationMethods.filter((m) => m.enabled).slice(0, 4)
+    : evaluationMethods.filter((m) => {
+        const cat = evaluationCategories.find((c) => c.id === m.categoryId)
+        return m.enabled && cat?.name === activeMethodTab
+      }).slice(0, 4)
+
+  /* ── 测评资源 ── */
+  const resourceBanks = questionBanks.filter((b) => b.status === "published").slice(0, 3)
+  const resourceExams = exams.filter((e) => e.status === "published").slice(0, 3)
+
+  /* ── 毕业设计 ── */
+  const publishedTopics = graduationProjectTopics.filter((t) => t.status === "published").slice(0, 6)
+
+  /* ── 画像 ── */
+  const topPortraits = studentAbilityPortraits.slice().sort((a, b) => b.totalCredits - a.totalCredits).slice(0, 8)
+  const majors = ["全部", ...Array.from(new Set(studentAbilityPortraits.map((p) => p.majorName)))]
+  const positions = ["全部", ...Array.from(new Set(positionsList.map((p) => p.name)))]
+
+  const filteredPortraits = topPortraits.filter((p) => {
+    const matchMajor = portraitMajor === "全部" || p.majorName === portraitMajor
+    const matchPos = portraitPosition === "全部" || p.positionName === portraitPosition
+    return matchMajor && matchPos
+  })
 
   return (
     <div>
-      {/* Platform Intro + Stats */}
-      <section className="border-b bg-white py-12">
-        <div className="mx-auto max-w-7xl px-6 text-center">
-          <div className="mb-4 flex items-center justify-end">
-            <Link href="/landingpage/workspace">
-              <Button variant="outline" size="sm" className="gap-1">
-                进入工作台 <ArrowRight className="h-3.5 w-3.5" />
-              </Button>
-            </Link>
+      {/* ═══ Hero Banner ═══ */}
+      <div style={{
+        background: "linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #3b82f6 100%)",
+        color: "#fff", padding: "60px 20px 50px", textAlign: "center", position: "relative", overflow: "hidden",
+      }}>
+        <div style={{ position: "absolute", top: -80, right: -80, width: 300, height: 300, background: "rgba(255,255,255,0.04)", borderRadius: "50%" }} />
+        <div style={{ position: "absolute", bottom: -60, left: "5%", width: 200, height: 200, background: "rgba(255,255,255,0.04)", borderRadius: "50%" }} />
+        <div style={{ maxWidth: 720, margin: "0 auto", position: "relative", zIndex: 1 }}>
+          <h1 style={{ fontSize: 40, fontWeight: "bold", marginBottom: 12, letterSpacing: 1 }}>能力测评认定平台</h1>
+          <p style={{ fontSize: 15, opacity: 0.85, marginBottom: 28 }}>集测评资源、岗位能力认定、毕业设计、学生画像于一体的一站式能力成长平台</p>
+          <div style={{
+            background: "#fff", borderRadius: 50, padding: "5px 5px 5px 24px",
+            display: "flex", alignItems: "center", boxShadow: "0 10px 30px rgba(0,0,0,0.15)",
+          }}>
+            <Search style={{ width: 18, height: 18, color: "#94a3b8", marginRight: 10 }} />
+            <input type="text" placeholder="搜索题库、试卷、考试、岗位能力认证、毕业设计、学生画像"
+              style={{ flex: 1, border: "none", outline: "none", fontSize: 14, padding: "12px 0", color: "#333", background: "transparent" }} />
+            <button style={{
+              background: "linear-gradient(135deg, #2563eb, #3b82f6)", color: "#fff", border: "none",
+              padding: "11px 32px", borderRadius: 50, cursor: "pointer", fontSize: 14, fontWeight: 500,
+            }}>搜索</button>
           </div>
-          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">能力测评认定平台</h1>
-          <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground sm:text-lg">
-            集测评资源、能力认定、毕业设计、学生画像于一体的一站式能力成长平台
-          </p>
-          <div className="mx-auto mt-6 flex max-w-xl gap-2">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input placeholder="搜索题库、试卷、认定项目..." className="h-10 pl-9" />
-            </div>
-            <Button className="h-10 gap-1 px-5">
-              搜索 <ArrowRight className="h-4 w-4" />
-            </Button>
-          </div>
-          <div className="mx-auto mt-10 grid max-w-3xl grid-cols-2 gap-3 sm:grid-cols-4">
-            {platformStats.map((stat) => (
-              <div key={stat.label} className="flex flex-col items-center gap-2 rounded-xl border bg-muted/30 p-4">
-                <stat.icon className="h-6 w-6 text-primary" />
-                <div className="text-xl font-bold sm:text-2xl">{stat.value}</div>
-                <div className="text-xs text-muted-foreground">{stat.label}</div>
+        </div>
+      </div>
+
+      {/* ═══ 主内容 ═══ */}
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "40px 20px 0" }}>
+
+        {/* ── 数据看板 ── */}
+        <section style={{ marginBottom: 50 }}>
+          <div style={{
+            background: "#fff", borderRadius: 12, boxShadow: "0 1px 3px rgba(0,0,0,0.06)", padding: 24,
+            display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 20,
+          }}>
+            {stats.map((s, i) => (
+              <div key={i} style={{ textAlign: "center", borderRight: i < stats.length - 1 ? "1px solid #f1f5f9" : "none" }}>
+                <div style={{ fontSize: 28, fontWeight: "bold", color: "#2563eb", lineHeight: 1.2 }}>{s.num}</div>
+                <div style={{ fontSize: 13, color: "#94a3b8", marginTop: 6 }}>{s.label}</div>
               </div>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-
-
-      {/* Service Entries */}
-      <section className="py-10">
-        <div className="mx-auto max-w-7xl px-6">
-          <h2 className="mb-5 text-lg font-semibold">平台服务</h2>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {serviceEntries.map((service) => (
-              <Link
-                key={service.title}
-                href={service.href}
-                className={`group relative overflow-hidden rounded-xl bg-gradient-to-br ${service.color} p-5 text-white transition-transform hover:scale-[1.02]`}
-              >
-                <service.icon className="h-7 w-7 opacity-90" />
-                <h3 className="mt-3 text-base font-semibold">{service.title}</h3>
-                <p className="mt-1 text-xs opacity-80">{service.desc}</p>
-                <ArrowRight className="absolute right-3 top-3 h-4 w-4 opacity-0 transition-opacity group-hover:opacity-100" />
-              </Link>
-            ))}
+        {/* ── 考试中心 ── */}
+        <section style={{ marginBottom: 50 }}>
+          <SectionHeader title="考试中心" subtitle="所有已发布的考试" moreHref="/landingpage/exams" />
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 20 }}>
+            {publishedExams.map((exam) => {
+              const st = examStatusMap[exam.status] || examStatusMap.draft
+              return (
+                <Link key={exam.id} href={`/landingpage/exams/${exam.id}`} style={{ textDecoration: "none", color: "inherit" }}>
+                  <div style={{
+                    background: "#fff", borderRadius: 10, padding: 20,
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.06)", transition: "all 0.25s",
+                    cursor: "pointer", borderTop: "3px solid #2563eb",
+                  }}
+                    onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 8px 16px rgba(0,0,0,0.08)" }}
+                    onMouseLeave={(e) => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.06)" }}>
+                    <span style={{
+                      display: "inline-block", padding: "3px 10px", background: st.bg, color: st.color,
+                      borderRadius: 12, fontSize: 12, marginBottom: 10, fontWeight: 500,
+                    }}>{st.label}</span>
+                    <h3 style={{ fontSize: 15, marginBottom: 10, color: "#1e293b", fontWeight: 600, lineHeight: 1.4 }}>{exam.name}</h3>
+                    <div style={{ fontSize: 12, color: "#94a3b8", marginBottom: 6, display: "flex", alignItems: "center", gap: 4 }}>
+                      <Clock style={{ width: 12, height: 12 }} /> {exam.duration}分钟 · {exam.questions.length}题
+                    </div>
+                    <div style={{ fontSize: 12, color: "#94a3b8", marginBottom: 6, display: "flex", alignItems: "center", gap: 4 }}>
+                      <Calendar style={{ width: 12, height: 12 }} /> {new Date(exam.createdAt).toLocaleDateString("zh-CN")}
+                    </div>
+                    <span style={{
+                      display: "block", textAlign: "center", background: "#2563eb", color: "#fff",
+                      padding: "8px 0", borderRadius: 6, fontSize: 13, marginTop: 12, fontWeight: 500,
+                    }}>进入答题</span>
+                  </div>
+                </Link>
+              )
+            })}
+            {publishedExams.length === 0 && (
+              <div style={{ gridColumn: "span 4", textAlign: "center", padding: 40, color: "#94a3b8", background: "#fff", borderRadius: 10 }}>暂无已发布考试</div>
+            )}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Evaluation Methods */}
-      <section className="border-t bg-white py-10">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="mb-5 flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold">测评方式介绍</h2>
-              <p className="text-sm text-muted-foreground mt-0.5">平台支持多种科学测评方式，全面评估学生能力</p>
-            </div>
-            <Link href="/evaluation-methods">
-              <Button variant="ghost" size="sm" className="gap-1">
-                查看全部 <ChevronRight className="h-4 w-4" />
-              </Button>
-            </Link>
-          </div>
-          <Tabs value={methodTab} onValueChange={setMethodTab}>
-            <TabsList className="mb-4 flex-wrap h-auto py-1">
-              {groupedMethods.map(({ category, methods }) => (
-                <TabsTrigger key={category.id} value={category.id} className="text-sm">
-                  {category.name}
-                  <span className="ml-1 text-xs text-muted-foreground">({methods.length})</span>
-                </TabsTrigger>
-              ))}
-            </TabsList>
-            {groupedMethods.map(({ category, methods }) => (
-              <TabsContent key={category.id} value={category.id} className="mt-0">
-                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                  {methods.map((method) => (
-                    <Card key={method.id} className="transition-shadow hover:shadow-sm">
-                      <CardContent className="p-4">
-                        <div className="flex items-start justify-between gap-2">
-                          <h4 className="text-sm font-medium">{method.name}</h4>
-                          {method.docLink && (
-                            <a
-                              href={method.docLink}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="shrink-0 text-muted-foreground hover:text-primary transition-colors"
-                              title="查看文档"
-                            >
-                              <ExternalLink className="h-3 w-3" />
-                            </a>
-                          )}
+        {/* ── 岗位能力认证 ── */}
+        <section style={{ marginBottom: 50 }}>
+          <SectionHeader title="岗位能力认证项目库" moreHref="/landingpage/certifications" />
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
+            {positionsList.slice(0, 3).map((pos, i) => {
+              const covers = [
+                "linear-gradient(135deg, #667eea, #764ba2)",
+                "linear-gradient(135deg, #f093fb, #f5576c)",
+                "linear-gradient(135deg, #4facfe, #00f2fe)",
+              ]
+              const st = certStatusMap[pos.ruleStatus] || "草稿"
+              const isEnded = pos.ruleStatus === "none" || pos.ruleStatus === "rejected"
+              return (
+                <Link key={pos.id} href={`/landingpage/certifications/${pos.id}`} style={{ textDecoration: "none", color: "inherit" }}>
+                  <div style={{
+                    background: "#fff", borderRadius: 10, overflow: "hidden",
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.06)", transition: "all 0.25s", cursor: "pointer",
+                  }}
+                    onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 8px 16px rgba(0,0,0,0.08)" }}
+                    onMouseLeave={(e) => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.06)" }}>
+                    <div style={{
+                      height: 140, background: covers[i % 3], position: "relative",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      color: "#fff", fontSize: 18, fontWeight: "bold",
+                    }}>
+                      {pos.name}
+                      <span style={{
+                        position: "absolute", top: 10, right: 10,
+                        background: "rgba(255,255,255,0.9)", color: isEnded ? "#94a3b8" : "#16a34a",
+                        padding: "3px 10px", borderRadius: 12, fontSize: 12, fontWeight: 500,
+                      }}>{st}</span>
+                    </div>
+                    <div style={{ padding: 18 }}>
+                      <h3 style={{ fontSize: 15, marginBottom: 10, color: "#1e293b", fontWeight: 600 }}>{pos.name}认证</h3>
+                      <div style={{ fontSize: 12, color: "#94a3b8", lineHeight: 1.8 }}>
+                        创建人：{pos.updatedBy} &nbsp; 更新：{pos.lastUpdated}<br />
+                        专业方向：{pos.professionalDirection}
+                      </div>
+                      <div style={{
+                        display: "flex", justifyContent: "space-between", marginTop: 12,
+                        paddingTop: 12, borderTop: "1px dashed #f1f5f9",
+                      }}>
+                        <div style={{ textAlign: "center" }}>
+                          <div style={{ fontSize: 18, fontWeight: "bold", color: "#2563eb" }}>{pos.relatedAbilityCount}</div>
+                          <div style={{ fontSize: 12, color: "#94a3b8" }}>能力项</div>
                         </div>
-                        <p className="mt-1.5 text-xs text-muted-foreground line-clamp-2">
-                          {method.description || '暂无说明'}
-                        </p>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </TabsContent>
-            ))}
-          </Tabs>
-        </div>
-      </section>
-
-      {/* Question Banks & Exams */}
-      <section className="border-t bg-white py-10">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="mb-5 flex items-center justify-between">
-            <h2 className="text-lg font-semibold">测评资源推荐</h2>
-            <Link href="/landingpage/resources">
-              <Button variant="ghost" size="sm" className="gap-1">
-                查看全部 <ChevronRight className="h-4 w-4" />
-              </Button>
-            </Link>
-          </div>
-
-          <div className="mb-6">
-            <h3 className="mb-3 text-sm font-medium text-muted-foreground">热门题库</h3>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              {questionBanks.map((bank) => (
-                <Card key={bank.id} className="cursor-pointer transition-shadow hover:shadow-md" onClick={() => setPreviewBank(bank)}>
-                  <CardContent className="p-4">
-                    <div className="mb-2 flex items-center justify-between">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
-                        <BookOpen className="h-4.5 w-4.5" />
+                        <div style={{ textAlign: "center" }}>
+                          <div style={{ fontSize: 18, fontWeight: "bold", color: "#2563eb" }}>{pos.ruleStatus === "published" ? "已发布" : "未发布"}</div>
+                          <div style={{ fontSize: 12, color: "#94a3b8" }}>规则状态</div>
+                        </div>
                       </div>
-                      {bank.hot && (
-                        <Badge variant="secondary" className="text-[10px]">
-                          <Star className="mr-1 h-3 w-3" />
-                          热门
-                        </Badge>
-                      )}
-                    </div>
-                    <h4 className="mb-1 text-sm font-semibold">{bank.title}</h4>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <Badge variant="outline" className="text-[10px] font-normal">{bank.category}</Badge>
-                      <span>{bank.questions} 题</span>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <h3 className="mb-3 text-sm font-medium text-muted-foreground">热门试卷</h3>
-            <div className="space-y-2">
-              {exams.map((exam) => (
-                <Link
-                  key={exam.id}
-                  href={`/exams/${exam.id}?mode=preview`}
-                  className="flex flex-col gap-2 rounded-lg border bg-white p-4 transition-colors hover:border-primary/50 sm:flex-row sm:items-center"
-                >
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-orange-50 text-orange-600">
-                    <FileText className="h-4.5 w-4.5" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <h4 className="text-sm font-medium">{exam.title}</h4>
-                    <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                      <Badge variant="outline" className="text-[10px] font-normal">{exam.type}</Badge>
-                      <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{exam.duration} 分钟</span>
-                      <span className="flex items-center gap-1"><ClipboardList className="h-3 w-3" />{exam.questions} 题</span>
-                      <span className="flex items-center gap-1"><Users className="h-3 w-3" />{exam.participants} 人已考</span>
                     </div>
                   </div>
-                  <span className="inline-flex shrink-0 items-center gap-1 rounded-md border bg-background px-2.5 py-1 text-xs font-medium hover:bg-accent">
-                    <Eye className="h-3 w-3" />预览
-                  </span>
                 </Link>
-              ))}
-            </div>
+              )
+            })}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Exam Center */}
-      <section className="border-t bg-white py-10">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="mb-5 flex items-center justify-between">
-            <h2 className="text-lg font-semibold">考试中心</h2>
-            <Link href="/landingpage/exams">
-              <Button variant="ghost" size="sm" className="gap-1">
-                查看全部 <ChevronRight className="h-4 w-4" />
-              </Button>
-            </Link>
-          </div>
-          <Tabs value={examCenterTab} onValueChange={(v) => setExamCenterTab(v as 'my' | 'all')} className="mb-4">
-            <TabsList>
-              <TabsTrigger value="my">我的考试</TabsTrigger>
-              <TabsTrigger value="all">全部考试</TabsTrigger>
-            </TabsList>
-          </Tabs>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {(examCenterTab === 'my' ? myExams : allExams).map((exam) => (
-              <Link key={exam.id} href={`/landingpage/exams/${exam.examId}`} className="block">
-                <Card className="transition-shadow hover:shadow-md cursor-pointer h-full">
-                  <CardContent className="p-4">
-                    <div className="mb-2 flex items-start justify-between">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-purple-50 text-purple-600">
-                        <ClipboardList className="h-4.5 w-4.5" />
-                      </div>
-                      <Badge variant={exam.status === '进行中' ? 'default' : exam.status === '未开始' ? 'secondary' : 'outline'} className="text-[10px]">
-                        {exam.status}
-                      </Badge>
-                    </div>
-                    <h4 className="mb-1 text-sm font-semibold">{exam.name}</h4>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <Badge variant="outline" className="text-[10px] font-normal">{exam.type}</Badge>
-                      <span>{exam.time}</span>
-                    </div>
-                    <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
-                      <span>{exam.duration} 分钟</span>
-                      <span>{exam.questionCount} 题</span>
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
+        {/* ── 测评方式 ── */}
+        <section style={{ marginBottom: 50 }}>
+          <SectionHeader title="测评方式库" moreHref="/evaluation-methods" />
+          <div style={{ display: "flex", gap: 10, marginBottom: 20, flexWrap: "wrap" }}>
+            {methodTabs.map((tab) => (
+              <button key={tab} onClick={() => setActiveMethodTab(tab)} style={{
+                padding: "7px 16px", background: activeMethodTab === tab ? "#2563eb" : "#fff",
+                color: activeMethodTab === tab ? "#fff" : "#64748b", borderRadius: 20, fontSize: 13,
+                cursor: "pointer", border: activeMethodTab === tab ? "1px solid #2563eb" : "1px solid #e2e8f0",
+                transition: "all 0.2s", display: "flex", alignItems: "center", gap: 6, fontWeight: 500,
+              }}>
+                {tab}
+                <span style={{
+                  background: activeMethodTab === tab ? "rgba(255,255,255,0.25)" : "#f1f5f9",
+                  color: activeMethodTab === tab ? "#fff" : "#64748b",
+                  padding: "1px 7px", borderRadius: 10, fontSize: 11,
+                }}>
+                  {tab === "全部" ? evaluationMethods.filter((m) => m.enabled).length :
+                    evaluationMethods.filter((m) => {
+                      const cat = evaluationCategories.find((c) => c.id === m.categoryId)
+                      return m.enabled && cat?.name === tab
+                    }).length}
+                </span>
+              </button>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* Certifications */}
-      <section className="py-10">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="mb-5 flex items-center justify-between">
-            <h2 className="text-lg font-semibold">能力认定</h2>
-            <Link href="/landingpage/certifications">
-              <Button variant="ghost" size="sm" className="gap-1">
-                查看全部 <ChevronRight className="h-4 w-4" />
-              </Button>
-            </Link>
-          </div>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {certifications.map((cert) => (
-              <Card key={cert.id} className="transition-shadow hover:shadow-md">
-                <CardContent className="p-4">
-                  <div className="mb-2 flex items-start justify-between">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-50 text-amber-600">
-                      <Award className="h-4.5 w-4.5" />
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 20 }}>
+            {filteredMethods.map((method, i) => {
+              const covers = [
+                "linear-gradient(135deg, #a8edea, #fed6e3)",
+                "linear-gradient(135deg, #ffecd2, #fcb69f)",
+                "linear-gradient(135deg, #84fab0, #8fd3f4)",
+                "linear-gradient(135deg, #a1c4fd, #c2e9fb)",
+              ]
+              const icons = ["📝", "💻", "🎤", "📁"]
+              return (
+                <Link key={method.id} href={`/evaluation-methods/student/${method.id}`} style={{ textDecoration: "none", color: "inherit" }}>
+                  <div style={{
+                    background: "#fff", borderRadius: 10, overflow: "hidden",
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.06)", transition: "all 0.25s", cursor: "pointer",
+                  }}
+                    onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 8px 16px rgba(0,0,0,0.08)" }}
+                    onMouseLeave={(e) => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.06)" }}>
+                    <div style={{
+                      height: 110, background: covers[i % 4],
+                      display: "flex", alignItems: "center", justifyContent: "center", fontSize: 36,
+                    }}>{icons[i % 4]}</div>
+                    <div style={{ padding: 16 }}>
+                      <h3 style={{ fontSize: 14, marginBottom: 8, color: "#1e293b", fontWeight: 600 }}>{method.name}</h3>
+                      <p style={{ fontSize: 12, color: "#94a3b8", lineHeight: 1.6, marginBottom: 12, height: 36, overflow: "hidden" }}>
+                        {method.description || "暂无说明"}
+                      </p>
+                      <span style={{ fontSize: 13, color: "#2563eb", fontWeight: 500 }}>查看使用说明 ›</span>
                     </div>
-                    <div className="flex gap-1 flex-wrap justify-end">
-                      {cert.tags.map((tag) => (
-                        <Badge key={tag} variant="secondary" className="text-[10px]">{tag}</Badge>
-                      ))}
-                    </div>
                   </div>
-                  <h4 className="mb-1 text-sm font-semibold">{cert.name}</h4>
-                  <div className="mb-2 text-xs text-muted-foreground flex items-center gap-1">
-                    <Briefcase className="h-3 w-3" />{cert.org}
-                  </div>
-                  <div className="flex items-center justify-between border-t pt-2 text-xs">
-                    <span className="text-muted-foreground"><Users className="mr-1 inline h-3 w-3" />{cert.enrolled}人报名</span>
-                    <span className="text-emerald-600">通过率 {cert.passing}</span>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Graduation Topics */}
-      <section className="border-t bg-white py-10">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="mb-5 flex items-center justify-between">
-            <h2 className="text-lg font-semibold">毕业设计选题广场</h2>
-            <Link href="/landingpage/graduation">
-              <Button variant="ghost" size="sm" className="gap-1">
-                查看全部 <ChevronRight className="h-4 w-4" />
-              </Button>
-            </Link>
-          </div>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {topics.map((topic) => (
-              <Card key={topic.id} className="transition-shadow hover:shadow-md">
-                <CardContent className="p-4">
-                  <div className="mb-2 flex items-start justify-between">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
-                      <GraduationCap className="h-4.5 w-4.5" />
-                    </div>
-                    <Badge variant={topic.spots <= 2 ? "destructive" : "secondary"} className="text-[10px]">
-                      余 {topic.spots}/{topic.total} 名
-                    </Badge>
-                  </div>
-                  <h4 className="mb-2 text-sm font-semibold leading-snug">{topic.title}</h4>
-                  <div className="space-y-1 text-xs text-muted-foreground">
-                    <div className="flex items-center gap-1"><Users className="h-3 w-3" />导师：{topic.mentor}</div>
-                    <div className="flex items-center gap-1"><MapPin className="h-3 w-3" />方向：{topic.direction}</div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Student Portrait Demo */}
-      <section className="py-10">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="overflow-hidden rounded-2xl border bg-white">
-            <div className="grid lg:grid-cols-2">
-              <div className="flex flex-col justify-center p-6 lg:p-10">
-                <Badge variant="secondary" className="mb-3 w-fit">学生能力画像</Badge>
-                <h2 className="text-xl font-bold sm:text-2xl">全方位记录你的成长轨迹</h2>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  基于课程成绩、考试成绩、认定结果、项目作品等多维数据，生成个人能力画像，助力职业发展规划。
-                </p>
-                <div className="mt-5 space-y-2">
-                  {[
-                    { icon: Target, text: "多维度能力评估：专业技能、通用能力、创新能力" },
-                    { icon: BarChart3, text: "可视化成长趋势：学期对比、能力雷达图" },
-                    { icon: FileText, text: "一键生成档案：简历素材、能力证明" },
-                  ].map((item, idx) => (
-                    <div key={idx} className="flex items-center gap-3">
-                      <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-purple-50 text-purple-600">
-                        <item.icon className="h-3.5 w-3.5" />
-                      </div>
-                      <span className="text-xs sm:text-sm">{item.text}</span>
-                    </div>
-                  ))}
-                </div>
-                <Link href="/landingpage/portrait">
-                  <Button className="mt-6 w-fit gap-1 text-xs sm:text-sm">
-                    查看示例画像 <ArrowRight className="h-3.5 w-3.5" />
-                  </Button>
                 </Link>
-              </div>
-              <div className="flex items-center justify-center bg-muted/30 p-6 lg:p-10">
-                <div className="relative flex h-56 w-56 items-center justify-center">
-                  <div className="absolute inset-0 rounded-full border-2 border-dashed border-muted" />
-                  <div className="absolute inset-4 rounded-full border-2 border-dashed border-muted" />
-                  <div className="absolute inset-8 rounded-full border-2 border-dashed border-muted" />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="h-full w-full rounded-full" style={{ background: "conic-gradient(from 0deg, rgba(139,92,246,0.25) 0deg 60deg, rgba(59,130,246,0.25) 60deg 140deg, rgba(16,185,129,0.25) 140deg 220deg, rgba(245,158,11,0.25) 220deg 300deg, rgba(236,72,153,0.25) 300deg 360deg)" }} />
-                  </div>
-                  <div className="relative z-10 flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-lg">
-                    <UserCircle className="h-8 w-8 text-primary" />
-                  </div>
-                  <span className="absolute -top-1 text-[10px] font-medium">专业技能</span>
-                  <span className="absolute -right-5 top-[30%] text-[10px] font-medium">通用能力</span>
-                  <span className="absolute -right-3 bottom-[20%] text-[10px] font-medium">创新能力</span>
-                  <span className="absolute -left-3 bottom-[20%] text-[10px] font-medium">实践能力</span>
-                  <span className="absolute -left-5 top-[30%] text-[10px] font-medium">团队协作</span>
-                </div>
-              </div>
-            </div>
+              )
+            })}
+            {filteredMethods.length === 0 && (
+              <div style={{ gridColumn: "span 4", textAlign: "center", padding: 40, color: "#94a3b8", background: "#fff", borderRadius: 10 }}>暂无测评方式</div>
+            )}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Preview Dialogs */}
-      <Dialog open={!!previewBank} onOpenChange={() => setPreviewBank(null)}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>题库预览</DialogTitle>
-          </DialogHeader>
-          {previewBank && (
-            <div className="space-y-4 py-4">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
-                  <BookOpen className="h-5 w-5" />
-                </div>
-                <div>
-                  <h3 className="font-semibold">{previewBank.title}</h3>
-                  <p className="text-sm text-muted-foreground">{previewBank.category} · {previewBank.questions} 题</p>
-                </div>
-              </div>
-              <div className="rounded-lg border p-4">
-                <p className="text-sm text-muted-foreground">题库内容预览区域，展示该题库下的部分题目...</p>
-              </div>
+        {/* ── 测评资源 ── */}
+        <section style={{ marginBottom: 50 }}>
+          <SectionHeader title="测评资源库" moreHref="/landingpage/resources" />
+          <div style={{ display: "flex", gap: 30, borderBottom: "1px solid #e2e8f0", marginBottom: 20 }}>
+            {["题库", "试卷库"].map((tab) => (
+              <button key={tab} onClick={() => setActiveResourceTab(tab)} style={{
+                padding: "10px 0", fontSize: 15, cursor: "pointer", position: "relative",
+                color: activeResourceTab === tab ? "#2563eb" : "#64748b",
+                fontWeight: activeResourceTab === tab ? "bold" : "normal",
+                border: "none", background: "none",
+              }}>
+                {tab}
+                {activeResourceTab === tab && (
+                  <span style={{ position: "absolute", bottom: -1, left: 0, right: 0, height: 2, background: "#2563eb" }} />
+                )}
+              </button>
+            ))}
+          </div>
+
+          {activeResourceTab === "题库" ? (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
+              {resourceBanks.map((bank, i) => {
+                const covers = [
+                  "linear-gradient(135deg, #fa709a, #fee140)",
+                  "linear-gradient(135deg, #30cfd0, #330867)",
+                  "linear-gradient(135deg, #a8c0ff, #3f2b96)",
+                ]
+                return (
+                  <Link key={bank.id} href={`/landingpage/resources/banks/${bank.id}`} style={{ textDecoration: "none", color: "inherit" }}>
+                    <div style={{
+                      background: "#fff", borderRadius: 10, overflow: "hidden",
+                      boxShadow: "0 1px 3px rgba(0,0,0,0.06)", transition: "all 0.25s", cursor: "pointer",
+                    }}
+                      onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 8px 16px rgba(0,0,0,0.08)" }}
+                      onMouseLeave={(e) => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.06)" }}>
+                      <div style={{
+                        height: 100, background: covers[i % 3],
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        color: "#fff", fontSize: 20, fontWeight: "bold",
+                      }}>{bank.name.slice(0, 6)}</div>
+                      <div style={{ padding: 16 }}>
+                        <h3 style={{ fontSize: 15, marginBottom: 10, color: "#1e293b", fontWeight: 600 }}>{bank.name}</h3>
+                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, fontSize: 12, color: "#64748b" }}>
+                          <span>题目数量：<strong style={{ color: "#2563eb" }}>{bank.questionCount}</strong></span>
+                          <span>题型：选择/编程</span>
+                          <span>创建人：{bank.creatorId || "系统"}</span>
+                          <span>共建：{bank.collaboratorIds?.length || 0}人</span>
+                          <span>创建：{new Date(bank.createdAt).toLocaleDateString("zh-CN")}</span>
+                          <span>更新：{new Date(bank.updatedAt).toLocaleDateString("zh-CN")}</span>
+                          <span>版本：{bank.version}</span>
+                          <span>编码：{bank.id.slice(0, 6).toUpperCase()}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                )
+              })}
+              {resourceBanks.length === 0 && (
+                <div style={{ gridColumn: "span 3", textAlign: "center", padding: 40, color: "#94a3b8", background: "#fff", borderRadius: 10 }}>暂无题库</div>
+              )}
+            </div>
+          ) : (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
+              {resourceExams.map((exam, i) => {
+                const covers = [
+                  "linear-gradient(135deg, #fa709a, #fee140)",
+                  "linear-gradient(135deg, #30cfd0, #330867)",
+                  "linear-gradient(135deg, #a8c0ff, #3f2b96)",
+                ]
+                return (
+                  <Link key={exam.id} href={`/landingpage/resources/exams/${exam.id}`} style={{ textDecoration: "none", color: "inherit" }}>
+                    <div style={{
+                      background: "#fff", borderRadius: 10, overflow: "hidden",
+                      boxShadow: "0 1px 3px rgba(0,0,0,0.06)", transition: "all 0.25s", cursor: "pointer",
+                    }}
+                      onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 8px 16px rgba(0,0,0,0.08)" }}
+                      onMouseLeave={(e) => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.06)" }}>
+                      <div style={{
+                        height: 100, background: covers[i % 3],
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        color: "#fff", fontSize: 20, fontWeight: "bold",
+                      }}>{exam.name.slice(0, 6)}</div>
+                      <div style={{ padding: 16 }}>
+                        <h3 style={{ fontSize: 15, marginBottom: 10, color: "#1e293b", fontWeight: 600 }}>{exam.name}</h3>
+                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, fontSize: 12, color: "#64748b" }}>
+                          <span>时长：<strong style={{ color: "#2563eb" }}>{exam.duration}分钟</strong></span>
+                          <span>题数：{exam.questions.length}题</span>
+                          <span>总分：{exam.questions.reduce((s, q) => s + q.score, 0)}分</span>
+                          <span>版本：{exam.version}</span>
+                          <span>创建：{new Date(exam.createdAt).toLocaleDateString("zh-CN")}</span>
+                          <span>更新：{new Date(exam.updatedAt).toLocaleDateString("zh-CN")}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                )
+              })}
+              {resourceExams.length === 0 && (
+                <div style={{ gridColumn: "span 3", textAlign: "center", padding: 40, color: "#94a3b8", background: "#fff", borderRadius: 10 }}>暂无试卷</div>
+              )}
             </div>
           )}
-        </DialogContent>
-      </Dialog>
+        </section>
 
+        {/* ── 毕业设计 ── */}
+        <section style={{ marginBottom: 50 }}>
+          <SectionHeader title="毕业设计选题中心" subtitle="去选题中心" moreHref="/landingpage/graduation" />
+          <div style={{ background: "#fff", padding: "15px 20px", borderRadius: 10, marginBottom: 20, boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}>
+            {[
+              { label: "院系：", tags: ["全部", "计算机学院", "软件学院", "信息学院", "大数据学院"] },
+              { label: "专业：", tags: ["全部", "计算机科学与技术", "软件工程", "网络工程", "数据科学"] },
+              { label: "岗位：", tags: ["全部", "Java开发", "前端开发", "算法工程师", "运维工程师"] },
+              { label: "标签：", tags: ["全部", "热门", "创新", "实战", "前沿"] },
+            ].map((row, idx) => (
+              <div key={idx} style={{ display: "flex", alignItems: "center", padding: "8px 0", borderBottom: idx < 3 ? "1px dashed #f1f5f9" : "none", fontSize: 13 }}>
+                <span style={{ color: "#94a3b8", width: 60, flexShrink: 0 }}>{row.label}</span>
+                <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                  {row.tags.map((tag) => (
+                    <span key={tag} style={{
+                      padding: "4px 12px", borderRadius: 4, cursor: "pointer", color: "#64748b",
+                      transition: "all 0.3s",
+                    }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = "#eff6ff"; e.currentTarget.style.color = "#2563eb" }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#64748b" }}>
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
+            {publishedTopics.map((topic) => (
+              <Link key={topic.id} href={`/landingpage/graduation/${topic.id}`} style={{ textDecoration: "none", color: "inherit" }}>
+                <div style={{
+                  background: "#fff", borderRadius: 10, padding: 18,
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.06)", transition: "all 0.25s",
+                  cursor: "pointer", borderLeft: "4px solid #3b82f6",
+                }}
+                  onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 8px 16px rgba(0,0,0,0.08)" }}
+                  onMouseLeave={(e) => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.06)" }}>
+                  <h3 style={{ fontSize: 14, marginBottom: 10, lineHeight: 1.5, color: "#1e293b", fontWeight: 600 }}>{topic.name}</h3>
+                  <div style={{ fontSize: 12, color: "#94a3b8", marginBottom: 10 }}>
+                    📚 {topic.positionName} · 👨‍🏫 {topic.advisorName} · 🏷️ {topic.source === "scene" ? "校内" : "企业"}
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 12, paddingTop: 12, borderTop: "1px dashed #f1f5f9" }}>
+                    <span style={{ fontSize: 12, color: "#94a3b8", display: "flex", alignItems: "center", gap: 4 }}>
+                      <Eye style={{ width: 12, height: 12 }} /> {topic.appliedCount}次浏览
+                    </span>
+                    <button style={{
+                      background: "#2563eb", color: "#fff", padding: "6px 14px",
+                      borderRadius: 4, fontSize: 12, cursor: "pointer", border: "none",
+                    }}>加入毕设选题</button>
+                  </div>
+                </div>
+              </Link>
+            ))}
+            {publishedTopics.length === 0 && (
+              <div style={{ gridColumn: "span 3", textAlign: "center", padding: 40, color: "#94a3b8", background: "#fff", borderRadius: 10 }}>暂无选题</div>
+            )}
+          </div>
+        </section>
 
+        {/* ── 优秀学生画像 ── */}
+        <section style={{ marginBottom: 50 }}>
+          <SectionHeader title="优秀学生能力画像" subtitle="实时能力排名榜单" moreHref="/landingpage/portrait" />
+          <div style={{ background: "#fff", borderRadius: 10, padding: 24, boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}>
+            {/* 筛选 */}
+            <div style={{ display: "flex", alignItems: "center", gap: 30, marginBottom: 16, borderBottom: "1px solid #f1f5f9", paddingBottom: 14, flexWrap: "wrap" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                <span style={{ fontSize: 13, color: "#94a3b8" }}>专业：</span>
+                {majors.slice(0, 5).map((m) => (
+                  <span key={m} onClick={() => setPortraitMajor(m)} style={{
+                    padding: "4px 12px", borderRadius: 12, fontSize: 13, cursor: "pointer",
+                    color: portraitMajor === m ? "#fff" : "#64748b",
+                    background: portraitMajor === m ? "#2563eb" : "#f8fafc",
+                    transition: "all 0.2s", fontWeight: 500,
+                  }}>{m}</span>
+                ))}
+              </div>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 22, flexWrap: "wrap" }}>
+              <span style={{ fontSize: 13, color: "#94a3b8" }}>岗位：</span>
+              {positions.slice(0, 6).map((p) => (
+                <span key={p} onClick={() => setPortraitPosition(p)} style={{
+                  padding: "4px 12px", borderRadius: 12, fontSize: 13, cursor: "pointer",
+                  color: portraitPosition === p ? "#fff" : "#64748b",
+                  background: portraitPosition === p ? "#2563eb" : "#f8fafc",
+                  transition: "all 0.2s", fontWeight: 500,
+                }}>{p}</span>
+              ))}
+            </div>
+
+            {/* 排名 */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 14 }}>
+              {filteredPortraits.map((p, i) => {
+                const isTop = i < 3
+                const noBg = isTop
+                  ? i === 0 ? "linear-gradient(135deg, #fbbf24, #f59e0b)"
+                    : i === 1 ? "linear-gradient(135deg, #cbd5e1, #94a3b8)"
+                      : "linear-gradient(135deg, #fdba74, #f97316)"
+                  : "#e2e8f0"
+                const noColor = isTop ? "#fff" : "#94a3b8"
+                const score = 98.5 - i * 1.6
+                return (
+                  <Link key={p.id} href={`/landingpage/portrait/${p.id}`} style={{ textDecoration: "none", color: "inherit" }}>
+                    <div style={{
+                      display: "flex", alignItems: "center", padding: 14,
+                      background: "#fafbfc", borderRadius: 8, transition: "all 0.25s",
+                      cursor: "pointer", border: "1px solid #f1f5f9",
+                    }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = "#eff6ff"; e.currentTarget.style.borderColor = "#2563eb"; e.currentTarget.style.transform = "translateX(3px)" }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = "#fafbfc"; e.currentTarget.style.borderColor = "#f1f5f9"; e.currentTarget.style.transform = "none" }}>
+                      <div style={{
+                        width: 34, height: 34, borderRadius: "50%", background: noBg, color: noColor,
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        fontWeight: "bold", fontSize: 13, marginRight: 14, flexShrink: 0,
+                      }}>{i + 1}</div>
+                      <div style={{
+                        width: 44, height: 44, borderRadius: "50%", background: "linear-gradient(135deg, #a1c4fd, #c2e9fb)",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        fontSize: 18, marginRight: 14, flexShrink: 0,
+                      }}>{i % 2 === 0 ? "👨‍🎓" : "👩‍🎓"}</div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 3, display: "flex", alignItems: "center", gap: 6, color: "#1e293b" }}>
+                          {p.studentName}
+                          <span style={{ fontSize: 11, background: "#dbeafe", color: "#2563eb", padding: "1px 6px", borderRadius: 4, fontWeight: 500 }}>{p.majorName}</span>
+                        </div>
+                        <div style={{ fontSize: 12, color: "#94a3b8" }}>
+                          {p.positionName} · 已认证 {p.completedScenes} 项岗位能力
+                        </div>
+                        <div style={{ height: 4, background: "#e2e8f0", borderRadius: 2, marginTop: 6, overflow: "hidden" }}>
+                          <div style={{ height: "100%", background: "linear-gradient(90deg, #3b82f6, #2563eb)", borderRadius: 2, width: `${Math.min(score, 100)}%` }} />
+                        </div>
+                      </div>
+                      <div style={{ textAlign: "right", marginLeft: 10, flexShrink: 0 }}>
+                        <div style={{ fontSize: 20, fontWeight: "bold", color: "#2563eb", lineHeight: 1 }}>{score.toFixed(1)}</div>
+                        <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 4 }}>综合分</div>
+                      </div>
+                    </div>
+                  </Link>
+                )
+              })}
+              {filteredPortraits.length === 0 && (
+                <div style={{ gridColumn: "span 2", textAlign: "center", padding: 40, color: "#94a3b8" }}>暂无画像数据</div>
+              )}
+            </div>
+          </div>
+        </section>
+
+      </div>
     </div>
   )
 }

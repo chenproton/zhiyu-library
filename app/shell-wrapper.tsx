@@ -1,7 +1,7 @@
 "use client"
 
 import { useSearchParams } from "next/navigation"
-import { PlatformShell } from "@/platform-navigation-shell"
+import { PlatformShell } from "@/components/platform-shell"
 import { evaluationNavigationConfig } from "@/lib/navigation-config"
 
 export default function ShellWrapper({

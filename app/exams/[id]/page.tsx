@@ -210,7 +210,7 @@ export default function ExamComposerPage() {
                   删除
                 </Button>
               )}
-              <Button variant="outline" size="sm" onClick={() => alert("试卷预览功能开发中")}>
+              <Button variant="outline" size="sm" onClick={() => router.push('/landingpage/resources/exams/exam-1?returnUrl=' + encodeURIComponent('/exams/' + examId))}>
                 <MonitorPlay className="mr-1 size-4" />
                 预览试卷
               </Button>

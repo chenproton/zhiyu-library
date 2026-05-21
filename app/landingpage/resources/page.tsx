@@ -20,40 +20,61 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { useData } from "@/components/providers/data-provider"
 
-const categories = ["全部", "计算机", "经管", "电子信息", "机械制造", "建筑工程", "医药卫生"]
+// categories removed per request
 
-const questionBanks = [
-  { id: "bank-1", title: "Python程序设计基础题库", category: "计算机", questions: 1280, hot: true, author: "张老师" },
-  { id: "bank-2", title: "会计基础实务题库", category: "经管", questions: 856, hot: false, author: "李老师" },
-  { id: "bank-3", title: "电子电路分析题库", category: "电子信息", questions: 642, hot: false, author: "工学院" },
-  { id: "bank-4", title: "机械制图与CAD题库", category: "机械制造", questions: 528, hot: false, author: "王老师" },
-  { id: "bank-5", title: "建筑工程测量题库", category: "建筑工程", questions: 430, hot: false, author: "赵老师" },
-  { id: "bank-6", title: "护理学基础题库", category: "医药卫生", questions: 760, hot: true, author: "医学院" },
-  { id: "bank-7", title: "数据结构与算法题库", category: "计算机", questions: 920, hot: true, author: "陈老师" },
-  { id: "bank-8", title: "市场营销学题库", category: "经管", questions: 510, hot: false, author: "刘老师" },
+const bankCovers = [
+  "linear-gradient(135deg, #fa709a, #fee140)",
+  "linear-gradient(135deg, #30cfd0, #330867)",
+  "linear-gradient(135deg, #a8c0ff, #3f2b96)",
+  "linear-gradient(135deg, #667eea, #764ba2)",
+  "linear-gradient(135deg, #f093fb, #f5576c)",
+  "linear-gradient(135deg, #4facfe, #00f2fe)",
+  "linear-gradient(135deg, #fa709a, #fee140)",
+  "linear-gradient(135deg, #30cfd0, #330867)",
 ]
 
-const exams = [
-  { id: "exam-1", title: "2024年春季《数据结构》期末统考", type: "期末考", duration: 120, questions: 40, participants: 2340 },
-  { id: "exam-2", title: "全国计算机等级考试二级Python真题", type: "真题", duration: 120, questions: 40, participants: 2840 },
-  { id: "exam-3", title: "2024年春季《数据结构》模拟测试卷（一）", type: "模拟卷", duration: 90, questions: 35, participants: 1256 },
-  { id: "exam-4", title: "2024年春季《数据结构》模拟测试卷（二）", type: "模拟卷", duration: 90, questions: 35, participants: 890 },
-  { id: "exam-5", title: "2023年《操作系统》期末统考真题", type: "真题", duration: 120, questions: 45, participants: 2100 },
+const examCovers = [
+  "linear-gradient(135deg, #fa709a, #fee140)",
+  "linear-gradient(135deg, #30cfd0, #330867)",
+  "linear-gradient(135deg, #a8c0ff, #3f2b96)",
+  "linear-gradient(135deg, #667eea, #764ba2)",
+  "linear-gradient(135deg, #f093fb, #f5576c)",
 ]
 
 export default function ResourcesPage() {
-  const [activeCategory, setActiveCategory] = useState("全部")
+  const [activeTab, setActiveTab] = useState<"题库" | "试卷">("题库")
   const [search, setSearch] = useState("")
   const { questionBanks: realBanks, exams: realExams } = useData()
 
+  // 用真实题库数据，但需要补充 category/hot/author 等展示字段
+  const enrichedBanks = useMemo(() => {
+    const fallbackMap: Record<string, { category: string; hot: boolean; author: string }> = {
+      "bank-1": { category: "计算机", hot: true, author: "张老师" },
+      "bank-2": { category: "经管", hot: false, author: "李老师" },
+      "bank-3": { category: "电子信息", hot: false, author: "工学院" },
+      "bank-4": { category: "机械制造", hot: false, author: "王老师" },
+      "bank-5": { category: "建筑工程", hot: false, author: "赵老师" },
+      "bank-6": { category: "医药卫生", hot: true, author: "医学院" },
+      "bank-7": { category: "计算机", hot: true, author: "陈老师" },
+      "bank-8": { category: "经管", hot: false, author: "刘老师" },
+    }
+    return realBanks.map((b) => {
+      const fb = fallbackMap[b.id] || { category: "其他", hot: false, author: b.creatorId || "系统" }
+      return { ...b, category: fb.category, hot: fb.hot, author: fb.author }
+    })
+  }, [realBanks])
+
   const filteredBanks = useMemo(
     () =>
-      questionBanks.filter(
-        (b) =>
-          (activeCategory === "全部" || b.category === activeCategory) &&
-          b.title.toLowerCase().includes(search.toLowerCase())
-      ),
-    [activeCategory, search]
+      enrichedBanks
+        .filter((b) => b.id !== "draft-pool")
+        .filter((b) => b.name.toLowerCase().includes(search.toLowerCase())),
+    [search, enrichedBanks]
+  )
+
+  const filteredExams = useMemo(
+    () => realExams.filter((e) => e.name.toLowerCase().includes(search.toLowerCase())),
+    [search, realExams]
   )
 
   const stats = [
@@ -108,168 +129,107 @@ export default function ResourcesPage() {
           ))}
         </div>
 
-        {/* Search + Filter */}
-        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center">
-          <div className="relative flex-1">
+        {/* Tabs */}
+        <div style={{ display: "flex", gap: 30, borderBottom: "1px solid #e2e8f0", marginBottom: 20 }}>
+          {(["题库", "试卷"] as const).map((tab) => (
+            <button key={tab} onClick={() => setActiveTab(tab)} style={{
+              padding: "10px 0", fontSize: 15, cursor: "pointer", position: "relative",
+              color: activeTab === tab ? "#2563eb" : "#64748b",
+              fontWeight: activeTab === tab ? "bold" : "normal",
+              border: "none", background: "none",
+            }}>
+              {tab}中心
+              {activeTab === tab && (
+                <span style={{ position: "absolute", bottom: -1, left: 0, right: 0, height: 2, background: "#2563eb" }} />
+              )}
+            </button>
+          ))}
+        </div>
+
+        {/* Search */}
+        <div className="mb-6">
+          <div className="relative max-w-md">
             <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
             <Input
-              placeholder="搜索题库、试卷..."
+              placeholder={activeTab === "题库" ? "搜索题库..." : "搜索试卷..."}
               className="h-9 rounded-full border-0 bg-white pl-9 text-sm shadow-sm"
               style={{ boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          <div className="flex items-center gap-2 overflow-x-auto pb-1">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className="shrink-0 rounded-full px-3 py-1 text-xs font-medium transition-colors"
-                style={
-                  activeCategory === cat
-                    ? { background: "#2563eb", color: "#fff" }
-                    : { background: "#fff", color: "#666", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }
-                }
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
         </div>
 
-        {/* Question Banks */}
-        <section className="mb-8">
-          <div className="mb-4 flex items-center gap-2">
-            <div className="h-5 w-1 rounded-full" style={{ background: "#2563eb" }} />
-            <h2 className="text-base font-semibold text-gray-900">题库中心</h2>
-          </div>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {filteredBanks.map((bank) => (
-              <Link key={bank.id} href={`/landingpage/resources/banks/${bank.id}`} className="block">
-                <div
-                  className="cursor-pointer rounded-xl bg-white p-4 transition-all duration-300"
-                  style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}
-                  onMouseEnter={(e) => {
-                    const el = e.currentTarget
-                    el.style.transform = "translateY(-4px)"
-                    el.style.boxShadow = "0 8px 24px rgba(0,0,0,0.1)"
-                  }}
-                  onMouseLeave={(e) => {
-                    const el = e.currentTarget
-                    el.style.transform = "translateY(0)"
-                    el.style.boxShadow = "0 2px 8px rgba(0,0,0,0.06)"
-                  }}
-                >
-                  <div className="mb-2 flex items-center justify-between">
-                    <div
-                      className="flex h-10 w-10 items-center justify-center rounded-lg"
-                      style={{ background: "#eff6ff", color: "#2563eb" }}
-                    >
-                      <BookOpen className="h-5 w-5" />
+        {/* Content */}
+        {activeTab === "题库" ? (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
+            {filteredBanks.map((bank, i) => (
+              <Link key={bank.id} href={`/landingpage/resources/banks/${bank.id}`} style={{ textDecoration: "none", color: "inherit" }}>
+                <div style={{
+                  background: "#fff", borderRadius: 10, overflow: "hidden",
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.06)", transition: "all 0.25s", cursor: "pointer",
+                }}
+                  onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 8px 16px rgba(0,0,0,0.08)" }}
+                  onMouseLeave={(e) => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.06)" }}>
+                  <div style={{
+                    height: 100, background: bankCovers[i % bankCovers.length],
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    color: "#fff", fontSize: 20, fontWeight: "bold",
+                  }}>{bank.name.slice(0, 6)}</div>
+                  <div style={{ padding: 16 }}>
+                    <h3 style={{ fontSize: 15, marginBottom: 10, color: "#1e293b", fontWeight: 600 }}>{bank.name}</h3>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, fontSize: 12, color: "#64748b" }}>
+                      <span>题目数量：<strong style={{ color: "#2563eb" }}>{bank.questionCount}</strong></span>
+                      <span>题型：选择/编程</span>
+                      <span>创建人：{bank.creatorId || "系统"}</span>
+                      <span>共建：{bank.collaboratorIds?.length || 0}人</span>
+                      <span>创建：{new Date(bank.createdAt).toLocaleDateString("zh-CN")}</span>
+                      <span>更新：{new Date(bank.updatedAt).toLocaleDateString("zh-CN")}</span>
+                      <span>版本：{bank.version}</span>
+                      <span>编码：{bank.id.slice(0, 6).toUpperCase()}</span>
                     </div>
-                    {bank.hot && (
-                      <span
-                        className="flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium"
-                        style={{ background: "#fffbeb", color: "#f59e0b" }}
-                      >
-                        <Star className="h-3 w-3" />
-                        热门
-                      </span>
-                    )}
                   </div>
-                  <h4 className="mb-1 text-sm font-semibold text-gray-900">{bank.title}</h4>
-                  <div className="flex items-center gap-2 text-xs text-gray-500">
-                    <Badge
-                      variant="outline"
-                      className="rounded-full text-[10px] font-normal"
-                      style={{ borderColor: "#e5e7eb", color: "#6b7280" }}
-                    >
-                      {bank.category}
-                    </Badge>
-                    <span>{bank.questions} 题</span>
-                  </div>
-                  <div className="mt-2 text-xs text-gray-400">出题人：{bank.author}</div>
                 </div>
               </Link>
             ))}
+            {filteredBanks.length === 0 && (
+              <div style={{ gridColumn: "span 3", textAlign: "center", padding: 40, color: "#94a3b8", background: "#fff", borderRadius: 10 }}>暂无匹配资源</div>
+            )}
           </div>
-          {filteredBanks.length === 0 && (
-            <div
-              className="rounded-xl bg-white py-12 text-center text-sm text-gray-400"
-              style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}
-            >
-              暂无匹配资源
-            </div>
-          )}
-        </section>
-
-        {/* Exams */}
-        <section>
-          <div className="mb-4 flex items-center gap-2">
-            <div className="h-5 w-1 rounded-full" style={{ background: "#2563eb" }} />
-            <h2 className="text-base font-semibold text-gray-900">试卷中心</h2>
-          </div>
-          <div className="space-y-2">
-            {exams.map((exam) => (
-              <Link
-                key={exam.id}
-                href={`/landingpage/resources/exams/${exam.id}`}
-                className="flex flex-col gap-2 rounded-xl bg-white p-4 transition-all duration-300 sm:flex-row sm:items-center"
-                style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}
-                onMouseEnter={(e) => {
-                  const el = e.currentTarget
-                  el.style.transform = "translateY(-2px)"
-                  el.style.boxShadow = "0 8px 24px rgba(0,0,0,0.1)"
+        ) : (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
+            {filteredExams.map((exam, i) => (
+              <Link key={exam.id} href={`/landingpage/resources/exams/${exam.id}`} style={{ textDecoration: "none", color: "inherit" }}>
+                <div style={{
+                  background: "#fff", borderRadius: 10, overflow: "hidden",
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.06)", transition: "all 0.25s", cursor: "pointer",
                 }}
-                onMouseLeave={(e) => {
-                  const el = e.currentTarget
-                  el.style.transform = "translateY(0)"
-                  el.style.boxShadow = "0 2px 8px rgba(0,0,0,0.06)"
-                }}
-              >
-                <div
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg"
-                  style={{ background: "#fff7ed", color: "#f97316" }}
-                >
-                  <FileText className="h-5 w-5" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <h4 className="text-sm font-medium text-gray-900">{exam.title}</h4>
-                  <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-gray-500">
-                    <Badge
-                      variant="outline"
-                      className="rounded-full text-[10px] font-normal"
-                      style={{ borderColor: "#e5e7eb", color: "#6b7280" }}
-                    >
-                      {exam.type}
-                    </Badge>
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      {exam.duration} 分钟
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <ClipboardList className="h-3 w-3" />
-                      {exam.questions} 题
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Users className="h-3 w-3" />
-                      {exam.participants} 人已考
-                    </span>
+                  onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 8px 16px rgba(0,0,0,0.08)" }}
+                  onMouseLeave={(e) => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.06)" }}>
+                  <div style={{
+                    height: 100, background: examCovers[i % examCovers.length],
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    color: "#fff", fontSize: 20, fontWeight: "bold",
+                  }}>{exam.name.slice(0, 6)}</div>
+                  <div style={{ padding: 16 }}>
+                    <h3 style={{ fontSize: 15, marginBottom: 10, color: "#1e293b", fontWeight: 600 }}>{exam.name}</h3>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, fontSize: 12, color: "#64748b" }}>
+                      <span>时长：<strong style={{ color: "#f59e0b" }}>{exam.duration}分钟</strong></span>
+                      <span>题数：{exam.questions.length}题</span>
+                      <span>总分：{exam.questions.reduce((s, q) => s + q.score, 0)}分</span>
+                      <span>版本：{exam.version}</span>
+                      <span>创建：{new Date(exam.createdAt).toLocaleDateString("zh-CN")}</span>
+                      <span>更新：{new Date(exam.updatedAt).toLocaleDateString("zh-CN")}</span>
+                    </div>
                   </div>
                 </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="shrink-0 rounded-lg text-xs h-8"
-                  style={{ borderColor: "#2563eb", color: "#2563eb" }}
-                >
-                  查看详情
-                </Button>
               </Link>
             ))}
+            {filteredExams.length === 0 && (
+              <div style={{ gridColumn: "span 3", textAlign: "center", padding: 40, color: "#94a3b8", background: "#fff", borderRadius: 10 }}>暂无试卷</div>
+            )}
           </div>
-        </section>
+        )}
       </div>
     </div>
   )

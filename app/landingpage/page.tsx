@@ -5,11 +5,11 @@ import { useState, useMemo } from "react"
 import {
   Clock, Calendar, FileText, BookOpen, Users, Award,
   BarChart3, Target, TrendingUp, Layers, Star, CheckCircle2,
-  MapPin, Zap, Eye, Search,
+  MapPin, Zap, Eye, Search, ClipboardList,
 } from "lucide-react"
 import { useData } from "@/components/providers/data-provider"
 
-function SectionHeader({ title, subtitle, moreHref = "#" }: { title: string; subtitle?: string; moreHref?: string }) {
+function SectionHeader({ title, subtitle, moreHref }: { title: string; subtitle?: string; moreHref?: string }) {
   return (
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 20 }}>
       <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
@@ -19,11 +19,13 @@ function SectionHeader({ title, subtitle, moreHref = "#" }: { title: string; sub
         </h2>
         {subtitle && <span style={{ color: "#94a3b8", fontSize: 13 }}>{subtitle}</span>}
       </div>
-      <Link href={moreHref} style={{ color: "#2563eb", fontSize: 13, textDecoration: "none" }}
-        onMouseEnter={(e) => { e.currentTarget.style.textDecoration = "underline" }}
-        onMouseLeave={(e) => { e.currentTarget.style.textDecoration = "none" }}>
-        查看全部 ›
-      </Link>
+      {moreHref && (
+        <Link href={moreHref} style={{ color: "#2563eb", fontSize: 13, textDecoration: "none" }}
+          onMouseEnter={(e) => { e.currentTarget.style.textDecoration = "underline" }}
+          onMouseLeave={(e) => { e.currentTarget.style.textDecoration = "none" }}>
+          查看全部 ›
+        </Link>
+      )}
     </div>
   )
 }
@@ -34,9 +36,101 @@ const examStatusMap: Record<string, { bg: string; color: string; label: string }
   pending: { bg: "#dbeafe", color: "#2563eb", label: "审核中" },
 }
 
+const MOCK_POSITIONS = [
+  "全部",
+  "前端开发工程师",
+  "后端开发工程师",
+  "全栈开发工程师",
+  "算法工程师",
+  "网络安全工程师",
+  "UI设计师",
+  "Java开发工程师",
+  "Python开发工程师",
+  "移动端开发工程师",
+  "测试工程师",
+  "运维工程师",
+  "产品经理",
+  "数据分析师",
+  "嵌入式开发工程师",
+  "云计算工程师",
+  "DevOps工程师",
+  "架构师",
+  "技术经理",
+  "数据库管理员",
+]
+
+function PositionFilter({
+  selected,
+  onChange,
+}: {
+  selected: string[]
+  onChange: (next: string[]) => void
+}) {
+  const [expanded, setExpanded] = useState(false)
+  const visible = expanded ? MOCK_POSITIONS : MOCK_POSITIONS.slice(0, 8)
+
+  const toggle = (pos: string) => {
+    if (pos === "全部") {
+      onChange(["全部"])
+      return
+    }
+    let next = selected.includes(pos)
+      ? selected.filter((s) => s !== pos)
+      : [...selected.filter((s) => s !== "全部"), pos]
+    if (next.length === 0) next = ["全部"]
+    onChange(next)
+  }
+
+  return (
+    <div style={{ marginBottom: 20 }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
+        <span style={{ fontSize: 13, color: "#94a3b8" }}>岗位筛选：</span>
+        {visible.map((pos) => (
+          <button
+            key={pos}
+            onClick={() => toggle(pos)}
+            style={{
+              padding: "5px 14px", borderRadius: 20, fontSize: 13, cursor: "pointer",
+              border: "none", fontWeight: 500, transition: "all 0.2s",
+              background: selected.includes(pos) ? "#2563eb" : "#f1f5f9",
+              color: selected.includes(pos) ? "#fff" : "#64748b",
+            }}
+          >
+            {pos}
+          </button>
+        ))}
+        {MOCK_POSITIONS.length > 8 && (
+          <button
+            onClick={() => setExpanded(!expanded)}
+            style={{
+              padding: "5px 14px", borderRadius: 20, fontSize: 13, cursor: "pointer",
+              fontWeight: 500, transition: "all 0.2s",
+              background: "#fff", color: "#2563eb", border: "1px solid #2563eb",
+            }}
+          >
+            {expanded ? "收起" : "展开更多"}
+          </button>
+        )}
+      </div>
+    </div>
+  )
+}
+
 const certStatusMap: Record<string, string> = {
   published: "进行中", ready: "待发布", reviewing: "审核中",
   rejected: "已驳回", draft: "草稿", none: "无规则",
+}
+
+function getMockTargetAudience(examId: string): { type: string; detail: string } {
+  const map: Record<string, { type: string; detail: string }> = {
+    "exam-1": { type: "学生", detail: "2024级前端1班、2024级前端2班" },
+    "exam-2": { type: "学生", detail: "2024级软件工程1班、2024级软件工程2班" },
+    "exam-3": { type: "学生", detail: "2023级计算机班" },
+    "exam-4": { type: "教师", detail: "张三、李四、王五" },
+    "exam-5": { type: "学生", detail: "2024级网络工程班" },
+    "exam-6": { type: "学生", detail: "2023级全栈开发班、2024级全栈开发班" },
+  }
+  return map[examId] || { type: "学生", detail: "2024级默认班" }
 }
 
 export default function LandingHomePage() {
@@ -48,7 +142,7 @@ export default function LandingHomePage() {
   const [activeMethodTab, setActiveMethodTab] = useState("全部")
   const [activeResourceTab, setActiveResourceTab] = useState("题库")
   const [portraitMajor, setPortraitMajor] = useState("全部")
-  const [portraitPosition, setPortraitPosition] = useState("全部")
+  const [selectedPositions, setSelectedPositions] = useState<string[]>(["全部"])
 
   /* ── 统计数据 ── */
   const stats = useMemo(() => [
@@ -82,11 +176,10 @@ export default function LandingHomePage() {
   /* ── 画像 ── */
   const topPortraits = studentAbilityPortraits.slice().sort((a, b) => b.totalCredits - a.totalCredits).slice(0, 8)
   const majors = ["全部", ...Array.from(new Set(studentAbilityPortraits.map((p) => p.majorName)))]
-  const positions = ["全部", ...Array.from(new Set(positionsList.map((p) => p.name)))]
 
   const filteredPortraits = topPortraits.filter((p) => {
     const matchMajor = portraitMajor === "全部" || p.majorName === portraitMajor
-    const matchPos = portraitPosition === "全部" || p.positionName === portraitPosition
+    const matchPos = selectedPositions.includes("全部") || selectedPositions.includes(p.positionName)
     return matchMajor && matchPos
   })
 
@@ -138,33 +231,72 @@ export default function LandingHomePage() {
         {/* ── 考试中心 ── */}
         <section style={{ marginBottom: 50 }}>
           <SectionHeader title="考试中心" subtitle="所有已发布的考试" moreHref="/landingpage/exams" />
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 20 }}>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {publishedExams.map((exam) => {
               const st = examStatusMap[exam.status] || examStatusMap.draft
+              const audience = getMockTargetAudience(exam.id)
               return (
-                <Link key={exam.id} href={`/landingpage/exams/${exam.id}`} style={{ textDecoration: "none", color: "inherit" }}>
-                  <div style={{
-                    background: "#fff", borderRadius: 10, padding: 20,
-                    boxShadow: "0 1px 3px rgba(0,0,0,0.06)", transition: "all 0.25s",
-                    cursor: "pointer", borderTop: "3px solid #2563eb",
-                  }}
-                    onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 8px 16px rgba(0,0,0,0.08)" }}
-                    onMouseLeave={(e) => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.06)" }}>
-                    <span style={{
-                      display: "inline-block", padding: "3px 10px", background: st.bg, color: st.color,
-                      borderRadius: 12, fontSize: 12, marginBottom: 10, fontWeight: 500,
-                    }}>{st.label}</span>
-                    <h3 style={{ fontSize: 15, marginBottom: 10, color: "#1e293b", fontWeight: 600, lineHeight: 1.4 }}>{exam.name}</h3>
-                    <div style={{ fontSize: 12, color: "#94a3b8", marginBottom: 6, display: "flex", alignItems: "center", gap: 4 }}>
-                      <Clock style={{ width: 12, height: 12 }} /> {exam.duration}分钟 · {exam.questions.length}题
+                <Link key={exam.id} href={`/landingpage/exams/${exam.id}`} className="block" style={{ textDecoration: "none", color: "inherit" }}>
+                  <div
+                    className="h-full cursor-pointer rounded-xl bg-white p-5 transition-all duration-300"
+                    style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}
+                    onMouseEnter={(e) => {
+                      const el = e.currentTarget
+                      el.style.transform = "translateY(-4px)"
+                      el.style.boxShadow = "0 8px 24px rgba(0,0,0,0.1)"
+                    }}
+                    onMouseLeave={(e) => {
+                      const el = e.currentTarget
+                      el.style.transform = "translateY(0)"
+                      el.style.boxShadow = "0 2px 8px rgba(0,0,0,0.06)"
+                    }}
+                  >
+                    <div className="mb-3 flex items-start justify-between">
+                      <div
+                        className="flex h-10 w-10 items-center justify-center rounded-lg"
+                        style={{ background: "#eff6ff", color: "#2563eb" }}
+                      >
+                        <ClipboardList className="h-5 w-5" />
+                      </div>
+                      <span
+                        className="flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium"
+                        style={{ background: st.bg, color: st.color }}
+                      >
+                        {st.label}
+                      </span>
                     </div>
-                    <div style={{ fontSize: 12, color: "#94a3b8", marginBottom: 6, display: "flex", alignItems: "center", gap: 4 }}>
-                      <Calendar style={{ width: 12, height: 12 }} /> {new Date(exam.createdAt).toLocaleDateString("zh-CN")}
+                    <h3 className="mb-1 text-base font-semibold text-gray-900">{exam.name}</h3>
+                    <p className="mb-3 text-sm text-gray-500 line-clamp-2">
+                      {exam.id === "exam-1" ? "考察 JavaScript、React 基础知识" : exam.id === "exam-2" ? "TypeScript 类型系统与高级特性测验" : exam.id === "exam-3" ? "React Hooks 与性能优化专项考核" : exam.id === "exam-4" ? "Node.js 基础与 Express 框架测试" : exam.id === "exam-5" ? "Vue3 组合式 API 与响应式原理" : exam.id === "exam-6" ? "前后端技术栈综合知识考核" : "综合知识考核"}
+                    </p>
+                    <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500">
+                      <span className="flex items-center gap-1">
+                        <Clock className="h-3 w-3" />
+                        {exam.duration} 分钟
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <FileText className="h-3 w-3" />
+                        {exam.questions.length} 题
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Calendar className="h-3 w-3" />
+                        {new Date(exam.createdAt).toLocaleDateString("zh-CN")}
+                      </span>
                     </div>
-                    <span style={{
-                      display: "block", textAlign: "center", background: "#2563eb", color: "#fff",
-                      padding: "8px 0", borderRadius: 6, fontSize: 13, marginTop: 12, fontWeight: 500,
-                    }}>进入答题</span>
+                    <div className="mt-2 flex items-center gap-1 text-xs text-gray-500">
+                      <Users className="h-3 w-3" />
+                      考试对象：{audience.detail}
+                    </div>
+                    {exam.status === "published" && (
+                      <div className="mt-4">
+                        <span
+                          className="block w-full rounded-lg py-2 text-center text-sm font-medium"
+                          style={{ background: "#2563eb", color: "#fff" }}
+                        >
+                          去考试
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </Link>
               )
@@ -178,15 +310,15 @@ export default function LandingHomePage() {
         {/* ── 岗位能力认证 ── */}
         <section style={{ marginBottom: 50 }}>
           <SectionHeader title="岗位能力认证项目库" moreHref="/landingpage/certifications" />
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
-            {positionsList.slice(0, 3).map((pos, i) => {
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 16 }}>
+            {positionsList.slice(0, 5).map((pos, i) => {
               const covers = [
                 "linear-gradient(135deg, #667eea, #764ba2)",
                 "linear-gradient(135deg, #f093fb, #f5576c)",
                 "linear-gradient(135deg, #4facfe, #00f2fe)",
+                "linear-gradient(135deg, #fa709a, #fee140)",
+                "linear-gradient(135deg, #30cfd0, #330867)",
               ]
-              const st = certStatusMap[pos.ruleStatus] || "草稿"
-              const isEnded = pos.ruleStatus === "none" || pos.ruleStatus === "rejected"
               return (
                 <Link key={pos.id} href={`/landingpage/certifications/${pos.id}`} style={{ textDecoration: "none", color: "inherit" }}>
                   <div style={{
@@ -196,34 +328,25 @@ export default function LandingHomePage() {
                     onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 8px 16px rgba(0,0,0,0.08)" }}
                     onMouseLeave={(e) => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.06)" }}>
                     <div style={{
-                      height: 140, background: covers[i % 3], position: "relative",
+                      height: 100, background: covers[i % 5], position: "relative",
                       display: "flex", alignItems: "center", justifyContent: "center",
-                      color: "#fff", fontSize: 18, fontWeight: "bold",
+                      color: "#fff", fontSize: 15, fontWeight: "bold",
                     }}>
                       {pos.name}
-                      <span style={{
-                        position: "absolute", top: 10, right: 10,
-                        background: "rgba(255,255,255,0.9)", color: isEnded ? "#94a3b8" : "#16a34a",
-                        padding: "3px 10px", borderRadius: 12, fontSize: 12, fontWeight: 500,
-                      }}>{st}</span>
                     </div>
-                    <div style={{ padding: 18 }}>
-                      <h3 style={{ fontSize: 15, marginBottom: 10, color: "#1e293b", fontWeight: 600 }}>{pos.name}认证</h3>
+                    <div style={{ padding: 14 }}>
+                      <h3 style={{ fontSize: 14, marginBottom: 8, color: "#1e293b", fontWeight: 600 }}>{pos.name}认证</h3>
                       <div style={{ fontSize: 12, color: "#94a3b8", lineHeight: 1.8 }}>
                         创建人：{pos.updatedBy} &nbsp; 更新：{pos.lastUpdated}<br />
-                        专业方向：{pos.professionalDirection}
+                        适用专业：{pos.professionalDirection}
                       </div>
                       <div style={{
-                        display: "flex", justifyContent: "space-between", marginTop: 12,
-                        paddingTop: 12, borderTop: "1px dashed #f1f5f9",
+                        display: "flex", justifyContent: "center", marginTop: 10,
+                        paddingTop: 10, borderTop: "1px dashed #f1f5f9",
                       }}>
                         <div style={{ textAlign: "center" }}>
                           <div style={{ fontSize: 18, fontWeight: "bold", color: "#2563eb" }}>{pos.relatedAbilityCount}</div>
                           <div style={{ fontSize: 12, color: "#94a3b8" }}>能力项</div>
-                        </div>
-                        <div style={{ textAlign: "center" }}>
-                          <div style={{ fontSize: 18, fontWeight: "bold", color: "#2563eb" }}>{pos.ruleStatus === "published" ? "已发布" : "未发布"}</div>
-                          <div style={{ fontSize: 12, color: "#94a3b8" }}>规则状态</div>
                         </div>
                       </div>
                     </div>
@@ -236,7 +359,7 @@ export default function LandingHomePage() {
 
         {/* ── 测评方式 ── */}
         <section style={{ marginBottom: 50 }}>
-          <SectionHeader title="测评方式库" moreHref="/evaluation-methods" />
+          <SectionHeader title="测评方式库" />
           <div style={{ display: "flex", gap: 10, marginBottom: 20, flexWrap: "wrap" }}>
             {methodTabs.map((tab) => (
               <button key={tab} onClick={() => setActiveMethodTab(tab)} style={{
@@ -270,11 +393,11 @@ export default function LandingHomePage() {
               ]
               const icons = ["📝", "💻", "🎤", "📁"]
               return (
-                <Link key={method.id} href={`/evaluation-methods/student/${method.id}`} style={{ textDecoration: "none", color: "inherit" }}>
-                  <div style={{
+                <div key={method.id} style={{
                     background: "#fff", borderRadius: 10, overflow: "hidden",
                     boxShadow: "0 1px 3px rgba(0,0,0,0.06)", transition: "all 0.25s", cursor: "pointer",
                   }}
+                    onClick={() => method.docLink && window.open(method.docLink, '_blank')}
                     onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 8px 16px rgba(0,0,0,0.08)" }}
                     onMouseLeave={(e) => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.06)" }}>
                     <div style={{
@@ -289,7 +412,6 @@ export default function LandingHomePage() {
                       <span style={{ fontSize: 13, color: "#2563eb", fontWeight: 500 }}>查看使用说明 ›</span>
                     </div>
                   </div>
-                </Link>
               )
             })}
             {filteredMethods.length === 0 && (
@@ -461,88 +583,90 @@ export default function LandingHomePage() {
           </div>
         </section>
 
-        {/* ── 优秀学生画像 ── */}
+        {/* ── 学生画像排行榜 ── */}
         <section style={{ marginBottom: 50 }}>
-          <SectionHeader title="优秀学生能力画像" subtitle="实时能力排名榜单" moreHref="/landingpage/portrait" />
+          <SectionHeader title="学生画像排行榜" subtitle="按岗位查看关联专业排行榜" />
           <div style={{ background: "#fff", borderRadius: 10, padding: 24, boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}>
-            {/* 筛选 */}
-            <div style={{ display: "flex", alignItems: "center", gap: 30, marginBottom: 16, borderBottom: "1px solid #f1f5f9", paddingBottom: 14, flexWrap: "wrap" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                <span style={{ fontSize: 13, color: "#94a3b8" }}>专业：</span>
-                {majors.slice(0, 5).map((m) => (
-                  <span key={m} onClick={() => setPortraitMajor(m)} style={{
-                    padding: "4px 12px", borderRadius: 12, fontSize: 13, cursor: "pointer",
-                    color: portraitMajor === m ? "#fff" : "#64748b",
-                    background: portraitMajor === m ? "#2563eb" : "#f8fafc",
-                    transition: "all 0.2s", fontWeight: 500,
-                  }}>{m}</span>
-                ))}
-              </div>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 22, flexWrap: "wrap" }}>
-              <span style={{ fontSize: 13, color: "#94a3b8" }}>岗位：</span>
-              {positions.slice(0, 6).map((p) => (
-                <span key={p} onClick={() => setPortraitPosition(p)} style={{
-                  padding: "4px 12px", borderRadius: 12, fontSize: 13, cursor: "pointer",
-                  color: portraitPosition === p ? "#fff" : "#64748b",
-                  background: portraitPosition === p ? "#2563eb" : "#f8fafc",
-                  transition: "all 0.2s", fontWeight: 500,
-                }}>{p}</span>
-              ))}
-            </div>
+            {/* 岗位筛选 — 平铺多选，模拟20个，可展开 */}
+            <PositionFilter selected={selectedPositions} onChange={setSelectedPositions} />
 
-            {/* 排名 */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 14 }}>
-              {filteredPortraits.map((p, i) => {
-                const isTop = i < 3
-                const noBg = isTop
-                  ? i === 0 ? "linear-gradient(135deg, #fbbf24, #f59e0b)"
-                    : i === 1 ? "linear-gradient(135deg, #cbd5e1, #94a3b8)"
-                      : "linear-gradient(135deg, #fdba74, #f97316)"
-                  : "#e2e8f0"
-                const noColor = isTop ? "#fff" : "#94a3b8"
-                const score = 98.5 - i * 1.6
+            {/* 关联专业卡片 */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
+              {(selectedPositions.includes("全部")
+                ? Array.from(new Set(studentAbilityPortraits.map((p) => p.majorName))).map((majorName) => ({
+                    majorName,
+                    students: studentAbilityPortraits.filter((p) => p.majorName === majorName),
+                  }))
+                : Array.from(
+                    new Set(
+                      studentAbilityPortraits
+                        .filter((p) => selectedPositions.includes(p.positionName))
+                        .map((p) => p.majorName)
+                    )
+                  ).map((majorName) => ({
+                    majorName,
+                    students: studentAbilityPortraits.filter(
+                      (p) => p.majorName === majorName && selectedPositions.includes(p.positionName)
+                    ),
+                  }))
+              ).map(({ majorName, students }, i) => {
+                const gradeMap: Record<string, number> = { A: 5, B: 4, C: 3, D: 2, E: 1 }
+                const avgGradeVal =
+                  students.reduce((s, p) => s + (gradeMap[p.overallGrade] || 3), 0) / students.length
+                const avgGradeLetter =
+                  avgGradeVal >= 4.5 ? "A" : avgGradeVal >= 3.5 ? "B" : avgGradeVal >= 2.5 ? "C" : avgGradeVal >= 1.5 ? "D" : "E"
+                const avgRankPct =
+                  students.reduce((s, p) => s + (p.majorRank / p.majorTotal) * 100, 0) / students.length
+                const avgCredits =
+                  students.reduce((s, p) => s + p.totalCredits, 0) / students.length
+                const covers = [
+                  "linear-gradient(135deg, #667eea, #764ba2)",
+                  "linear-gradient(135deg, #f093fb, #f5576c)",
+                  "linear-gradient(135deg, #4facfe, #00f2fe)",
+                  "linear-gradient(135deg, #fa709a, #fee140)",
+                  "linear-gradient(135deg, #30cfd0, #330867)",
+                  "linear-gradient(135deg, #a8edea, #fed6e3)",
+                ]
                 return (
-                  <Link key={p.id} href={`/landingpage/portrait/${p.id}`} style={{ textDecoration: "none", color: "inherit" }}>
+                  <Link key={majorName} href={`/landingpage/portrait/major/${encodeURIComponent(majorName)}`} style={{ textDecoration: "none", color: "inherit" }}>
                     <div style={{
-                      display: "flex", alignItems: "center", padding: 14,
-                      background: "#fafbfc", borderRadius: 8, transition: "all 0.25s",
-                      cursor: "pointer", border: "1px solid #f1f5f9",
+                      background: "#fff", borderRadius: 10, overflow: "hidden",
+                      boxShadow: "0 1px 3px rgba(0,0,0,0.06)", transition: "all 0.25s", cursor: "pointer",
+                      border: "1px solid #f1f5f9",
                     }}
-                      onMouseEnter={(e) => { e.currentTarget.style.background = "#eff6ff"; e.currentTarget.style.borderColor = "#2563eb"; e.currentTarget.style.transform = "translateX(3px)" }}
-                      onMouseLeave={(e) => { e.currentTarget.style.background = "#fafbfc"; e.currentTarget.style.borderColor = "#f1f5f9"; e.currentTarget.style.transform = "none" }}>
+                      onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 8px 16px rgba(0,0,0,0.08)" }}
+                      onMouseLeave={(e) => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.06)" }}>
                       <div style={{
-                        width: 34, height: 34, borderRadius: "50%", background: noBg, color: noColor,
+                        height: 100, background: covers[i % covers.length], position: "relative",
                         display: "flex", alignItems: "center", justifyContent: "center",
-                        fontWeight: "bold", fontSize: 13, marginRight: 14, flexShrink: 0,
-                      }}>{i + 1}</div>
-                      <div style={{
-                        width: 44, height: 44, borderRadius: "50%", background: "linear-gradient(135deg, #a1c4fd, #c2e9fb)",
-                        display: "flex", alignItems: "center", justifyContent: "center",
-                        fontSize: 18, marginRight: 14, flexShrink: 0,
-                      }}>{i % 2 === 0 ? "👨‍🎓" : "👩‍🎓"}</div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 3, display: "flex", alignItems: "center", gap: 6, color: "#1e293b" }}>
-                          {p.studentName}
-                          <span style={{ fontSize: 11, background: "#dbeafe", color: "#2563eb", padding: "1px 6px", borderRadius: 4, fontWeight: 500 }}>{p.majorName}</span>
-                        </div>
-                        <div style={{ fontSize: 12, color: "#94a3b8" }}>
-                          {p.positionName} · 已认证 {p.completedScenes} 项岗位能力
-                        </div>
-                        <div style={{ height: 4, background: "#e2e8f0", borderRadius: 2, marginTop: 6, overflow: "hidden" }}>
-                          <div style={{ height: "100%", background: "linear-gradient(90deg, #3b82f6, #2563eb)", borderRadius: 2, width: `${Math.min(score, 100)}%` }} />
-                        </div>
+                        color: "#fff", fontSize: 18, fontWeight: "bold",
+                      }}>
+                        {majorName.slice(0, 6)}
                       </div>
-                      <div style={{ textAlign: "right", marginLeft: 10, flexShrink: 0 }}>
-                        <div style={{ fontSize: 20, fontWeight: "bold", color: "#2563eb", lineHeight: 1 }}>{score.toFixed(1)}</div>
-                        <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 4 }}>综合分</div>
+                      <div style={{ padding: 16 }}>
+                        <h3 style={{ fontSize: 15, marginBottom: 10, color: "#1e293b", fontWeight: 600 }}>{majorName}</h3>
+                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, fontSize: 12, color: "#64748b" }}>
+                          <span>学生数量：<strong style={{ color: "#2563eb" }}>{students.length} 人</strong></span>
+                          <span>平均评级：<strong style={{ color: "#f59e0b" }}>{avgGradeLetter}</strong></span>
+                          <span>平均学分：<strong>{avgCredits.toFixed(1)}</strong></span>
+                          <span>平均排名：<strong>{avgRankPct.toFixed(1)}%</strong></span>
+                        </div>
+                        <div style={{
+                          marginTop: 12, paddingTop: 12, borderTop: "1px dashed #f1f5f9",
+                          textAlign: "center", fontSize: 13, color: "#2563eb", fontWeight: 500,
+                        }}>
+                          查看专业排行榜 ›
+                        </div>
                       </div>
                     </div>
                   </Link>
                 )
               })}
-              {filteredPortraits.length === 0 && (
-                <div style={{ gridColumn: "span 2", textAlign: "center", padding: 40, color: "#94a3b8" }}>暂无画像数据</div>
+              {(selectedPositions.includes("全部")
+                ? Array.from(new Set(studentAbilityPortraits.map((p) => p.majorName)))
+                : Array.from(new Set(studentAbilityPortraits.filter((p) => selectedPositions.includes(p.positionName)).map((p) => p.majorName)))
+              ).length === 0 && (
+                <div style={{ gridColumn: "span 3", textAlign: "center", padding: 40, color: "#94a3b8" }}>暂无关联专业</div>
               )}
             </div>
           </div>

@@ -76,6 +76,7 @@ export interface QuestionBank {
   coverUrl?: string
   status: Status
   questionCount: number
+  creatorId?: string
   collaboratorIds?: string[]
   collaboratorDeptIds?: string[]
   batchId?: string
@@ -244,6 +245,7 @@ export interface AbilityPoint {
   mappingType: 'inherit' | 'custom'
   customMapping?: LevelMapping[]
   requiredLevel: string // 岗位所需掌握度
+  weight?: number // 能力点权重
   relatedTasks: RelatedTask[]
 }
 

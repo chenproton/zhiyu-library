@@ -67,6 +67,14 @@ export default function JobAbilityResultsPage() {
     return grade
   }
 
+  const getRandomScore = (id: string) => {
+    let hash = 0
+    for (let i = 0; i < id.length; i++) {
+      hash = id.charCodeAt(i) + ((hash << 5) - hash)
+    }
+    return Math.abs(hash) % 101
+  }
+
   const formatDateTime = (date: Date) => {
     return new Intl.DateTimeFormat("zh-CN", {
       year: "numeric",
@@ -163,14 +171,16 @@ export default function JobAbilityResultsPage() {
                   <TableHead className="w-[100px]">专业</TableHead>
                   <TableHead className="w-[100px]">院系</TableHead>
                   <TableHead className="w-[140px]">岗位能力达标率</TableHead>
-                  <TableHead className="w-[80px]">岗位能力认定结果</TableHead>
+                  <TableHead className="w-[120px]">岗位胜任度</TableHead>
+                  <TableHead className="w-[120px]">岗位能力认定得分</TableHead>
+                  <TableHead className="w-[120px]">岗位能力认定毕业标准</TableHead>
                   <TableHead className="w-[140px]">更新时间</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredResults.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="h-24 text-center text-muted-foreground">
+                    <TableCell colSpan={10} className="h-24 text-center text-muted-foreground">
                       {jobAbilityResults.length === 0 ? "暂无认定结果" : "没有找到匹配的认定结果"}
                     </TableCell>
                   </TableRow>
@@ -189,6 +199,12 @@ export default function JobAbilityResultsPage() {
                       <TableCell className="text-sm text-muted-foreground">{result.department || '-'}</TableCell>
                       <TableCell>
                         <span className="text-sm font-medium">{result.achievementRate}%（{result.achievedAbilityPoints}/{result.totalAbilityPoints} 能力点达成）</span>
+                      </TableCell>
+                      <TableCell>
+                        <span className="text-sm font-medium text-purple-600">{((Math.abs(getRandomScore(result.id) * 2 - 100) * (getRandomScore(result.id) >= 50 ? 1 : -1))).toFixed(0)}%</span>
+                      </TableCell>
+                      <TableCell>
+                        <span className="text-sm font-medium text-blue-600">{getRandomScore(result.id)}</span>
                       </TableCell>
                       <TableCell>
                         <span className="text-sm font-medium">{getGradeLabel(result.grade)}</span>

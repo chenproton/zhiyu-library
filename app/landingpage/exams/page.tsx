@@ -13,6 +13,7 @@ import {
   CheckCircle2,
   AlertCircle,
   Calendar,
+  Users,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -20,18 +21,21 @@ import { Input } from "@/components/ui/input"
 import { useData } from "@/components/providers/data-provider"
 
 const myExams = [
-  { id: "exam-1", name: "前端基础测试", status: "进行中", type: "随堂测", time: "2024-03-15 14:00", duration: 60, questionCount: 20, description: "考察 JavaScript、React 基础知识" },
-  { id: "exam-2", name: "TypeScript 能力测试", status: "未开始", type: "教学考试", time: "2024-03-20 10:00", duration: 90, questionCount: 30, description: "TypeScript 类型系统与高级特性测验" },
+  { id: "exam-1", name: "前端基础测试", status: "进行中", type: "随堂测", time: "2024-03-15 14:00", duration: 60, questionCount: 20, description: "考察 JavaScript、React 基础知识", college: "信息技术学院", major: "电子计算机", targetAudience: "2024级前端1班、2024级前端2班" },
+  { id: "exam-2", name: "TypeScript 能力测试", status: "未开始", type: "教学考试", time: "2024-03-20 10:00", duration: 90, questionCount: 30, description: "TypeScript 类型系统与高级特性测验", college: "信息技术学院", major: "软件工程", targetAudience: "2024级软件工程1班、2024级软件工程2班" },
 ]
 
 const allExams = [
-  { id: "exam-1", name: "前端基础测试", status: "进行中", type: "随堂测", time: "2024-03-15 14:00", duration: 60, questionCount: 20, description: "考察 JavaScript、React 基础知识" },
-  { id: "exam-2", name: "TypeScript 能力测试", status: "未开始", type: "教学考试", time: "2024-03-20 10:00", duration: 90, questionCount: 30, description: "TypeScript 类型系统与高级特性测验" },
-  { id: "exam-3", name: "React 进阶考核", status: "已结束", type: "期末考", time: "2024-03-10 09:00", duration: 120, questionCount: 40, description: "React Hooks 与性能优化专项考核" },
-  { id: "exam-4", name: "Node.js 后端测试", status: "进行中", type: "随堂测", time: "2024-02-28 14:00", duration: 60, questionCount: 25, description: "Node.js 基础与 Express 框架测试" },
-  { id: "exam-5", name: "Vue.js 进阶考核", status: "未开始", type: "期末考", time: "2024-04-05 10:00", duration: 120, questionCount: 35, description: "Vue3 组合式 API 与响应式原理" },
-  { id: "exam-6", name: "全栈开发综合测试", status: "已结束", type: "综合考", time: "2024-03-25 09:00", duration: 150, questionCount: 50, description: "前后端技术栈综合知识考核" },
+  { id: "exam-1", name: "前端基础测试", status: "进行中", type: "随堂测", time: "2024-03-15 14:00", duration: 60, questionCount: 20, description: "考察 JavaScript、React 基础知识", college: "信息技术学院", major: "电子计算机", targetAudience: "2024级前端1班、2024级前端2班" },
+  { id: "exam-2", name: "TypeScript 能力测试", status: "未开始", type: "教学考试", time: "2024-03-20 10:00", duration: 90, questionCount: 30, description: "TypeScript 类型系统与高级特性测验", college: "信息技术学院", major: "软件工程", targetAudience: "2024级软件工程1班、2024级软件工程2班" },
+  { id: "exam-3", name: "React 进阶考核", status: "已结束", type: "期末考", time: "2024-03-10 09:00", duration: 120, questionCount: 40, description: "React Hooks 与性能优化专项考核", college: "信息技术学院", major: "电子计算机", targetAudience: "2023级计算机班" },
+  { id: "exam-4", name: "Node.js 后端测试", status: "进行中", type: "随堂测", time: "2024-02-28 14:00", duration: 60, questionCount: 25, description: "Node.js 基础与 Express 框架测试", college: "土木工程学院", major: "土木工程", targetAudience: "2024级网络工程班" },
+  { id: "exam-5", name: "Vue.js 进阶考核", status: "未开始", type: "期末考", time: "2024-04-05 10:00", duration: 120, questionCount: 35, description: "Vue3 组合式 API 与响应式原理", college: "信息技术学院", major: "软件工程", targetAudience: "2024级软件工程班" },
+  { id: "exam-6", name: "全栈开发综合测试", status: "已结束", type: "综合考", time: "2024-03-25 09:00", duration: 150, questionCount: 50, description: "前后端技术栈综合知识考核", college: "信息技术学院", major: "网络工程", targetAudience: "2023级全栈开发班、2024级全栈开发班" },
 ]
+
+const collegeOptions = ["全部", "信息技术学院", "土木工程学院", "机械工程学院", "经济管理学院"]
+const majorOptions = ["全部", "电子计算机", "软件工程", "网络工程", "土木工程", "机械设计", "工商管理"]
 
 const statusMeta: Record<string, { color: string; bg: string; icon: typeof CheckCircle2 }> = {
   进行中: { color: "#2563eb", bg: "#eff6ff", icon: PlayCircle },
@@ -42,12 +46,21 @@ const statusMeta: Record<string, { color: string; bg: string; icon: typeof Check
 export default function ExamListPage() {
   const [tab, setTab] = useState<"my" | "all">("my")
   const [search, setSearch] = useState("")
+  const [collegeFilter, setCollegeFilter] = useState("全部")
+  const [majorFilter, setMajorFilter] = useState("全部")
   const { exams } = useData()
 
   const baseList = tab === "my" ? myExams : allExams
   const examsList = useMemo(
-    () => baseList.filter((e) => e.name.toLowerCase().includes(search.toLowerCase())),
-    [baseList, search]
+    () => baseList.filter((e) => {
+      const matchSearch = e.name.toLowerCase().includes(search.toLowerCase()) ||
+        e.id.toLowerCase().includes(search.toLowerCase()) ||
+        (e as any).college?.toLowerCase().includes(search.toLowerCase())
+      const matchCollege = collegeFilter === "全部" || (e as any).college === collegeFilter
+      const matchMajor = majorFilter === "全部" || (e as any).major === majorFilter
+      return matchSearch && matchCollege && matchMajor
+    }),
+    [baseList, search, collegeFilter, majorFilter]
   )
 
   const stats = [
@@ -125,15 +138,43 @@ export default function ExamListPage() {
               </button>
             ))}
           </div>
-          <div className="relative w-full sm:w-64">
-            <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-            <Input
-              placeholder="搜索考试..."
-              className="h-9 rounded-full border-0 bg-white pl-9 text-sm shadow-sm"
-              style={{ boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="relative w-full sm:w-64">
+              <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <Input
+                placeholder="搜索考试名称、编码与班级名称"
+                className="h-9 rounded-full border-0 bg-white pl-9 text-sm shadow-sm"
+                style={{ boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs text-gray-500 whitespace-nowrap">二级院系</span>
+              <select
+                value={collegeFilter}
+                onChange={(e) => setCollegeFilter(e.target.value)}
+                className="h-9 rounded-full border-0 bg-white px-3 text-sm text-gray-700 shadow-sm outline-none"
+                style={{ boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}
+              >
+                {collegeOptions.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs text-gray-500 whitespace-nowrap">适用专业</span>
+              <select
+                value={majorFilter}
+                onChange={(e) => setMajorFilter(e.target.value)}
+                className="h-9 rounded-full border-0 bg-white px-3 text-sm text-gray-700 shadow-sm outline-none"
+                style={{ boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}
+              >
+                {majorOptions.map((m) => (
+                  <option key={m} value={m}>{m}</option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
 
@@ -188,6 +229,10 @@ export default function ExamListPage() {
                       <Calendar className="h-3 w-3" />
                       {exam.time}
                     </span>
+                  </div>
+                  <div className="mt-2 flex items-center gap-1 text-xs text-gray-500">
+                    <Users className="h-3 w-3" />
+                    考试对象：{(exam as any).targetAudience}
                   </div>
                   {exam.status === "进行中" && (
                     <div className="mt-4">

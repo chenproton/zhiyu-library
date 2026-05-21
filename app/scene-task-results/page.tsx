@@ -546,12 +546,16 @@ type MethodType = (typeof METHODS)[number]
 function SceneTaskTab() {
   const { sceneGradingScenarios, sceneGradingSubmissions, sceneGradingStudents } = useData()
   const [searchQuery, setSearchQuery] = useState("")
+  const firstScenario = sceneGradingScenarios[0]
+  const firstTask = firstScenario?.tasks[0]
   const [selectedScenarioId, setSelectedScenarioId] = useState<string | null>(
-    sceneGradingScenarios[0]?.id || null
+    firstScenario?.id || null
   )
-  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null)
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(
+    firstTask?.id || null
+  )
   const [expandedScenarios, setExpandedScenarios] = useState<Set<string>>(
-    new Set(sceneGradingScenarios[0]?.id ? [sceneGradingScenarios[0].id] : [])
+    new Set(firstScenario?.id ? [firstScenario.id] : [])
   )
   const [methodFilter, setMethodFilter] = useState<MethodType>("全部")
   const [statusFilter, setStatusFilter] = useState<"all" | "pending" | "graded">("all")
@@ -715,23 +719,10 @@ function SceneTaskTab() {
             return (
               <div key={node.scenarioId}>
                 <button
-                  onClick={() => {
-                    setSelectedScenarioId(node.scenarioId)
-                    toggleScenario(node.scenarioId)
-                  }}
-                  className={cn(
-                    "w-full text-left rounded-lg p-2.5 transition-all border flex items-center gap-2",
-                    selectedScenarioId === node.scenarioId && !selectedTaskId
-                      ? "bg-primary/[0.04] border-primary/30 shadow-sm"
-                      : "bg-white border-transparent hover:bg-gray-50 hover:border-gray-200"
-                  )}
+                  onClick={() => toggleScenario(node.scenarioId)}
+                  className="w-full text-left rounded-lg p-2.5 transition-all border flex items-center gap-2 bg-white border-transparent hover:bg-gray-50 hover:border-gray-200"
                 >
-                  <BookOpen
-                    className={cn(
-                      "h-4 w-4 shrink-0",
-                      selectedScenarioId === node.scenarioId ? "text-primary" : "text-gray-400"
-                    )}
-                  />
+                  <BookOpen className="h-4 w-4 shrink-0 text-gray-400" />
                   <div className="flex-1 min-w-0">
                     <p
                       className={cn(
@@ -754,7 +745,10 @@ function SceneTaskTab() {
                     {node.tasks.map((task) => (
                       <button
                         key={task.taskId}
-                        onClick={() => setSelectedTaskId(task.taskId)}
+                        onClick={() => {
+                          setSelectedScenarioId(node.scenarioId)
+                          setSelectedTaskId(task.taskId)
+                        }}
                         className={cn(
                           "w-full text-left rounded-md px-3 py-2 text-xs transition-all border-l-2",
                           selectedTaskId === task.taskId

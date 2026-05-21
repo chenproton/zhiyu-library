@@ -259,7 +259,7 @@ export default function ExamsPage() {
                   <TableCell>
                     <span
                       className="cursor-pointer font-medium hover:underline"
-                      onClick={() => router.push(`/exams/${exam.id}?mode=preview`)}
+                      onClick={() => router.push('/landingpage/resources/exams/exam-1?returnUrl=' + encodeURIComponent('/exams'))}
                     >
                       {exam.name}
                     </span>
@@ -288,7 +288,7 @@ export default function ExamsPage() {
                       onDelete={() => deleteExam(exam.id)}
                       onStatusChange={(action) => updateExamStatus(exam.id, action)}
                       onView={() => router.push(`/exams/${exam.id}`)}
-                      onPreview={() => router.push(`/exams/${exam.id}?mode=preview`)}
+                      onPreview={() => router.push('/landingpage/resources/exams/exam-1?returnUrl=' + encodeURIComponent('/exams'))}
                       onInvite={() => handleInvite(exam)}
                     />
                   </TableCell>

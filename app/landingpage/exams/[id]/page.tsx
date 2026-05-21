@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useParams } from "next/navigation"
 import {
   ArrowLeft, Clock, FileText, CheckCircle2, AlertCircle, Send,
@@ -14,6 +14,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Textarea } from "@/components/ui/textarea"
 import { useData } from "@/components/providers/data-provider"
+import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts"
+import type { Exam } from "@/lib/types"
 
 /* ─── 状态颜色映射 ─── */
 const statusConfig: Record<string, { bg: string; color: string; label: string }> = {
@@ -23,6 +25,41 @@ const statusConfig: Record<string, { bg: string; color: string; label: string }>
   rejected: { bg: "#fee2e2", color: "#dc2626", label: "已驳回" },
   toPublish: { bg: "#e0e7ff", color: "#4f46e5", label: "待发布" },
   published: { bg: "#dcfce7", color: "#16a34a", label: "已发布" },
+}
+
+const typeLabelMap: Record<string, string> = {
+  single: "单选题",
+  multiple: "多选题",
+  judge: "判断题",
+  fill: "填空题",
+  essay: "问答题",
+  short_answer: "简答题",
+}
+
+const pieColors = ["#2563eb", "#3b82f6", "#60a5fa", "#93c5fd", "#bfdbfe", "#dbeafe"]
+
+function getExamTimeStatus(examId: string): { bg: string; color: string; label: string } {
+  const map: Record<string, { bg: string; color: string; label: string }> = {
+    "exam-1": { label: "进行中", bg: "#dbeafe", color: "#2563eb" },
+    "exam-2": { label: "未开始", bg: "#fef3c7", color: "#d97706" },
+    "exam-3": { label: "已完成", bg: "#dcfce7", color: "#16a34a" },
+    "exam-4": { label: "进行中", bg: "#dbeafe", color: "#2563eb" },
+    "exam-5": { label: "未开始", bg: "#fef3c7", color: "#d97706" },
+    "exam-6": { label: "已完成", bg: "#dcfce7", color: "#16a34a" },
+  }
+  return map[examId] || { label: "进行中", bg: "#dbeafe", color: "#2563eb" }
+}
+
+function getMockTargetAudience(examId: string): { type: string; detail: string } {
+  const map: Record<string, { type: string; detail: string }> = {
+    "exam-1": { type: "学生", detail: "2024级前端1班、2024级前端2班" },
+    "exam-2": { type: "学生", detail: "2024级软件工程1班、2024级软件工程2班" },
+    "exam-3": { type: "学生", detail: "2023级计算机班" },
+    "exam-4": { type: "教师", detail: "张三、李四、王五" },
+    "exam-5": { type: "学生", detail: "2024级网络工程班" },
+    "exam-6": { type: "学生", detail: "2023级全栈开发班、2024级全栈开发班" },
+  }
+  return map[examId] || { type: "学生", detail: "2024级默认班" }
 }
 
 export default function ExamDetailPage() {
@@ -67,6 +104,25 @@ export default function ExamDetailPage() {
   const cfg = statusConfig[exam.status] || statusConfig.draft
   const totalScore = exam.questions.reduce((s, q) => s + (q.score || 0), 0)
   const answeredCount = Object.keys(answers).length
+  const timeStatus = getExamTimeStatus(exam.id)
+  const targetAudience = getMockTargetAudience(exam.id)
+
+  const questionTypeStats = useMemo(() => {
+    const stats: Record<string, { count: number; score: number }> = {}
+    exam.questions.forEach((q) => {
+      const label = typeLabelMap[q.type] || q.type
+      if (!stats[label]) stats[label] = { count: 0, score: 0 }
+      stats[label].count += 1
+      stats[label].score += q.score
+    })
+    return Object.entries(stats).map(([name, { count, score }], index) => ({
+      name,
+      count,
+      score,
+      value: count,
+      color: pieColors[index % pieColors.length],
+    }))
+  }, [exam.questions])
 
   const handleSingle = (qid: string, val: string) => setAnswers((p) => ({ ...p, [qid]: val }))
   const handleMultiple = (qid: string, opt: string, checked: boolean) => {
@@ -218,8 +274,8 @@ export default function ExamDetailPage() {
             <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8 }}>{exam.name}</h1>
             <p style={{ fontSize: 14, opacity: 0.9 }}>{exam.description}</p>
           </div>
-          <span style={{ padding: "4px 12px", borderRadius: 20, fontSize: 12, fontWeight: 500, background: "rgba(255,255,255,0.2)" }}>
-            {cfg.label}
+          <span style={{ padding: "4px 12px", borderRadius: 20, fontSize: 12, fontWeight: 500, background: timeStatus.bg, color: timeStatus.color }}>
+            {timeStatus.label}
           </span>
         </div>
         <div style={{ padding: "24px 32px", display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 24 }}>
@@ -227,20 +283,66 @@ export default function ExamDetailPage() {
             { icon: <Clock style={{ width: 18, height: 18 }} />, label: "考试时长", value: `${exam.duration} 分钟` },
             { icon: <ListOrdered style={{ width: 18, height: 18 }} />, label: "题目数量", value: `${exam.questions.length} 题` },
             { icon: <BarChart3 style={{ width: 18, height: 18 }} />, label: "总分", value: `${totalScore} 分` },
-            { icon: <Signal style={{ width: 18, height: 18 }} />, label: "状态", value: cfg.label },
+            { icon: <Users style={{ width: 18, height: 18 }} />, label: "考试对象", value: `${targetAudience.type}（${targetAudience.detail}）` }
           ].map((item, i) => (
             <div key={i} style={{ textAlign: "center", padding: "16px 0", background: "#f5f6f7", borderRadius: 8 }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, color: "#3370ff", marginBottom: 6 }}>
                 {item.icon} <span style={{ fontSize: 13, fontWeight: 500 }}>{item.label}</span>
               </div>
-              <div style={{ fontSize: 18, fontWeight: 700 }}>{item.value}</div>
+              <div style={{ fontSize: 14, fontWeight: 700, padding: "0 8px" }}>{item.value}</div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* 考试须知 + 题目预览 */}
+      {/* 考试概览 + 考试须知 */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
+        <div style={{ background: "#fff", borderRadius: 12, border: "1px solid #e5e6eb", padding: 24 }}>
+          <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
+            <FileText style={{ width: 18, height: 18, color: "#3370ff" }} /> 考试概览
+          </h3>
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            {questionTypeStats.length > 0 ? (
+              <>
+                <div style={{ width: "100%", height: 220 }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={questionTypeStats}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={50}
+                        outerRadius={80}
+                        paddingAngle={3}
+                        dataKey="value"
+                        nameKey="name"
+                        label={({ name, score }) => `${name}: ${score}分`}
+                      >
+                        {questionTypeStats.map((entry: typeof questionTypeStats[0], index: number) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip formatter={(value: number, name: string, props: any) => [`${value}题 / ${props.payload.score}分`, name]} />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                  {questionTypeStats.map((stat: typeof questionTypeStats[0]) => (
+                    <div key={stat.name} style={{ display: "flex", alignItems: "center", gap: 8, padding: 10, background: "#f5f6f7", borderRadius: 8 }}>
+                      <span style={{ width: 10, height: 10, borderRadius: "50%", background: stat.color, flexShrink: 0 }} />
+                      <span style={{ fontSize: 13, color: "#1f2329" }}>{stat.name}</span>
+                      <span style={{ fontSize: 12, color: "#8f959e", marginLeft: "auto" }}>{stat.count}题 / {stat.score}分</span>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <div style={{ textAlign: "center", fontSize: 13, color: "#8f959e", padding: 20 }}>暂无题目数据</div>
+            )}
+          </div>
+        </div>
+
         <div style={{ background: "#fff", borderRadius: 12, border: "1px solid #e5e6eb", padding: 24 }}>
           <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
             <BookOpen style={{ width: 18, height: 18, color: "#3370ff" }} /> 考试须知
@@ -261,26 +363,6 @@ export default function ExamDetailPage() {
               <Button size="lg" variant="outline" disabled>
                 {exam.status === "draft" || exam.status === "unsubmitted" || exam.status === "pending" || exam.status === "rejected" ? "考试未发布" : "考试已结束"}
               </Button>
-            )}
-          </div>
-        </div>
-
-        <div style={{ background: "#fff", borderRadius: 12, border: "1px solid #e5e6eb", padding: 24 }}>
-          <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
-            <FileText style={{ width: 18, height: 18, color: "#3370ff" }} /> 题目概览
-          </h3>
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {exam.questions.slice(0, 6).map((q, i) => (
-              <div key={q.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: 12, background: "#f5f6f7", borderRadius: 8 }}>
-                <span style={{ width: 24, height: 24, borderRadius: "50%", background: "#3370ff", color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 600, flexShrink: 0 }}>{i + 1}</span>
-                <span style={{ fontSize: 14, color: "#1f2329", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{q.content}</span>
-                <span style={{ fontSize: 12, color: "#8f959e", flexShrink: 0 }}>{q.score}分</span>
-              </div>
-            ))}
-            {exam.questions.length > 6 && (
-              <div style={{ textAlign: "center", fontSize: 13, color: "#8f959e", padding: 8 }}>
-                共 {exam.questions.length} 题，考试开始后显示全部
-              </div>
             )}
           </div>
         </div>

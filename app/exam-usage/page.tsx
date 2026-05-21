@@ -279,6 +279,7 @@ export default function ExamUsagePage() {
   const [startTime, setStartTime] = useState<string>("")
   const [endTime, setEndTime] = useState<string>("")
   const [publishToFront, setPublishToFront] = useState(true)
+  const [examNotice, setExamNotice] = useState(`1. 请在规定时间内完成所有题目，超时将自动提交。\n2. 单选题每题只有一个正确答案，多选题有多个正确答案。\n3. 答题过程中请勿刷新页面或关闭浏览器。\n4. 提交后无法修改答案，请确认后再提交。\n5. 考试期间系统将自动保存答题进度。`)
   const [coverUrl, setCoverUrl] = useState("")
   const coverFileInputRef = useRef<HTMLInputElement>(null)
   const [orgPopoverOpen, setOrgPopoverOpen] = useState(false)
@@ -320,6 +321,7 @@ export default function ExamUsagePage() {
   const openCreateDialog = () => {
     setCreateDialogOpen(true)
     setPublishToFront(true)
+    setExamNotice(`1. 请在规定时间内完成所有题目，超时将自动提交。\n2. 单选题每题只有一个正确答案，多选题有多个正确答案。\n3. 答题过程中请勿刷新页面或关闭浏览器。\n4. 提交后无法修改答案，请确认后再提交。\n5. 考试期间系统将自动保存答题进度。`)
   }
 
   const handleCreateExam = () => {
@@ -337,6 +339,7 @@ export default function ExamUsagePage() {
     setPublishToFront(false)
     setCoverUrl("")
     setOrgSearch("")
+    setExamNotice(`1. 请在规定时间内完成所有题目，超时将自动提交。\n2. 单选题每题只有一个正确答案，多选题有多个正确答案。\n3. 答题过程中请勿刷新页面或关闭浏览器。\n4. 提交后无法修改答案，请确认后再提交。\n5. 考试期间系统将自动保存答题进度。`)
     setTargetAudience('student')
     setSelectedTeacherIds([])
   }
@@ -710,6 +713,16 @@ export default function ExamUsagePage() {
               </Field>
 
               <Field>
+                <FieldLabel>考试须知</FieldLabel>
+                <Textarea
+                  value={examNotice}
+                  onChange={(e) => setExamNotice(e.target.value)}
+                  placeholder="请输入考试须知"
+                  rows={5}
+                />
+              </Field>
+
+              <Field>
                 <FieldLabel>考试封面</FieldLabel>
                 <FieldDescription>支持上传 5MB 以内的图片文件</FieldDescription>
                 <input
@@ -889,10 +902,10 @@ export default function ExamUsagePage() {
               </Field>
 
               <Field>
-                <FieldLabel>是否发布到前台</FieldLabel>
+                <FieldLabel>是否发布到前台考试中心</FieldLabel>
                 <div className="flex items-center gap-2">
                   <Switch checked={publishToFront} onCheckedChange={setPublishToFront} />
-                  <span className="text-sm text-muted-foreground">{publishToFront ? '已发布' : '未发布'}</span>
+                  <span className="text-sm text-muted-foreground">{publishToFront ? '是' : '否'}</span>
                 </div>
               </Field>
             </FieldGroup>

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo, useEffect } from "react"
+import { useState, useMemo, useEffect, useRef } from "react"
 import { Plus, X, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -50,6 +50,7 @@ export function AddQuestionToExamDialog({
     return questionBanks.filter(bank => ['published', 'draft', 'unsubmitted', 'rejected'].includes(bank.status))
   }, [questionBanks])
 
+  const scrollRef = useRef<HTMLDivElement>(null)
   const [selectedBankId, setSelectedBankId] = useState<string>("")
   const [type, setType] = useState<QuestionType>("single")
   const [content, setContent] = useState("")
@@ -221,7 +222,7 @@ export function AddQuestionToExamDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="flex h-[85vh] max-w-3xl flex-col overflow-hidden p-0">
+      <DialogContent className="flex h-[85vh] max-w-3xl flex-col overflow-hidden p-0" annotationContext="add-question-to-exam" annotationContainerRef={scrollRef}>
         <DialogHeader className="border-b px-6 py-4">
           <DialogTitle>新增题目</DialogTitle>
           <DialogDescription>
@@ -230,7 +231,7 @@ export function AddQuestionToExamDialog({
         </DialogHeader>
 
         <ScrollArea className="flex-1 overflow-hidden">
-          <div className="px-6 py-4">
+          <div ref={scrollRef} className="px-6 py-4">
             <FieldGroup>
               {/* 关联题库 */}
               <Field>

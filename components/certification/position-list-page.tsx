@@ -345,7 +345,7 @@ export function PositionListPage() {
           setConfirmDialog((prev) => ({ ...prev, open }))
         }
       >
-        <DialogContent>
+        <DialogContent annotationContext="position-list">
           <DialogHeader>
             <DialogTitle>{confirmDialog.title}</DialogTitle>
             <DialogDescription>{confirmDialog.description}</DialogDescription>

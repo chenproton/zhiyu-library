@@ -4,6 +4,7 @@ import { Suspense } from 'react'
 import { Analytics } from '@vercel/analytics/next'
 import { DataProvider } from '@/components/providers/data-provider'
 import ShellWrapper from './shell-wrapper'
+import { AnnotationClient } from '@/components/annotation-client'
 import './globals.css'
 
 // const geist = Geist({ subsets: ["latin"] })
@@ -32,6 +33,7 @@ export default function RootLayout({
           </Suspense>
         </DataProvider>
         {process.env.NODE_ENV === 'production' && <Analytics />}
+        <AnnotationClient />
       </body>
     </html>
   )

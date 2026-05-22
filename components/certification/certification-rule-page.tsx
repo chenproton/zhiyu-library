@@ -147,7 +147,7 @@ function WeightConfigDialog({
   }
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-lg" annotationContext="certification-rule">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>配置各子节点权重，合计必须为 100%</DialogDescription>

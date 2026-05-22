@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useRef } from "react"
 import { Search, Plus, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -42,6 +42,7 @@ export function ManualQuestionDialog({
 }: ManualQuestionDialogProps) {
   const { questionBanks, getQuestionsByBank } = useData()
   
+  const scrollRef = useRef<HTMLDivElement>(null)
   const [selectedBankId, setSelectedBankId] = useState<string>("")
   const [search, setSearch] = useState("")
   const [typeFilter, setTypeFilter] = useState<QuestionType | "all">("all")
@@ -102,7 +103,7 @@ export function ManualQuestionDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="flex h-[80vh] max-w-3xl flex-col p-0">
+      <DialogContent className="flex h-[80vh] max-w-3xl flex-col p-0" annotationContext="manual-question" annotationContainerRef={scrollRef}>
         <DialogHeader className="border-b px-6 py-4">
           <DialogTitle>手动抽题</DialogTitle>
           <DialogDescription>
@@ -189,7 +190,7 @@ export function ManualQuestionDialog({
               </Button>
             </div>
             <ScrollArea className="flex-1 overflow-hidden">
-              <div className="flex flex-col gap-1 p-4">
+              <div ref={scrollRef} className="flex flex-col gap-1 p-4">
                 {filteredQuestions.length === 0 ? (
                   <p className="py-8 text-center text-sm text-muted-foreground">
                     {questions.length === 0 ? "该题库暂无题目" : "没有找到匹配的题目"}

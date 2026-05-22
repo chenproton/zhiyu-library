@@ -1,11 +1,4 @@
-export { AnnotationSystem } from './components/AnnotationSystem';
-
-export { useAnnotations } from './hooks/useAnnotations';
-
-export type { AnnotationAdapter } from './lib/adapter';
-export { createJsonFileAdapter } from './lib/adapters/json-file';
-export type { JsonFileAdapterOptions } from './lib/adapters/json-file';
-
+// 类型
 export type {
   Annotation,
   Comment,
@@ -14,7 +7,20 @@ export type {
   AnnotationTheme,
   AnnotationSystemProps,
   UseAnnotationsConfig,
-} from './lib/types';
+} from './types'
 
-export { GET as GET_ANNOTATIONS, POST as POST_ANNOTATIONS, PUT as PUT_ANNOTATIONS, DELETE as DELETE_ANNOTATIONS } from './api/annotations';
-export { GET as GET_COMMENTS, POST as POST_COMMENTS, DELETE as DELETE_COMMENTS } from './api/comments';
+// 适配器
+export type { AnnotationAdapter } from './adapter'
+export { createJsonFileAdapter } from './json-file-adapter'
+export type { JsonFileAdapterOptions } from './json-file-adapter'
+
+// Hook
+export { useAnnotations } from './use-annotations'
+
+// 组件
+export { AnnotationSystem } from './components/annotation-system'
+export { AnnotationLayer } from './components/annotation-layer'
+export { AnnotationController } from './components/annotation-controller'
+export { AnnotationEditor } from './components/annotation-editor'
+export { CommentPanel } from './components/comment-panel'
+export { AnnotationClient } from './components/annotation-client'

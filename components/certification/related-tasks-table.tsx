@@ -204,7 +204,7 @@ export function RelatedTasksTable({
 
       {/* 任务自定义映射编辑弹窗 */}
       <Dialog open={!!editingTaskId} onOpenChange={(open) => !open && setEditingTaskId(null)}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-lg" annotationContext="related-tasks">
           <DialogHeader>
             <DialogTitle>
               编辑「{editingTask?.name}」等级映射

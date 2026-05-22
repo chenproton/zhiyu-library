@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -29,6 +29,7 @@ export function TaskSelectorDialog({
   existingTaskIds,
   onConfirm,
 }: TaskSelectorDialogProps) {
+  const scrollRef = useRef<HTMLDivElement>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
 
@@ -70,7 +71,7 @@ export function TaskSelectorDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-lg" annotationContext="task-selector" annotationContainerRef={scrollRef}>
         <DialogHeader>
           <DialogTitle>选择关联任务</DialogTitle>
           <DialogDescription>
@@ -89,7 +90,7 @@ export function TaskSelectorDialog({
             />
           </div>
 
-          <div className="max-h-64 space-y-2 overflow-y-auto rounded-md border p-3">
+          <div ref={scrollRef} className="max-h-64 space-y-2 overflow-y-auto rounded-md border p-3">
             {filteredTasks.length === 0 ? (
               <div className="py-8 text-center text-sm text-muted-foreground">
                 暂无可关联的任务

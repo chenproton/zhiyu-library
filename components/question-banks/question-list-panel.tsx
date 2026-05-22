@@ -590,7 +590,7 @@ export function QuestionListPanel({ bankId }: QuestionListPanelProps) {
 
       {/* 批量移动弹窗 */}
       <Dialog open={batchMoveOpen} onOpenChange={setBatchMoveOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md" annotationContext="batch-move">
           <DialogHeader>
             <DialogTitle>批量移动到题库</DialogTitle>
           </DialogHeader>

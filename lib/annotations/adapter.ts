@@ -1,4 +1,4 @@
-import type { Annotation, Comment } from './types';
+import type { Annotation, Comment } from './types'
 
 /**
  * AnnotationAdapter 接口
@@ -8,33 +8,33 @@ import type { Annotation, Comment } from './types';
  */
 export interface AnnotationAdapter {
   /** 获取指定页面和上下文的所有标注 */
-  getAnnotationsByPage(page: string, context?: string): Promise<Annotation[]>;
+  getAnnotationsByPage(page: string, context?: string): Promise<Annotation[]>
 
   /** 根据 ID 获取单个标注 */
-  getAnnotationById(id: string): Promise<Annotation | undefined>;
+  getAnnotationById(id: string): Promise<Annotation | undefined>
 
   /** 创建新标注 */
   createAnnotation(
     annotation: Omit<Annotation, 'id' | 'createdAt'>
-  ): Promise<Annotation>;
+  ): Promise<Annotation>
 
   /** 更新标注（位置、内容、图片） */
   updateAnnotation(
     id: string,
-    updates: Partial<Pick<Annotation, 'x' | 'y' | 'content' | 'imageUrl'>>
-  ): Promise<Annotation | undefined>;
+    updates: Partial<Pick<Annotation, 'x' | 'y' | 'content' | 'imageUrl' | 'closed'>>
+  ): Promise<Annotation | undefined>
 
   /** 删除标注（连带删除其所有评论） */
-  deleteAnnotation(id: string): Promise<boolean>;
+  deleteAnnotation(id: string): Promise<boolean>
 
   /** 获取某标注下的所有评论 */
-  getCommentsByAnnotationId(annotationId: string): Promise<Comment[]>;
+  getCommentsByAnnotationId(annotationId: string): Promise<Comment[]>
 
   /** 创建评论 */
   createComment(
     comment: Omit<Comment, 'id' | 'createdAt'>
-  ): Promise<Comment>;
+  ): Promise<Comment>
 
   /** 删除评论（连带删除其所有回复） */
-  deleteComment(id: string): Promise<boolean>;
+  deleteComment(id: string): Promise<boolean>
 }

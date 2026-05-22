@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import {
   Dialog,
   DialogContent,
@@ -43,6 +43,7 @@ export function QuestionFormDialog({
   question,
   onSubmit,
 }: QuestionFormDialogProps) {
+  const scrollRef = useRef<HTMLDivElement>(null)
   const [type, setType] = useState<QuestionType>("single")
   const [content, setContent] = useState("")
   const [options, setOptions] = useState<string[]>(["", "", "", ""])
@@ -222,14 +223,15 @@ export function QuestionFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>{question ? "编辑题目" : "新建题目"}</DialogTitle>
-          <DialogDescription>
-            {question ? "修改题目内容和答案" : "添加新题目到当前题库"}
-          </DialogDescription>
-        </DialogHeader>
-        <form onSubmit={handleSubmit}>
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl" annotationContext="question-form" annotationContainerRef={scrollRef}>
+        <div ref={scrollRef} className="flex flex-col gap-4">
+          <DialogHeader>
+            <DialogTitle>{question ? "编辑题目" : "新建题目"}</DialogTitle>
+            <DialogDescription>
+              {question ? "修改题目内容和答案" : "添加新题目到当前题库"}
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSubmit}>
           <FieldGroup className="py-4">
             <div className="grid gap-4 sm:grid-cols-2">
               <Field>
@@ -387,6 +389,7 @@ export function QuestionFormDialog({
             </Button>
           </DialogFooter>
         </form>
+        </div>
       </DialogContent>
     </Dialog>
   )

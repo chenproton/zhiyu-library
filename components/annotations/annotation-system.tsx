@@ -1,11 +1,11 @@
-'use client';
+'use client'
 
-import { useState, useEffect } from 'react';
-import { usePathname } from 'next/navigation';
-import { useAnnotations } from '../hooks/useAnnotations';
-import { AnnotationLayer } from './AnnotationLayer';
-import { AnnotationController } from './AnnotationController';
-import type { AnnotationSystemProps } from '../lib/types';
+import { useState, useEffect } from 'react'
+import { usePathname } from 'next/navigation'
+import { useAnnotations } from '@/hooks/use-annotations'
+import { AnnotationLayer } from './annotation-layer'
+import { AnnotationController } from './annotation-controller'
+import type { AnnotationSystemProps } from '@/lib/annotations/types'
 
 export function AnnotationSystem({
   page: pageProp,
@@ -17,26 +17,28 @@ export function AnnotationSystem({
   theme,
   onModeChange,
   hideController = false,
-}: AnnotationSystemProps & { hideController?: boolean }) {
-  const pathname = usePathname();
-  const [currentPath, setCurrentPath] = useState(pathname || '');
+  fixed = false,
+  containerRef,
+}: AnnotationSystemProps & { hideController?: boolean; containerRef?: React.RefObject<HTMLElement | null> }) {
+  const pathname = usePathname()
+  const [currentPath, setCurrentPath] = useState(pathname || '')
 
   useEffect(() => {
-    setCurrentPath(pathname || '');
-  }, [pathname]);
+    setCurrentPath(pathname || '')
+  }, [pathname])
 
   useEffect(() => {
     const handleRouteChange = () => {
       if (typeof window !== 'undefined') {
-        setCurrentPath(window.location.pathname);
+        setCurrentPath(window.location.pathname)
       }
-    };
+    }
 
-    window.addEventListener('popstate', handleRouteChange);
-    return () => window.removeEventListener('popstate', handleRouteChange);
-  }, []);
+    window.addEventListener('popstate', handleRouteChange)
+    return () => window.removeEventListener('popstate', handleRouteChange)
+  }, [])
 
-  const page = pageProp || currentPath;
+  const page = pageProp || currentPath
 
   const {
     annotations,
@@ -58,33 +60,33 @@ export function AnnotationSystem({
     apiBasePath,
     defaultMode,
     currentUser,
-  });
+  })
 
   useEffect(() => {
-    onModeChange?.(mode);
-  }, [mode, onModeChange]);
+    onModeChange?.(mode)
+  }, [mode, onModeChange])
 
   // 当隐藏控制器时，仍然支持键盘快捷键切换模式
   useEffect(() => {
-    if (!hideController) return;
+    if (!hideController) return
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-      const key = e.key.toLowerCase();
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
+      const key = e.key.toLowerCase()
       if (key === 'e') {
-        setMode('edit');
+        setMode('edit')
       } else if (key === 'v') {
-        setMode('view');
+        setMode('view')
       } else if (key === 'o') {
-        setMode('off');
+        setMode('off')
       }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [hideController, setMode]);
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [hideController, setMode])
 
   const handleRefreshComments = (annotationId: string) => {
-    refreshComments(annotationId);
-  };
+    refreshComments(annotationId)
+  }
 
   return (
     <>
@@ -95,6 +97,11 @@ export function AnnotationSystem({
         loading={loading}
         zIndex={zIndex}
         theme={theme}
+        fixed={fixed}
+        containerRef={containerRef}
+        user={user}
+        setUser={setUser}
+        setMode={setMode}
         onCreateAnnotation={createAnnotation}
         onUpdateAnnotation={updateAnnotation}
         onDeleteAnnotation={deleteAnnotation}
@@ -114,5 +121,5 @@ export function AnnotationSystem({
         />
       )}
     </>
-  );
+  )
 }

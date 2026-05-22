@@ -47,6 +47,7 @@ export function ExamFormDialog({
   const [coverUrl, setCoverUrl] = useState<string>("")
   const [collaboratorDialogOpen, setCollaboratorDialogOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const fieldGroupRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (exam) {
@@ -111,7 +112,7 @@ export function ExamFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-lg" annotationContext="exam-form" annotationContainerRef={fieldGroupRef}>
         <DialogHeader>
           <DialogTitle>{exam ? "编辑试卷" : "新建试卷"}</DialogTitle>
           <DialogDescription>
@@ -119,7 +120,7 @@ export function ExamFormDialog({
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
-          <FieldGroup className="max-h-[60vh] overflow-y-auto py-4">
+          <FieldGroup ref={fieldGroupRef} className="max-h-[60vh] overflow-y-auto py-4">
             <Field>
               <FieldLabel htmlFor="name">试卷名称</FieldLabel>
               <Input
@@ -248,6 +249,7 @@ export function ExamFormDialog({
       <CoBuilderDialog
         open={collaboratorDialogOpen}
         onOpenChange={setCollaboratorDialogOpen}
+        annotationContext="exam-co-builder"
         title="选择共建人"
         description="选择可以共同维护此试卷的用户"
         selectedIds={collaboratorIds}

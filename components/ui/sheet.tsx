@@ -5,6 +5,32 @@ import * as SheetPrimitive from '@radix-ui/react-dialog'
 import { XIcon } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
+import { AnnotationSystem } from '@/components/annotations/annotation-system'
+
+function SheetAnnotationContext({
+  annotationContext,
+  annotationContainerRef,
+}: {
+  annotationContext?: string | boolean
+  annotationContainerRef?: React.RefObject<HTMLElement | null>
+}) {
+  const idRef = React.useRef<string | null>(null)
+  if (idRef.current === null && annotationContext === true) {
+    idRef.current = `sheet-${Math.random().toString(36).slice(2, 9)}`
+  }
+  const ctx = annotationContext === true ? idRef.current : annotationContext || null
+  if (!ctx) return null
+  return (
+    <AnnotationSystem
+      context={ctx}
+      zIndex={100}
+      defaultMode="view"
+      hideController
+      fixed={!annotationContainerRef}
+      containerRef={annotationContainerRef}
+    />
+  )
+}
 
 function Sheet({ ...props }: React.ComponentProps<typeof SheetPrimitive.Root>) {
   return <SheetPrimitive.Root data-slot="sheet" {...props} />
@@ -48,9 +74,13 @@ function SheetContent({
   className,
   children,
   side = 'right',
+  annotationContext,
+  annotationContainerRef,
   ...props
 }: React.ComponentProps<typeof SheetPrimitive.Content> & {
   side?: 'top' | 'right' | 'bottom' | 'left'
+  annotationContext?: string | boolean
+  annotationContainerRef?: React.RefObject<HTMLElement | null>
 }) {
   return (
     <SheetPortal>
@@ -76,6 +106,7 @@ function SheetContent({
           <XIcon className="size-4" />
           <span className="sr-only">Close</span>
         </SheetPrimitive.Close>
+        <SheetAnnotationContext annotationContext={annotationContext} annotationContainerRef={annotationContainerRef} />
       </SheetPrimitive.Content>
     </SheetPortal>
   )

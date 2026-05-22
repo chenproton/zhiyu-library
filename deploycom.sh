@@ -22,6 +22,11 @@ STANDALONE_DIR="$SCRIPT_DIR/.next/standalone"
 STATIC_DIR="$SCRIPT_DIR/.next/static"
 PUBLIC_DIR="$SCRIPT_DIR/public"
 
+# 标注数据备份配置
+ANNOTATION_DATA_FILE="data/annotations.json"
+REMOTE_DATA_PATH="$REMOTE_DIR/$ANNOTATION_DATA_FILE"
+BACKUP_PATH="/tmp/annotations-backup-${SITE_NAME}.json"
+
 SSH_OPTS="-o StrictHostKeyChecking=no -o ConnectTimeout=15 -o ServerAliveInterval=60 -o ServerAliveCountMax=3 -p $SSH_PORT"
 
 # ==================== 主入口 ====================
@@ -31,6 +36,11 @@ echo "🚀 启动智能部署: [$SITE_NAME]"
 echo ""
 
 cd "$SCRIPT_DIR"
+
+# ── 0. 备份远程标注数据 ──────────────────────────────────────────────
+echo "[0/3] 备份远程标注数据..."
+ssh $SSH_OPTS "$REMOTE_USER@$REMOTE_HOST" \
+  "if [ -f $REMOTE_DATA_PATH ]; then cp $REMOTE_DATA_PATH $BACKUP_PATH && echo '已备份远程标注数据'; else echo '远程无标注数据，跳过备份'; fi"
 
 # ── 1. 本地构建 ──────────────────────────────────────────────────────
 echo "[1/3] 本地构建中..."
@@ -91,6 +101,12 @@ ssh $SSH_OPTS "$REMOTE_USER@$REMOTE_HOST" \
 
   pm2 save > /dev/null
 REMOTE_EOF
+
+# ── 4. 恢复远程标注数据 ──────────────────────────────────────────────
+echo ""
+echo "[4/4] 恢复远程标注数据..."
+ssh $SSH_OPTS "$REMOTE_USER@$REMOTE_HOST" \
+  "if [ -f $BACKUP_PATH ]; then mkdir -p $(dirname $REMOTE_DATA_PATH) && mv $BACKUP_PATH $REMOTE_DATA_PATH && echo '已恢复标注数据'; else echo '无备份数据，跳过恢复'; fi"
 
 echo ""
 echo "✨ [$SITE_NAME] 部署任务圆满完成！"

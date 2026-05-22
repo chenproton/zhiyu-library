@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useRef } from "react"
 import { Search, X, UserPlus, ChevronDown, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -22,6 +22,7 @@ interface CoBuilderDialogProps {
   onChange: (ids: string[]) => void
   title?: string
   description?: string
+  annotationContext?: string
 }
 
 // 按部门组织用户
@@ -37,7 +38,9 @@ export function CoBuilderDialog({
   onChange,
   title = "选择共建人",
   description = "从组织架构中选择共建人",
+  annotationContext = "co-builder",
 }: CoBuilderDialogProps) {
+  const leftScrollRef = useRef<HTMLDivElement>(null)
   const [expandedDepts, setExpandedDepts] = useState<string[]>(
     departmentTree.map((d) => d.name)
   )
@@ -75,7 +78,7 @@ export function CoBuilderDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[640px] max-h-[80vh] overflow-hidden flex flex-col">
+      <DialogContent className="sm:max-w-[640px] max-h-[80vh] overflow-hidden flex flex-col" annotationContext={annotationContext} annotationContainerRef={leftScrollRef}>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
@@ -105,7 +108,7 @@ export function CoBuilderDialog({
                 <div className="px-3 py-2.5 bg-gray-50 border-b text-sm font-medium text-gray-500">
                   组织架构
                 </div>
-                <div className="flex-1 overflow-y-auto p-3 space-y-1">
+                <div ref={leftScrollRef} className="flex-1 overflow-y-auto p-3 space-y-1">
                   {departmentTree.map((dept) => {
                     const isExpanded = expandedDepts.includes(dept.name)
                     const deptUsers = filteredTeachers.filter(

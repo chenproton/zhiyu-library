@@ -925,6 +925,7 @@ export default function ExamUsagePage() {
       <CoBuilderDialog
         open={teacherDialogOpen}
         onOpenChange={setTeacherDialogOpen}
+        annotationContext="exam-usage-co-builder"
         title="选择参考人员"
         description="选择参加考试的教师"
         selectedIds={selectedTeacherIds}

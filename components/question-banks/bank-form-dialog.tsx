@@ -47,6 +47,7 @@ export function BankFormDialog({
   const [batchId, setBatchId] = useState<string>("")
   const [collaboratorDialogOpen, setCollaboratorDialogOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const fieldGroupRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (bank) {
@@ -110,7 +111,7 @@ export function BankFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-lg" annotationContext="bank-form" annotationContainerRef={fieldGroupRef}>
         <DialogHeader>
           <DialogTitle>{bank ? "编辑题库" : "新建题库"}</DialogTitle>
           <DialogDescription>
@@ -118,7 +119,7 @@ export function BankFormDialog({
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
-          <FieldGroup className="max-h-[60vh] overflow-y-auto py-4">
+          <FieldGroup ref={fieldGroupRef} className="max-h-[60vh] overflow-y-auto py-4">
             <Field>
               <FieldLabel htmlFor="name">题库名称</FieldLabel>
               <Input
@@ -247,6 +248,7 @@ export function BankFormDialog({
       <CoBuilderDialog
         open={collaboratorDialogOpen}
         onOpenChange={setCollaboratorDialogOpen}
+        annotationContext="bank-co-builder"
         title="选择共建人"
         description="选择可以共同维护此题库的用户"
         selectedIds={collaboratorIds}

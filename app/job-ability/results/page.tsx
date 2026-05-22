@@ -201,7 +201,7 @@ export default function JobAbilityResultsPage() {
                         <span className="text-sm font-medium">{result.achievementRate}%（{result.achievedAbilityPoints}/{result.totalAbilityPoints} 能力点达成）</span>
                       </TableCell>
                       <TableCell>
-                        <span className="text-sm font-medium text-purple-600">{((Math.abs(getRandomScore(result.id) * 2 - 100) * (getRandomScore(result.id) >= 50 ? 1 : -1))).toFixed(0)}%</span>
+                        <span className="text-sm font-medium text-purple-600">{getRandomScore(result.id)}%</span>
                       </TableCell>
                       <TableCell>
                         <span className="text-sm font-medium text-blue-600">{getRandomScore(result.id)}</span>

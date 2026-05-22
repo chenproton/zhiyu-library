@@ -200,35 +200,41 @@ body {
 .radar-ability-wrap {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 16px;
 }
 .radar-section {
     display: grid;
-    grid-template-columns: 1fr 280px;
-    gap: 16px;
+    grid-template-columns: 1fr 420px;
+    gap: 14px;
     align-items: center;
 }
-#radarChart { height: 240px; }
+#radarChart { height: 240px; width: 100%; min-width: 0; }
 
 .score-overview {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
 }
 .score-stat-item {
     background: #fff;
-    border-radius: 6px;
-    padding: 10px 6px;
+    border-radius: 8px;
+    padding: 14px 4px;
     text-align: center;
     border: 1px solid #e5e7eb;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 70px;
+    min-height: 80px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.score-stat-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.1);
 }
 .score-stat-item .v {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 700;
     line-height: 1.2;
 }
@@ -236,12 +242,12 @@ body {
     font-size: 11px;
     color: #6b7280;
     margin-top: 4px;
+    font-weight: 500;
 }
 .score-stat-item.green { background: linear-gradient(135deg, #f0fdf4, #dcfce7); border-color: #bbf7d0; }
 .score-stat-item.green .v { color: #059669; }
 .score-stat-item.purple { background: linear-gradient(135deg, #faf5ff, #ede9fe); border-color: #c4b5fd; }
 .score-stat-item.purple .v { color: #7c3aed; }
-.score-stat-item.purple .v.negative { color: #dc2626; }
 .score-stat-item.blue { background: linear-gradient(135deg, #eff6ff, #dbeafe); border-color: #bfdbfe; }
 .score-stat-item.blue .v { color: #2563eb; }
 .score-stat-item.amber { background: linear-gradient(135deg, #fffbeb, #fef3c7); border-color: #fcd34d; }
@@ -522,7 +528,7 @@ body {
                                 <div class="l">岗位能力达标率</div>
                             </div>
                             <div class="score-stat-item purple">
-                                <div class="v" id="competencyVal">+32%</div>
+                                <div class="v" id="competencyVal">32%</div>
                                 <div class="l">岗位胜任度</div>
                             </div>
                             <div class="score-stat-item blue">
@@ -804,10 +810,10 @@ const dataMap = {
 };
 
 const scoreMap = {
-    '前端开发工程师': { pct: '89%', competency: '+32%', score: '87', grade: 'A+' },
-    '后端开发工程师': { pct: '78%', competency: '+18%', score: '76', grade: 'B+' },
-    '产品经理': { pct: '83%', competency: '+45%', score: '82', grade: 'A' },
-    'UI设计师': { pct: '83%', competency: '+28%', score: '80', grade: 'A' }
+    '前端开发工程师': { pct: '89%', competency: '32%', score: '87', grade: 'A+' },
+    '后端开发工程师': { pct: '78%', competency: '18%', score: '76', grade: 'B+' },
+    '产品经理': { pct: '83%', competency: '45%', score: '82', grade: 'A' },
+    'UI设计师': { pct: '83%', competency: '28%', score: '80', grade: 'A' }
 };
 
 const abilityMap = {
@@ -1399,14 +1405,6 @@ function switchTab(el, key) {
     document.getElementById('competencyVal').textContent = s.competency;
     document.getElementById('scoreVal').textContent = s.score;
     document.getElementById('gradeLabel').textContent = s.grade;
-    
-    // 胜任度正负颜色
-    const compEl = document.getElementById('competencyVal');
-    if (s.competency.startsWith('-')) {
-        compEl.classList.add('negative');
-    } else {
-        compEl.classList.remove('negative');
-    }
     
     // 更新能力画像表
     document.getElementById('abilityBody').innerHTML = abilityMap[key];

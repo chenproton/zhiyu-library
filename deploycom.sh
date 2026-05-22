@@ -38,9 +38,9 @@ echo ""
 cd "$SCRIPT_DIR"
 
 # ── 0. 备份远程标注数据 ──────────────────────────────────────────────
-echo "[0/3] 备份远程标注数据..."
+echo "[0/4] 备份远程标注数据..."
 ssh $SSH_OPTS "$REMOTE_USER@$REMOTE_HOST" \
-  "if [ -f $REMOTE_DATA_PATH ]; then cp $REMOTE_DATA_PATH $BACKUP_PATH && echo '已备份远程标注数据'; else echo '远程无标注数据，跳过备份'; fi"
+  "rm -f $BACKUP_PATH; if [ -f $REMOTE_DATA_PATH ]; then cp $REMOTE_DATA_PATH $BACKUP_PATH && echo '已备份远程标注数据'; else echo '远程无标注数据，跳过备份'; fi"
 
 # ── 1. 本地构建 ──────────────────────────────────────────────────────
 echo "[1/3] 本地构建中..."
@@ -77,9 +77,15 @@ rsync -az --delete-after \
   "$STANDALONE_DIR/" \
   "$REMOTE_USER@$REMOTE_HOST:$REMOTE_DIR/"
 
-# ── 3. 服务器进程切换 ──────────────────────────────────────────────
+# ── 3. 恢复远程标注数据（必须在 PM2 重启前恢复，否则新进程会读到空文件）
 echo ""
-echo "[3/3] 重启 PM2 服务..."
+echo "[3/4] 恢复远程标注数据..."
+ssh $SSH_OPTS "$REMOTE_USER@$REMOTE_HOST" \
+  "if [ -f $BACKUP_PATH ]; then mkdir -p $(dirname $REMOTE_DATA_PATH) && cp $BACKUP_PATH $REMOTE_DATA_PATH && echo '已恢复标注数据'; else echo '无备份数据，跳过恢复'; fi"
+
+# ── 4. 服务器进程切换 ──────────────────────────────────────────────
+echo ""
+echo "[4/4] 重启 PM2 服务..."
 
 ssh $SSH_OPTS "$REMOTE_USER@$REMOTE_HOST" \
   "export SITE_NAME='$SITE_NAME'; export PORT='$PORT'; export REMOTE_DIR='$REMOTE_DIR'; bash -s" << 'REMOTE_EOF'
@@ -101,12 +107,6 @@ ssh $SSH_OPTS "$REMOTE_USER@$REMOTE_HOST" \
 
   pm2 save > /dev/null
 REMOTE_EOF
-
-# ── 4. 恢复远程标注数据 ──────────────────────────────────────────────
-echo ""
-echo "[4/4] 恢复远程标注数据..."
-ssh $SSH_OPTS "$REMOTE_USER@$REMOTE_HOST" \
-  "if [ -f $BACKUP_PATH ]; then mkdir -p $(dirname $REMOTE_DATA_PATH) && mv $BACKUP_PATH $REMOTE_DATA_PATH && echo '已恢复标注数据'; else echo '无备份数据，跳过恢复'; fi"
 
 echo ""
 echo "✨ [$SITE_NAME] 部署任务圆满完成！"

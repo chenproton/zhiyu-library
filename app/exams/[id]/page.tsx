@@ -182,12 +182,6 @@ export default function ExamComposerPage() {
                 <Award className="size-4" />
                 总分 {exam.totalScore} 分
               </span>
-              {!isPreview && (
-                <span className="flex items-center gap-1">
-                  <Clock className="size-4" />
-                  {formatDuration(exam.duration)}
-                </span>
-              )}
             </div>
           </div>
           {!isPreview && (
@@ -262,7 +256,7 @@ export default function ExamComposerPage() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => alert("批量导入题目功能开发中")}
+                onClick={() => alert("此处参考 1.0 版本页面功能即可")}
               >
                 <FileUp className="mr-1 size-4" />
                 批量导入题目

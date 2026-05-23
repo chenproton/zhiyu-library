@@ -110,7 +110,7 @@ export function PositionListPage() {
   }
 
   const handleSaveRule = () => {
-    alert('保存规则功能开发中')
+    alert('此处参考 1.0 版本页面功能即可')
   }
 
   const handleCancelApproval = (position: Position) => {

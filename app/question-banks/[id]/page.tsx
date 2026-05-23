@@ -332,11 +332,11 @@ export default function QuestionBankDetailPage() {
           </Tabs>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={() => alert("导入功能开发中")}>
+          <Button variant="outline" size="sm" onClick={() => alert("此处参考 1.0 版本页面功能即可")}>
             <Upload className="mr-1 size-3.5" />
             导入题目
           </Button>
-          <Button size="sm" onClick={() => { setEditingQuestion(null); setQuestionFormOpen(true) }}>
+          <Button size="sm" onClick={() => alert('此处参考 1.0 版本页面功能即可')}>
             <Plus className="mr-1 size-3.5" />
             添加题目
           </Button>

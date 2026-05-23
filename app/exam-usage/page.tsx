@@ -639,11 +639,11 @@ export default function ExamUsagePage() {
                           <DropdownMenuSeparator />
                           {usage.displayType === '教学考试' && (
                             <>
-                              <DropdownMenuItem onClick={() => alert('编辑功能开发中')}>
+                              <DropdownMenuItem onClick={() => alert('此处参考 1.0 版本页面功能即可')}>
                                 <Pencil className="size-4" />
                                 编辑
                               </DropdownMenuItem>
-                              <DropdownMenuItem variant="destructive" onClick={() => alert('删除功能开发中')}>
+                              <DropdownMenuItem variant="destructive" onClick={() => alert('此处参考 1.0 版本页面功能即可')}>
                                 <Trash2 className="size-4" />
                                 删除
                               </DropdownMenuItem>

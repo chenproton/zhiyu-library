@@ -5,6 +5,9 @@ import { Analytics } from '@vercel/analytics/next'
 import { DataProvider } from '@/components/providers/data-provider'
 import ShellWrapper from './shell-wrapper'
 import { AnnotationClient } from '@/components/annotation-client'
+import { AnnotationEditProvider } from '@/lib/annotation-edit-context'
+import { FloatingAnnotations } from '@/components/floating-annotations'
+import { AnnotationEditToolbar } from '@/components/annotation-edit-toolbar'
 import './globals.css'
 
 // const geist = Geist({ subsets: ["latin"] })
@@ -24,13 +27,17 @@ export default function RootLayout({
     <html lang="zh-CN">
       <body className={`font-sans antialiased`}>
         <DataProvider>
-          <Suspense fallback={
-            <div className="flex min-h-screen bg-[#f5f7fa] pt-14">
-              <main className="min-w-0 flex-1 p-6">{children}</main>
-            </div>
-          }>
-            <ShellWrapper>{children}</ShellWrapper>
-          </Suspense>
+          <AnnotationEditProvider>
+            <Suspense fallback={
+              <div className="flex min-h-screen bg-[#f5f7fa] pt-14">
+                <main className="min-w-0 flex-1 p-6">{children}</main>
+              </div>
+            }>
+              <ShellWrapper>{children}</ShellWrapper>
+            </Suspense>
+            <FloatingAnnotations />
+            <AnnotationEditToolbar />
+          </AnnotationEditProvider>
         </DataProvider>
         {process.env.NODE_ENV === 'production' && <Analytics />}
         <AnnotationClient />

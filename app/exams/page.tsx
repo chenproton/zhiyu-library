@@ -33,6 +33,8 @@ import { useData } from "@/components/providers/data-provider"
 import type { Exam, Status, ExamFormData } from "@/lib/types"
 import { STATUS_LABELS } from "@/lib/types"
 import { mockUsers, mockBatches } from "@/lib/mock-data"
+import { PrdAnnotation } from "@/components/prd-annotation"
+import { getAnnotation } from "@/lib/prd-annotations"
 
 type OwnerTab = 'mine' | 'collaborate' | 'public'
 type ViewMode = 'list' | 'batch'
@@ -142,22 +144,30 @@ export default function ExamsPage() {
         stats={stats}
         actions={
           <>
-            <Button variant="outline">
-              <Settings className="mr-2 size-4" />
-              配置审批流程
-            </Button>
-            <Button variant="outline">
-              <FolderTree className="mr-2 size-4" />
-              配置批次分组
-            </Button>
-            <Button variant="outline">
-              <Upload className="mr-2 size-4" />
-              导入试卷
-            </Button>
-            <Button onClick={() => { setEditingExam(null); setFormOpen(true) }}>
-              <Plus className="mr-2 size-4" />
-              新建试卷
-            </Button>
+            <PrdAnnotation data={getAnnotation("exam-btn-config-approval")}>
+              <Button variant="outline">
+                <Settings className="mr-2 size-4" />
+                配置审批流程
+              </Button>
+            </PrdAnnotation>
+            <PrdAnnotation data={getAnnotation("exam-btn-config-batch")}>
+              <Button variant="outline">
+                <FolderTree className="mr-2 size-4" />
+                配置批次分组
+              </Button>
+            </PrdAnnotation>
+            <PrdAnnotation data={getAnnotation("exam-btn-import")}>
+              <Button variant="outline">
+                <Upload className="mr-2 size-4" />
+                导入试卷
+              </Button>
+            </PrdAnnotation>
+            <PrdAnnotation data={getAnnotation("exam-btn-create")}>
+              <Button onClick={() => { setEditingExam(null); setFormOpen(true) }}>
+                <Plus className="mr-2 size-4" />
+                新建试卷
+              </Button>
+            </PrdAnnotation>
           </>
         }
         className="mb-4"
@@ -233,17 +243,35 @@ export default function ExamsPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[180px]">试卷名称</TableHead>
-                <TableHead className="w-[200px]">试卷简介</TableHead>
-                <TableHead className="w-[80px]">题目数量</TableHead>
-                <TableHead className="w-[80px]">总分</TableHead>
-                <TableHead className="w-[120px]">所属批次</TableHead>
-                <TableHead className="w-[100px]">创建人</TableHead>
-                <TableHead className="w-[140px]">共建人</TableHead>
-                <TableHead className="w-[100px]">状态</TableHead>
+                <TableHead className="w-[180px]">
+                  <PrdAnnotation data={getAnnotation("exam-col-name")}>试卷名称</PrdAnnotation>
+                </TableHead>
+                <TableHead className="w-[200px]">
+                  <PrdAnnotation data={getAnnotation("exam-col-desc")}>试卷简介</PrdAnnotation>
+                </TableHead>
+                <TableHead className="w-[80px]">
+                  <PrdAnnotation data={getAnnotation("exam-col-question-count")}>题目数量</PrdAnnotation>
+                </TableHead>
+                <TableHead className="w-[80px]">
+                  <PrdAnnotation data={getAnnotation("exam-col-total-score")}>总分</PrdAnnotation>
+                </TableHead>
+                <TableHead className="w-[120px]">
+                  <PrdAnnotation data={getAnnotation("exam-col-batch")}>所属批次</PrdAnnotation>
+                </TableHead>
+                <TableHead className="w-[100px]">
+                  <PrdAnnotation data={getAnnotation("exam-col-creator")}>创建人</PrdAnnotation>
+                </TableHead>
+                <TableHead className="w-[140px]">
+                  <PrdAnnotation data={getAnnotation("exam-col-collaborators")}>共建人</PrdAnnotation>
+                </TableHead>
+                <TableHead className="w-[100px]">
+                  <PrdAnnotation data={getAnnotation("exam-col-status")}>状态</PrdAnnotation>
+                </TableHead>
                 <TableHead className="w-[130px]">创建时间</TableHead>
                 <TableHead className="w-[130px]">更新时间</TableHead>
-                <TableHead className="sticky right-0 w-[80px] bg-white text-right">操作</TableHead>
+                <TableHead className="sticky right-0 w-[80px] bg-white text-right">
+                  <PrdAnnotation data={getAnnotation("exam-col-actions")}>操作</PrdAnnotation>
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

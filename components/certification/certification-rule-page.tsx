@@ -44,6 +44,8 @@ import { cn } from '@/lib/utils'
 import { useToast } from '@/hooks/use-toast'
 import { Toaster } from '@/components/ui/toaster'
 import Link from 'next/link'
+import { PrdAnnotation } from '@/components/prd-annotation'
+import { getAnnotation } from '@/lib/prd-annotations'
 
 interface CertificationRulePageProps {
   isGlobal?: boolean
@@ -960,17 +962,19 @@ export function CertificationRulePage({ isGlobal = false, positionId }: Certific
                     )}
                     {row.isFirstOfAbilityPoint && (
                       <TableCell rowSpan={row.abilityPointRowSpan} className="text-center align-top border-r border-border">
-                        <button
-                          className={cn(
-                            'inline-flex items-center gap-1 px-2 py-0.5 rounded text-sm transition-colors',
-                            !isReadOnly && 'hover:bg-secondary cursor-pointer',
-                          )}
-                          onClick={() => handleOpenPointWeightDialog()}
-                          disabled={isReadOnly}
-                        >
-                          <Edit2 className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                          {row.pointWeight > 0 ? `${row.pointWeight}%` : '--'}
-                        </button>
+                        <PrdAnnotation data={getAnnotation("jac-btn-point-weight")}>
+                          <button
+                            className={cn(
+                              'inline-flex items-center gap-1 px-2 py-0.5 rounded text-sm transition-colors',
+                              !isReadOnly && 'hover:bg-secondary cursor-pointer',
+                            )}
+                            onClick={() => handleOpenPointWeightDialog()}
+                            disabled={isReadOnly}
+                          >
+                            <Edit2 className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            {row.pointWeight > 0 ? `${row.pointWeight}%` : '--'}
+                          </button>
+                        </PrdAnnotation>
                       </TableCell>
                     )}
                     <TableCell className="text-primary">
@@ -978,17 +982,19 @@ export function CertificationRulePage({ isGlobal = false, positionId }: Certific
                     </TableCell>
                     <TableCell className="text-center">
                       {row.weight > 0 ? (
-                        <button
-                          className={cn(
-                            'inline-flex items-center gap-1 px-2 py-0.5 rounded text-sm transition-colors',
-                            !isReadOnly && 'hover:bg-secondary cursor-pointer',
-                          )}
-                          onClick={() => handleOpenTaskWeightDialog(row.abilityItemId, row.abilityPointId)}
-                          disabled={isReadOnly}
-                        >
-                          <Edit2 className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                          {row.weight}%
-                        </button>
+                        <PrdAnnotation data={getAnnotation("jac-btn-task-weight")}>
+                          <button
+                            className={cn(
+                              'inline-flex items-center gap-1 px-2 py-0.5 rounded text-sm transition-colors',
+                              !isReadOnly && 'hover:bg-secondary cursor-pointer',
+                            )}
+                            onClick={() => handleOpenTaskWeightDialog(row.abilityItemId, row.abilityPointId)}
+                            disabled={isReadOnly}
+                          >
+                            <Edit2 className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            {row.weight}%
+                          </button>
+                        </PrdAnnotation>
                       ) : (
                         <span className="text-muted-foreground">--</span>
                       )}

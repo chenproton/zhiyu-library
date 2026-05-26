@@ -22,6 +22,8 @@ import { Input } from "@/components/ui/input"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { cn } from "@/lib/utils"
 import { useData } from "@/components/providers/data-provider"
+import { PrdAnnotation } from "@/components/prd-annotation"
+import { getAnnotation } from "@/lib/prd-annotations"
 
 // ==================== Shared Status Filter ====================
 
@@ -796,11 +798,15 @@ function SceneTaskTab() {
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-lg font-semibold text-gray-800">
-                  任务名称：{selectedTask.name}
+                  <PrdAnnotation data={getAnnotation("str-scene-task-name")}>
+                    任务名称：{selectedTask.name}
+                  </PrdAnnotation>
                 </h2>
                 <div className="flex items-center gap-2 mt-1">
                   <span className="text-xs text-gray-500">
-                    场景名称：{selectedScenario?.name}
+                    <PrdAnnotation data={getAnnotation("str-scene-scenario-name")}>
+                      场景名称：{selectedScenario?.name}
+                    </PrdAnnotation>
                   </span>
                   <span className="text-gray-300">|</span>
                   <Badge variant="outline" className="text-xs font-normal text-gray-500">

@@ -55,6 +55,8 @@ import { useData } from "@/components/providers/data-provider"
 import { PageHeaderCard } from "@/components/shared/page-header-card"
 import { CoBuilderDialog } from "@/components/shared/co-builder-dialog"
 import { mockUsers } from "@/lib/mock-data"
+import { PrdAnnotation } from "@/components/prd-annotation"
+import { getAnnotation } from "@/lib/prd-annotations"
 
 // 使用类型：随堂测、在线考试
 type UsageType = 'quiz' | 'exam'
@@ -572,10 +574,12 @@ export default function ExamUsagePage() {
         description="查看试卷在各模块的使用情况"
         className="mb-4"
         actions={
-          <Button onClick={openCreateDialog}>
-            <Plus className="mr-2 size-4" />
-            添加考试
-          </Button>
+          <PrdAnnotation data={getAnnotation("eu-btn-create")}>
+            <Button onClick={openCreateDialog}>
+              <Plus className="mr-2 size-4" />
+              添加考试
+            </Button>
+          </PrdAnnotation>
         }
         stats={[
           {
@@ -648,16 +652,36 @@ export default function ExamUsagePage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[160px]">试卷名称</TableHead>
-                <TableHead className="w-[120px]">使用场景</TableHead>
-                <TableHead className="w-[100px]">面向对象</TableHead>
-                <TableHead className="w-[160px]">考试描述</TableHead>
-                <TableHead className="w-[90px]">考试时长</TableHead>
-                <TableHead className="w-[90px]">参考人数</TableHead>
-                <TableHead className="w-[160px]">考试开放时间</TableHead>
-                <TableHead className="w-[90px]">及格人数</TableHead>
-                <TableHead className="w-[90px]">考试状态</TableHead>
-                <TableHead className="sticky right-0 w-[140px] bg-white text-right">操作</TableHead>
+                <TableHead className="w-[160px]">
+                  <PrdAnnotation data={getAnnotation("eu-col-exam-name")}>试卷名称</PrdAnnotation>
+                </TableHead>
+                <TableHead className="w-[120px]">
+                  <PrdAnnotation data={getAnnotation("eu-col-scene")}>使用场景</PrdAnnotation>
+                </TableHead>
+                <TableHead className="w-[100px]">
+                  <PrdAnnotation data={getAnnotation("eu-col-target")}>面向对象</PrdAnnotation>
+                </TableHead>
+                <TableHead className="w-[160px]">
+                  <PrdAnnotation data={getAnnotation("eu-col-desc")}>考试描述</PrdAnnotation>
+                </TableHead>
+                <TableHead className="w-[90px]">
+                  <PrdAnnotation data={getAnnotation("eu-col-duration")}>考试时长</PrdAnnotation>
+                </TableHead>
+                <TableHead className="w-[90px]">
+                  <PrdAnnotation data={getAnnotation("eu-col-participants")}>参考人数</PrdAnnotation>
+                </TableHead>
+                <TableHead className="w-[160px]">
+                  <PrdAnnotation data={getAnnotation("eu-col-time")}>考试开放时间</PrdAnnotation>
+                </TableHead>
+                <TableHead className="w-[90px]">
+                  <PrdAnnotation data={getAnnotation("eu-col-pass")}>及格人数</PrdAnnotation>
+                </TableHead>
+                <TableHead className="w-[90px]">
+                  <PrdAnnotation data={getAnnotation("eu-col-status")}>考试状态</PrdAnnotation>
+                </TableHead>
+                <TableHead className="sticky right-0 w-[140px] bg-white text-right">
+                  <PrdAnnotation data={getAnnotation("eu-col-actions")}>操作</PrdAnnotation>
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

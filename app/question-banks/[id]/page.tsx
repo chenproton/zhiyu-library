@@ -40,6 +40,8 @@ import { useData } from "@/components/providers/data-provider"
 import type { Question, QuestionType, QuestionFormData, QuestionBankFormData } from "@/lib/types"
 import { QUESTION_TYPE_LABELS, DIFFICULTY_LABELS } from "@/lib/types"
 import { mockUsers, mockDepartments } from "@/lib/mock-data"
+import { PrdAnnotation } from "@/components/prd-annotation"
+import { getAnnotation } from "@/lib/prd-annotations"
 
 export default function QuestionBankDetailPage() {
   const params = useParams()
@@ -338,14 +340,18 @@ export default function QuestionBankDetailPage() {
           </Tabs>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={() => alert("此处参考 1.0 版本页面功能即可")}>
-            <Upload className="mr-1 size-3.5" />
-            导入题目
-          </Button>
-          <Button size="sm" onClick={() => alert('此处参考 1.0 版本页面功能即可')}>
-            <Plus className="mr-1 size-3.5" />
-            添加题目
-          </Button>
+          <PrdAnnotation data={getAnnotation("qbd-btn-import")}>
+            <Button variant="outline" size="sm" onClick={() => alert("此处参考 1.0 版本页面功能即可")}>
+              <Upload className="mr-1 size-3.5" />
+              导入题目
+            </Button>
+          </PrdAnnotation>
+          <PrdAnnotation data={getAnnotation("qbd-btn-add-question")}>
+            <Button size="sm" onClick={() => alert('此处参考 1.0 版本页面功能即可')}>
+              <Plus className="mr-1 size-3.5" />
+              添加题目
+            </Button>
+          </PrdAnnotation>
         </div>
       </div>
 
@@ -418,12 +424,22 @@ export default function QuestionBankDetailPage() {
                   />
                 </TableHead>
               )}
-              <TableHead className="w-[40%]">题目内容</TableHead>
-              <TableHead className="w-[100px]">题型</TableHead>
-              <TableHead className="w-[80px]">难度</TableHead>
-              <TableHead className="w-[100px]">添加来源</TableHead>
+              <TableHead className="w-[40%]">
+                <PrdAnnotation data={getAnnotation("qbd-col-content")}>题目内容</PrdAnnotation>
+              </TableHead>
+              <TableHead className="w-[100px]">
+                <PrdAnnotation data={getAnnotation("qbd-col-type")}>题型</PrdAnnotation>
+              </TableHead>
+              <TableHead className="w-[80px]">
+                <PrdAnnotation data={getAnnotation("qbd-col-difficulty")}>难度</PrdAnnotation>
+              </TableHead>
+              <TableHead className="w-[100px]">
+                <PrdAnnotation data={getAnnotation("qbd-col-source")}>添加来源</PrdAnnotation>
+              </TableHead>
               <TableHead className="w-[120px]">创建时间</TableHead>
-              <TableHead className="w-[120px] text-right">操作</TableHead>
+              <TableHead className="w-[120px] text-right">
+                <PrdAnnotation data={getAnnotation("qbd-col-actions")}>操作</PrdAnnotation>
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

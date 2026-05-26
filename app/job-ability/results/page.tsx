@@ -16,6 +16,8 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { useData } from "@/components/providers/data-provider"
 import { StudentPortraitModal } from "@/components/shared/student-portrait-modal"
 import { PageHeaderCard } from "@/components/shared/page-header-card"
+import { PrdAnnotation } from "@/components/prd-annotation"
+import { getAnnotation } from "@/lib/prd-annotations"
 
 export default function JobAbilityResultsPage() {
   const { jobAbilityResults, positionsList } = useData()

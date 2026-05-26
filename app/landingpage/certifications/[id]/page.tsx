@@ -299,7 +299,7 @@ export default function CertificationDetailPage() {
         {/* 指标 */}
         <div style={{ padding: "24px 32px", display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 24 }}>
           {[
-            { icon: <Clock style={{ width: 18, height: 18 }} />, label: "能力点数量", value: `${gradeData.totalPoints} 个` },
+            { icon: <Clock style={{ width: 18, height: 18 }} />, label: "能力点", value: `${gradeData.totalPoints} 个` },
             { icon: <TrendingUp style={{ width: 18, height: 18 }} />, label: "平均达成率(实时)", value: `${gradeData.avgRate}%` },
             { icon: <Award style={{ width: 18, height: 18 }} />, label: "认定标准最近更新", value: gradeData.lastUpdated },
           ].map((item, i) => (

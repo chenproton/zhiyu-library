@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { Search, Briefcase, User, Calendar, TrendingUp, AlertCircle, GraduationCap, Building2, BookOpen, Award } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -21,7 +21,7 @@ export default function JobAbilityResultsPage() {
   const { jobAbilityResults, positionsList } = useData()
 
   const [search, setSearch] = useState("")
-  const [selectedPositionId, setSelectedPositionId] = useState<string>("all")
+  const [selectedPositionId, setSelectedPositionId] = useState<string>("")
   const [rateFilter, setRateFilter] = useState<string>("all")
   const [portraitOpen, setPortraitOpen] = useState(false)
   const [selectedStudent, setSelectedStudent] = useState<typeof filteredResults[0] | null>(null)
@@ -32,11 +32,18 @@ export default function JobAbilityResultsPage() {
     return positionsList.filter(p => positionIds.has(p.id))
   }, [positionsList, jobAbilityResults])
 
+  // 默认选中第一个岗位
+  useEffect(() => {
+    if (!selectedPositionId && positionsWithResults.length > 0) {
+      setSelectedPositionId(positionsWithResults[0].id)
+    }
+  }, [positionsWithResults, selectedPositionId])
+
   // 右侧筛选后的结果
   const filteredResults = useMemo(() => {
     let results = [...jobAbilityResults]
 
-    if (selectedPositionId !== "all") {
+    if (selectedPositionId) {
       results = results.filter((r) => r.positionId === selectedPositionId)
     }
     if (rateFilter !== "all") {
@@ -100,19 +107,6 @@ export default function JobAbilityResultsPage() {
         </div>
         <ScrollArea className="flex-1">
           <div className="p-2 space-y-1">
-            <button
-              onClick={() => setSelectedPositionId("all")}
-              className={`flex w-full flex-col rounded-lg px-3 py-2.5 text-left text-sm transition-colors ${
-                selectedPositionId === "all"
-                  ? "bg-primary/10 font-medium text-primary"
-                  : "text-gray-700 hover:bg-gray-50"
-              }`}
-            >
-              <div className="flex items-center justify-between">
-                <span>全部岗位</span>
-                <span className="text-xs text-muted-foreground">{jobAbilityResults.length} 人</span>
-              </div>
-            </button>
             {positionsWithResults.map((pos) => (
               <button
                 key={pos.id}
@@ -138,11 +132,7 @@ export default function JobAbilityResultsPage() {
       <div className="flex-1 overflow-auto px-8 py-6">
         <PageHeaderCard
           title="岗位能力认定结果"
-          description={
-            selectedPositionId === "all"
-              ? "查看所有岗位的认定结果"
-              : `查看 ${positionsList.find(p => p.id === selectedPositionId)?.name || ''} 的认定结果`
-          }
+          description={`查看 ${positionsList.find(p => p.id === selectedPositionId)?.name || ''} 的认定结果`}
           className="mb-4"
         />
 
@@ -173,14 +163,13 @@ export default function JobAbilityResultsPage() {
                   <TableHead className="w-[140px]">岗位能力达标率</TableHead>
                   <TableHead className="w-[120px]">岗位胜任度</TableHead>
                   <TableHead className="w-[120px]">岗位能力认定得分</TableHead>
-                  <TableHead className="w-[120px]">岗位能力认定毕业标准</TableHead>
                   <TableHead className="w-[140px]">更新时间</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredResults.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={10} className="h-24 text-center text-muted-foreground">
+                    <TableCell colSpan={9} className="h-24 text-center text-muted-foreground">
                       {jobAbilityResults.length === 0 ? "暂无认定结果" : "没有找到匹配的认定结果"}
                     </TableCell>
                   </TableRow>
@@ -205,9 +194,6 @@ export default function JobAbilityResultsPage() {
                       </TableCell>
                       <TableCell>
                         <span className="text-sm font-medium text-blue-600">{getRandomScore(result.id)}</span>
-                      </TableCell>
-                      <TableCell>
-                        <span className="text-sm font-medium">{getGradeLabel(result.grade)}</span>
                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground">
                         {formatDateTime(result.evaluationTime)}

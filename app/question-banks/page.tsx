@@ -121,7 +121,7 @@ export default function QuestionBanksPage() {
 
   const handleDelete = (bank: QuestionBank) => {
     if (bank.isDraftPool) {
-      alert('我的草稿库不可删除')
+      alert('默认题库不可删除')
       return
     }
     if (confirm(`确定要删除题库「${bank.name}」吗？题库中的所有题目也会被删除。`)) {
@@ -300,7 +300,7 @@ export default function QuestionBanksPage() {
                       <span className="text-sm text-muted-foreground">张三</span>
                     </TableCell>
                     <TableCell>
-                      <span className="text-sm text-muted-foreground">{bank.isDraftPool ? '李四、王五' : (bank.collaboratorIds?.length ? bank.collaboratorIds.map(id => mockUsers.find(u => u.id === id)?.name).filter(Boolean).join('、') || '-' : '-')}</span>
+                      <span className="text-sm text-muted-foreground">{bank.isDraftPool ? '-' : (bank.collaboratorIds?.length ? bank.collaboratorIds.map(id => mockUsers.find(u => u.id === id)?.name).filter(Boolean).join('、') || '-' : '-')}</span>
                     </TableCell>
                     <TableCell>
                       {bank.isDraftPool ? (

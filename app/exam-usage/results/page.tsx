@@ -40,6 +40,7 @@ interface ExamStudentResult {
   totalScore: number
   submitTime: Date
   isPass: boolean
+  rank: number
 }
 
 // 模拟学生数据
@@ -80,9 +81,12 @@ function generateMockResults(usage: ExamUsage): ExamStudentResult[] {
       totalScore,
       submitTime: new Date(examStartTime.getTime() + Math.random() * timeRange),
       isPass: score >= passScore,
+      rank: 0,
     })
   }
-  return results.sort((a, b) => b.score - a.score)
+  const sorted = results.sort((a, b) => b.score - a.score)
+  sorted.forEach((r, idx) => { r.rank = idx + 1 })
+  return sorted
 }
 
 function getUsageIcon(usage: ExamUsage) {
@@ -314,6 +318,9 @@ function ExamResultsContent() {
                   <TableRow key={result.id}>
                     <TableCell>
                       <div className="flex items-center gap-1.5">
+                        <span className="inline-flex w-6 items-center justify-center text-xs font-semibold text-muted-foreground">
+                          {result.rank}
+                        </span>
                         <User className="size-3.5 text-blue-500" />
                         <span className="text-sm">{result.studentName}</span>
                       </div>

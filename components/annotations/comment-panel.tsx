@@ -388,7 +388,7 @@ export function CommentPanel({
                                 <textarea
                                   value={editContent}
                                   onChange={(e) => setEditContent(e.target.value)}
-                                  className="w-full h-20 p-2 border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:border-transparent text-sm"
+                                  className="w-full h-60 p-2 border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:border-transparent text-sm"
                                   style={{ '--tw-ring-color': primaryColor } as React.CSSProperties}
                                 />
                                 <div className="flex gap-2 mt-2">

@@ -212,7 +212,7 @@ export default function CertificationsPage() {
                       <div style={{ fontSize: 18, fontWeight: "bold", color: "#2563eb" }}>
                         {pos.relatedAbilityCount}
                       </div>
-                      <div style={{ fontSize: 12, color: "#94a3b8" }}>能力项</div>
+                      <div style={{ fontSize: 12, color: "#94a3b8" }}>能力点</div>
                     </div>
                   </div>
                 </div>

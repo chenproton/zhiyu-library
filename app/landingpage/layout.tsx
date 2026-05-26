@@ -10,7 +10,7 @@ export default function LandingLayout({
       {children}
       {/* 页脚 */}
       <footer style={{ background: "#1e293b", color: "#94a3b8", padding: "24px 20px", textAlign: "center", fontSize: 13, marginTop: 40 }}>
-        <p>© 2024 能力测评认定平台 | 一站式能力成长平台</p>
+        <p>© 2024 能力测评中心 | 一站式能力成长平台</p>
       </footer>
     </div>
   )

@@ -393,6 +393,7 @@ export interface EvaluationMethod {
   relatedTaskIds: string[]
   description?: string
   docLink?: string
+  subCategoryName?: string
 }
 
 // 场景任务

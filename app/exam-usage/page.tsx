@@ -37,6 +37,14 @@ import { Textarea } from "@/components/ui/textarea"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command"
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -87,7 +95,7 @@ export const mockClasses = [
 export interface OrgNode {
   id: string
   name: string
-  type: 'department' | 'grade' | 'class'
+  type: 'department' | 'grade' | 'class' | 'student'
   children?: OrgNode[]
 }
 
@@ -102,9 +110,36 @@ export const mockOrgClasses: OrgNode[] = [
         name: '2024级',
         type: 'grade',
         children: [
-          { id: 'class-1', name: '2024级前端开发1班', type: 'class' },
-          { id: 'class-2', name: '2024级前端开发2班', type: 'class' },
-          { id: 'class-3', name: '2024级后端开发1班', type: 'class' },
+          {
+            id: 'class-1',
+            name: '2024级前端开发1班',
+            type: 'class',
+            children: [
+              { id: 'stu-1-1', name: '张伟', type: 'student' },
+              { id: 'stu-1-2', name: '李娜', type: 'student' },
+              { id: 'stu-1-3', name: '王强', type: 'student' },
+            ]
+          },
+          {
+            id: 'class-2',
+            name: '2024级前端开发2班',
+            type: 'class',
+            children: [
+              { id: 'stu-2-1', name: '刘洋', type: 'student' },
+              { id: 'stu-2-2', name: '陈静', type: 'student' },
+              { id: 'stu-2-3', name: '杨帆', type: 'student' },
+            ]
+          },
+          {
+            id: 'class-3',
+            name: '2024级后端开发1班',
+            type: 'class',
+            children: [
+              { id: 'stu-3-1', name: '赵敏', type: 'student' },
+              { id: 'stu-3-2', name: '孙磊', type: 'student' },
+              { id: 'stu-3-3', name: '周涛', type: 'student' },
+            ]
+          },
         ]
       },
       {
@@ -112,7 +147,15 @@ export const mockOrgClasses: OrgNode[] = [
         name: '2023级',
         type: 'grade',
         children: [
-          { id: 'class-8', name: '2023级前端开发1班', type: 'class' },
+          {
+            id: 'class-8',
+            name: '2023级前端开发1班',
+            type: 'class',
+            children: [
+              { id: 'stu-8-1', name: '吴倩', type: 'student' },
+              { id: 'stu-8-2', name: '郑宇', type: 'student' },
+            ]
+          },
         ]
       }
     ]
@@ -127,9 +170,36 @@ export const mockOrgClasses: OrgNode[] = [
         name: '2024级',
         type: 'grade',
         children: [
-          { id: 'class-4', name: '2024级后端开发2班', type: 'class' },
-          { id: 'class-5', name: '2024级全栈开发班', type: 'class' },
-          { id: 'class-6', name: '2024级测试工程班', type: 'class' },
+          {
+            id: 'class-4',
+            name: '2024级后端开发2班',
+            type: 'class',
+            children: [
+              { id: 'stu-4-1', name: '马超', type: 'student' },
+              { id: 'stu-4-2', name: '朱琳', type: 'student' },
+              { id: 'stu-4-3', name: '胡军', type: 'student' },
+            ]
+          },
+          {
+            id: 'class-5',
+            name: '2024级全栈开发班',
+            type: 'class',
+            children: [
+              { id: 'stu-5-1', name: '郭明', type: 'student' },
+              { id: 'stu-5-2', name: '何秀', type: 'student' },
+              { id: 'stu-5-3', name: '高飞', type: 'student' },
+            ]
+          },
+          {
+            id: 'class-6',
+            name: '2024级测试工程班',
+            type: 'class',
+            children: [
+              { id: 'stu-6-1', name: '林峰', type: 'student' },
+              { id: 'stu-6-2', name: '罗丹', type: 'student' },
+              { id: 'stu-6-3', name: '梁雪', type: 'student' },
+            ]
+          },
         ]
       },
       {
@@ -137,7 +207,15 @@ export const mockOrgClasses: OrgNode[] = [
         name: '2023级',
         type: 'grade',
         children: [
-          { id: 'class-7', name: '2023级产品设计班', type: 'class' },
+          {
+            id: 'class-7',
+            name: '2023级产品设计班',
+            type: 'class',
+            children: [
+              { id: 'stu-7-1', name: '宋佳', type: 'student' },
+              { id: 'stu-7-2', name: '唐勇', type: 'student' },
+            ]
+          },
         ]
       }
     ]
@@ -287,6 +365,7 @@ export default function ExamUsagePage() {
   const [targetAudience, setTargetAudience] = useState<'student' | 'teacher'>('student')
   const [selectedTeacherIds, setSelectedTeacherIds] = useState<string[]>([])
   const [teacherDialogOpen, setTeacherDialogOpen] = useState(false)
+  const [examSelectOpen, setExamSelectOpen] = useState(false)
 
   const selectedExam = exams.find(e => e.id === selectedExamId)
 
@@ -420,23 +499,28 @@ export default function ExamUsagePage() {
     }
   }
 
-  const getDescendantClassIds = (node: OrgNode): string[] => {
-    if (node.type === 'class') return [node.id]
-    return (node.children || []).flatMap(getDescendantClassIds)
+  const getDescendantIds = (node: OrgNode): string[] => {
+    if (node.type === 'student') return [node.id]
+    return (node.children || []).flatMap(getDescendantIds)
   }
 
   const isNodeFullySelected = (node: OrgNode): boolean => {
-    const classIds = getDescendantClassIds(node)
-    return classIds.length > 0 && classIds.every(id => selectedClassIds.includes(id))
+    const ids = getDescendantIds(node)
+    return ids.length > 0 && ids.every(id => selectedClassIds.includes(id))
+  }
+
+  const isNodePartiallySelected = (node: OrgNode): boolean => {
+    const ids = getDescendantIds(node)
+    return ids.some(id => selectedClassIds.includes(id)) && !ids.every(id => selectedClassIds.includes(id))
   }
 
   const toggleNode = (node: OrgNode) => {
-    const classIds = getDescendantClassIds(node)
-    const allSelected = classIds.every(id => selectedClassIds.includes(id))
+    const ids = getDescendantIds(node)
+    const allSelected = ids.every(id => selectedClassIds.includes(id))
     if (allSelected) {
-      setSelectedClassIds(prev => prev.filter(id => !classIds.includes(id)))
+      setSelectedClassIds(prev => prev.filter(id => !ids.includes(id)))
     } else {
-      setSelectedClassIds(prev => Array.from(new Set([...prev, ...classIds])))
+      setSelectedClassIds(prev => Array.from(new Set([...prev, ...ids])))
     }
   }
 
@@ -450,23 +534,31 @@ export default function ExamUsagePage() {
   const renderOrgNode = (node: OrgNode, depth: number) => {
     if (!nodeMatchesSearch(node, orgSearch)) return null
     const checked = isNodeFullySelected(node)
-    const indentClass = depth === 0 ? 'pl-2' : depth === 1 ? 'pl-6' : 'pl-10'
+    const indeterminate = isNodePartiallySelected(node)
+    const indentClass = depth === 0 ? 'pl-2' : depth === 1 ? 'pl-6' : depth === 2 ? 'pl-10' : 'pl-14'
 
     return (
       <div key={node.id}>
         <label className={`flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 hover:bg-muted ${indentClass}`}>
-          <Checkbox checked={checked} onCheckedChange={() => toggleNode(node)} />
+          <Checkbox
+            checked={checked}
+            data-state={indeterminate ? 'indeterminate' : checked ? 'checked' : 'unchecked'}
+            onCheckedChange={() => toggleNode(node)}
+          />
           <span className="text-sm">{node.name}</span>
+          {node.type === 'student' && (
+            <span className="text-xs text-muted-foreground">学生</span>
+          )}
         </label>
         {node.children?.map(child => renderOrgNode(child, depth + 1))}
       </div>
     )
   }
 
-  const classNameMap = useMemo(() => {
+  const nodeNameMap = useMemo(() => {
     const map = new Map<string, string>()
     const traverse = (node: OrgNode) => {
-      if (node.type === 'class') map.set(node.id, node.name)
+      map.set(node.id, node.name)
       node.children?.forEach(traverse)
     }
     mockOrgClasses.forEach(traverse)
@@ -673,24 +765,48 @@ export default function ExamUsagePage() {
             <FieldGroup className="py-4">
               <Field>
                 <FieldLabel>选择试卷 *</FieldLabel>
-                <Select value={selectedExamId} onValueChange={setSelectedExamId}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="请选择一份试卷" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      {exams.length === 0 ? (
-                        <SelectItem value="none" disabled>暂无可用试卷</SelectItem>
-                      ) : (
-                        exams.map((exam) => (
-                          <SelectItem key={exam.id} value={exam.id}>
-                            {exam.name}（{exam.totalScore}分 / {exam.questions.length}题）
-                          </SelectItem>
-                        ))
-                      )}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
+                <Popover open={examSelectOpen} onOpenChange={setExamSelectOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-between font-normal"
+                    >
+                      <span className="truncate">
+                        {selectedExam
+                          ? `${selectedExam.name}（${selectedExam.totalScore}分 / ${selectedExam.questions.length}题）`
+                          : "请选择一份试卷"}
+                      </span>
+                      <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[320px] p-0" align="start">
+                    <Command>
+                      <CommandInput placeholder="搜索试卷..." />
+                      <CommandList>
+                        <CommandEmpty>未找到匹配试卷</CommandEmpty>
+                        <CommandGroup>
+                          {exams.map((exam) => (
+                            <CommandItem
+                              key={exam.id}
+                              value={exam.id}
+                              onSelect={() => {
+                                setSelectedExamId(exam.id)
+                                setExamSelectOpen(false)
+                              }}
+                            >
+                              <span className="flex-1 truncate">
+                                {exam.name}（{exam.totalScore}分 / {exam.questions.length}题）
+                              </span>
+                              {selectedExamId === exam.id && (
+                                <CheckCircle2 className="size-4 text-primary" />
+                              )}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
               </Field>
 
               <Field>
@@ -786,14 +902,14 @@ export default function ExamUsagePage() {
 
               {targetAudience === 'student' && (
                 <Field>
-                  <FieldLabel>参考班级</FieldLabel>
+                  <FieldLabel>参考学生</FieldLabel>
                   <Popover open={orgPopoverOpen} onOpenChange={setOrgPopoverOpen}>
                     <PopoverTrigger asChild>
                       <Button variant="outline" className="w-full justify-between font-normal">
                         <span className="truncate">
                           {selectedClassIds.length === 0
-                            ? "请选择参考班级"
-                            : `已选 ${selectedClassIds.length} 个班级`
+                            ? "请选择参考学生"
+                            : `已选 ${selectedClassIds.length} 人`
                           }
                         </span>
                         <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
@@ -804,25 +920,25 @@ export default function ExamUsagePage() {
                         <div className="relative">
                           <Search className="absolute left-2 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                           <Input
-                            placeholder="搜索班级..."
+                            placeholder="搜索学生或班级..."
                             value={orgSearch}
                             onChange={(e) => setOrgSearch(e.target.value)}
                             className="pl-8"
                           />
                         </div>
                       </div>
-                      <ScrollArea className="h-[240px] overflow-hidden">
+                      <ScrollArea className="h-[280px] overflow-hidden">
                         <div className="p-2">
                           {mockOrgClasses.map(node => renderOrgNode(node, 0))}
                         </div>
                       </ScrollArea>
                       {selectedClassIds.length > 0 && (
                         <div className="border-t p-2">
-                          <div className="mb-1 text-xs text-muted-foreground">已选班级</div>
+                          <div className="mb-1 text-xs text-muted-foreground">已选学生</div>
                           <div className="flex flex-wrap gap-1">
                             {selectedClassIds.map(id => (
                               <Badge key={id} variant="secondary" className="gap-1">
-                                {classNameMap.get(id) || id}
+                                {nodeNameMap.get(id) || id}
                                 <button
                                   type="button"
                                   onClick={() => handleToggleClass(id)}

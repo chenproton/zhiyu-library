@@ -118,11 +118,12 @@ export default function EvaluationMethodsPage() {
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/30 hover:bg-muted/30">
-              <TableHead className="w-[130px]">一级分类</TableHead>
-              <TableHead className="w-[140px]">二级分类（测评方式）</TableHead>
+              <TableHead className="w-[120px]">一级分类</TableHead>
+              <TableHead className="w-[120px]">二级分类</TableHead>
+              <TableHead className="w-[140px]">测评方式</TableHead>
               <TableHead className="w-[90px] text-center">前台展示</TableHead>
-              <TableHead className="min-w-[260px]">测评方式说明</TableHead>
-              <TableHead className="w-[180px]">文档链接</TableHead>
+              <TableHead className="min-w-[200px]">测评方式说明</TableHead>
+              <TableHead className="w-[160px]">文档链接</TableHead>
               <TableHead className="w-[120px] text-center">管理场景任务</TableHead>
               <TableHead className="w-[100px] text-right">操作</TableHead>
             </TableRow>
@@ -130,77 +131,100 @@ export default function EvaluationMethodsPage() {
           <TableBody>
             {groupedMethods.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
+                <TableCell colSpan={8} className="h-24 text-center text-muted-foreground">
                   暂无测评方式
                 </TableCell>
               </TableRow>
             ) : (
-              groupedMethods.map(([categoryId, methods]) => {
+              groupedMethods.flatMap(([categoryId, methods]) => {
                 const categoryName = getCategoryName(categoryId)
-                return methods.map((method, index) => {
-                  const taskCount = getSceneTasksByMethod(method.id).length
-                  return (
-                    <TableRow key={method.id}>
-                      {index === 0 && (
-                        <TableCell
-                          rowSpan={methods.length}
-                          className="align-top font-medium bg-muted/10 border-r"
-                        >
-                          <Badge variant="outline" className="text-xs">{categoryName}</Badge>
-                        </TableCell>
-                      )}
-                      <TableCell>
-                        <span className={`text-sm ${method.enabled ? 'text-foreground' : 'text-muted-foreground'}`}>
-                          {method.name}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <Switch
-                          checked={method.enabled}
-                          onCheckedChange={() => handleToggle(method)}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <span className="text-sm text-muted-foreground line-clamp-2">
-                          {method.description || '-'}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        {method.docLink ? (
-                          <a
-                            href={method.docLink}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline truncate max-w-[160px]"
+                // 按二级分类再分组
+                const subGroups = new Map<string, EvaluationMethod[]>()
+                methods.forEach((m) => {
+                  const sub = m.subCategoryName || '-'
+                  const list = subGroups.get(sub) || []
+                  list.push(m)
+                  subGroups.set(sub, list)
+                })
+                const subGroupEntries = Array.from(subGroups.entries())
+                let globalMethodIndex = 0
+                return subGroupEntries.flatMap(([subName, subMethods]) => {
+                  return subMethods.map((method, idx) => {
+                    const taskCount = getSceneTasksByMethod(method.id).length
+                    const isFirstOfCategory = globalMethodIndex === 0
+                    const isFirstOfSub = idx === 0
+                    globalMethodIndex++
+                    return (
+                      <TableRow key={method.id}>
+                        {isFirstOfCategory && (
+                          <TableCell
+                            rowSpan={methods.length}
+                            className="align-top font-medium bg-muted/10 border-r"
                           >
-                            <ExternalLink className="size-3 shrink-0" />
-                            <span className="truncate">{method.docLink}</span>
-                          </a>
-                        ) : (
-                          <span className="text-sm text-muted-foreground">-</span>
+                            <Badge variant="outline" className="text-xs">{categoryName}</Badge>
+                          </TableCell>
                         )}
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <button
-                          className="text-sm font-medium text-primary hover:underline"
-                          onClick={() => handleOpenTasks(method)}
-                        >
-                          {taskCount} 个任务
-                        </button>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-7 gap-1 text-xs"
-                          onClick={() => handleOpenEdit(method)}
-                        >
-                          <Pencil className="size-3" />
-                          编辑
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  )
+                        {isFirstOfSub && (
+                          <TableCell
+                            rowSpan={subMethods.length}
+                            className="align-top text-muted-foreground border-r"
+                          >
+                            <span className="text-sm">{subName}</span>
+                          </TableCell>
+                        )}
+                        <TableCell>
+                          <span className={`text-sm ${method.enabled ? 'text-foreground' : 'text-muted-foreground'}`}>
+                            {method.name}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <Switch
+                            checked={method.enabled}
+                            onCheckedChange={() => handleToggle(method)}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <span className="text-sm text-muted-foreground line-clamp-2">
+                            {method.description || '-'}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          {method.docLink ? (
+                            <a
+                              href={method.docLink}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline truncate max-w-[160px]"
+                            >
+                              <ExternalLink className="size-3 shrink-0" />
+                              <span className="truncate">{method.docLink}</span>
+                            </a>
+                          ) : (
+                            <span className="text-sm text-muted-foreground">-</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <button
+                            className="text-sm font-medium text-primary hover:underline"
+                            onClick={() => handleOpenTasks(method)}
+                          >
+                            {taskCount} 个任务
+                          </button>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 gap-1 text-xs"
+                            onClick={() => handleOpenEdit(method)}
+                          >
+                            <Pencil className="size-3" />
+                            编辑
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })
                 })
               })
             )}

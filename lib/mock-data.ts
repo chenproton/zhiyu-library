@@ -68,7 +68,7 @@ export const mockQuestionBanks: QuestionBank[] = [
   },
   {
     id: 'draft-pool',
-    name: '我的草稿库',
+    name: '默认题库',
     description: '',
     status: 'draft',
     questionCount: 8,
@@ -2139,23 +2139,29 @@ export const mockJobAbilityResults: JobAbilityResult[] = [
 
 // 一级测评分类
 export const mockEvaluationCategories: EvaluationMethodCategory[] = [
-  { id: 'cat-1', name: '知识测评', order: 1 },
-  { id: 'cat-2', name: '过程测评', order: 2 },
-  { id: 'cat-3', name: '成果测评', order: 3 },
+  { id: 'cat-platform', name: '平台通用', order: 1 },
+  { id: 'cat-industry', name: '行业专属', order: 2 },
 ]
 
-// 二级测评方式
+// 二级测评方式（含三级 subCategoryName）
 export const mockEvaluationMethods: EvaluationMethod[] = [
-  // 知识测评
-  { id: 'method-1-1', categoryId: 'cat-1', name: '题库', enabled: true, relatedTaskIds: ['st-1'], description: '通过题库系统对学生进行知识掌握程度的考核，支持客观题与主观题混合组卷。', docLink: 'https://www.baidu.com' },
-  { id: 'method-1-2', categoryId: 'cat-1', name: '试卷', enabled: true, relatedTaskIds: ['st-2'], description: '以标准化试卷形式，系统检验学生对课程知识点的理解、记忆与综合运用能力。', docLink: 'https://www.baidu.com' },
-  { id: 'method-1-3', categoryId: 'cat-1', name: '随堂测', enabled: true, relatedTaskIds: ['st-3'], description: '课堂实时进行的简短测验，快速反馈学生对当堂教学内容的掌握情况。', docLink: 'https://www.baidu.com' },
-  // 过程测评
-  { id: 'method-2-1', categoryId: 'cat-2', name: '现场问答', enabled: true, relatedTaskIds: ['st-4'], description: '以口头问答形式，在真实教学场景中检验学生对知识点的即时反应与表达。', docLink: 'https://www.baidu.com' },
-  // 成果测评
-  { id: 'method-3-1', categoryId: 'cat-3', name: '在线评审', enabled: true, relatedTaskIds: ['st-5'], description: '对学生提交的作品、报告或方案进行在线多维度评审与打分。', docLink: 'https://www.baidu.com' },
-  { id: 'method-3-2', categoryId: 'cat-3', name: '作业', enabled: true, relatedTaskIds: ['st-6'], description: '通过课后作业的完成质量，评估学生对课堂知识的巩固程度和应用能力。', docLink: 'https://www.baidu.com' },
-  { id: 'method-3-3', categoryId: 'cat-3', name: '成果评价', enabled: true, relatedTaskIds: ['st-6'], description: '基于学生完成的课程项目、实践成果或综合报告，进行系统性评价与等级认定。', docLink: 'https://www.baidu.com' },
+  // 平台通用 / 知识
+  { id: 'method-1-1', categoryId: 'cat-platform', subCategoryName: '知识', name: '题库', enabled: true, relatedTaskIds: ['st-1'], description: '通过题库系统对学生进行知识掌握程度的考核，支持客观题与主观题混合组卷。', docLink: 'https://www.baidu.com' },
+  { id: 'method-1-2', categoryId: 'cat-platform', subCategoryName: '知识', name: '试卷', enabled: true, relatedTaskIds: ['st-2'], description: '以标准化试卷形式，系统检验学生对课程知识点的理解、记忆与综合运用能力。', docLink: 'https://www.baidu.com' },
+  { id: 'method-1-3', categoryId: 'cat-platform', subCategoryName: '知识', name: '随堂测', enabled: true, relatedTaskIds: ['st-3'], description: '课堂实时进行的简短测验，快速反馈学生对当堂教学内容的掌握情况。', docLink: 'https://www.baidu.com' },
+  // 平台通用 / 过程评价
+  { id: 'method-2-1', categoryId: 'cat-platform', subCategoryName: '过程评价', name: '现场问答', enabled: true, relatedTaskIds: ['st-4'], description: '以口头问答形式，在真实教学场景中检验学生对知识点的即时反应与表达。', docLink: 'https://www.baidu.com' },
+  // 平台通用 / 成果评价
+  { id: 'method-3-1', categoryId: 'cat-platform', subCategoryName: '成果评价', name: '在线评审', enabled: true, relatedTaskIds: ['st-5'], description: '对学生提交的作品、报告或方案进行在线多维度评审与打分。', docLink: 'https://www.baidu.com' },
+  { id: 'method-3-2', categoryId: 'cat-platform', subCategoryName: '成果评价', name: '作业', enabled: true, relatedTaskIds: ['st-6'], description: '通过课后作业的完成质量，评估学生对课堂知识的巩固程度和应用能力。', docLink: 'https://www.baidu.com' },
+  { id: 'method-3-3', categoryId: 'cat-platform', subCategoryName: '成果评价', name: '成果评价', enabled: true, relatedTaskIds: ['st-6'], description: '基于学生完成的课程项目、实践成果或综合报告，进行系统性评价与等级认定。', docLink: 'https://www.baidu.com' },
+  // 行业专属 / 智慧物流
+  { id: 'method-logistics-1', categoryId: 'cat-industry', subCategoryName: '智慧物流', name: 'WMS（入库单）自动化评分', enabled: true, relatedTaskIds: ['st-logistics-1'], description: '基于仓储管理系统（WMS）入库单操作数据，对学生进行入库流程规范、数据录入准确性及异常处理能力的自动化评分。', docLink: 'https://www.baidu.com' },
+  { id: 'method-logistics-2', categoryId: 'cat-industry', subCategoryName: '智慧物流', name: 'WMS（出库单）自动化评分', enabled: true, relatedTaskIds: ['st-logistics-2'], description: '基于仓储管理系统（WMS）出库单操作数据，对学生进行出库流程规范、拣货策略应用及发货准确性的自动化评分。', docLink: 'https://www.baidu.com' },
+  { id: 'method-logistics-3', categoryId: 'cat-industry', subCategoryName: '智慧物流', name: 'WMS（波次分拣）自动化评分', enabled: true, relatedTaskIds: ['st-logistics-3'], description: '基于仓储管理系统（WMS）波次分拣任务数据，对学生进行波次规划、分拣路径优化及订单履约效率的自动化评分。', docLink: 'https://www.baidu.com' },
+  // 行业专属 / 网络安全
+  { id: 'method-cyber-1', categoryId: 'cat-industry', subCategoryName: '网络安全', name: '网络流量分析自助评价', enabled: true, relatedTaskIds: ['st-cyber-1'], description: '通过模拟真实网络流量场景，对学生进行网络协议分析、异常流量识别与安全事件溯源能力的自助式评价。', docLink: 'https://www.baidu.com' },
+  { id: 'method-cyber-2', categoryId: 'cat-industry', subCategoryName: '网络安全', name: '网络靶场自助评价', enabled: true, relatedTaskIds: ['st-cyber-2'], description: '在虚拟化网络靶场环境中，对学生进行渗透测试、漏洞利用、防御加固等网络安全实战能力的自助式评价。', docLink: 'https://www.baidu.com' },
 ]
 
 // 场景任务
@@ -2190,6 +2196,13 @@ export const mockSceneTasks: SceneTask[] = [
   { id: 'st-28', name: '前端开发工程师认定', sceneName: '职业能力认定中心', methodIds: ['method-9-3'] },
   { id: 'st-29', name: '阶段成果汇报', sceneName: '项目评审室', methodIds: ['method-1-4'] },
   { id: 'st-30', name: '课后编程作业', sceneName: '在线学习平台', methodIds: ['method-1-5'] },
+  // 网络安全
+  { id: 'st-cyber-1', name: '网络流量分析与溯源', sceneName: '网络安全实训室', methodIds: ['method-cyber-1'] },
+  { id: 'st-cyber-2', name: '靶场攻防实战', sceneName: '网络靶场实验室', methodIds: ['method-cyber-2'] },
+  // 智慧物流
+  { id: 'st-logistics-1', name: '入库单录入与审核', sceneName: '智慧物流仓储中心', methodIds: ['method-logistics-1'] },
+  { id: 'st-logistics-2', name: '出库单拣货与复核', sceneName: '智慧物流仓储中心', methodIds: ['method-logistics-2'] },
+  { id: 'st-logistics-3', name: '波次分拣任务执行', sceneName: '智慧物流分拣中心', methodIds: ['method-logistics-3'] },
 ]
 
 // 场景任务测评结果

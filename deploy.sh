@@ -26,6 +26,7 @@ PUBLIC_DIR="$SCRIPT_DIR/public"
 ANNOTATION_DATA_FILE="data/annotations.json"
 REMOTE_DATA_PATH="$REMOTE_DIR/$ANNOTATION_DATA_FILE"
 BACKUP_PATH="/tmp/annotations-backup-${SITE_NAME}.json"
+HISTORY_BACKUP_DIR="/var/backups/${SITE_NAME}"
 
 SSH_OPTS="-o StrictHostKeyChecking=no -o ConnectTimeout=15 -o ServerAliveInterval=60 -o ServerAliveCountMax=3 -p $SSH_PORT"
 
@@ -41,6 +42,17 @@ cd "$SCRIPT_DIR"
 echo "[0/4] 备份远程标注数据..."
 ssh $SSH_OPTS "$REMOTE_USER@$REMOTE_HOST" \
   "rm -f $BACKUP_PATH; if [ -f $REMOTE_DATA_PATH ]; then cp $REMOTE_DATA_PATH $BACKUP_PATH && echo '已备份远程标注数据'; else echo '远程无标注数据，跳过备份'; fi"
+
+# 同时保存多份历史备份（保留最近 30 天）
+echo "[0.5/4] 保存历史备份..."
+ssh $SSH_OPTS "$REMOTE_USER@$REMOTE_HOST" \
+  "mkdir -p $HISTORY_BACKUP_DIR && if [ -f $REMOTE_DATA_PATH ]; then cp $REMOTE_DATA_PATH $HISTORY_BACKUP_DIR/annotations-$(date +%Y%m%d-%H%M%S).json && find $HISTORY_BACKUP_DIR -name 'annotations-*.json' -mtime +30 -delete && echo '已保存历史备份（保留30天）'; else echo '无标注数据，跳过历史备份'; fi"
+
+# 设置每日自动备份（仅首次）
+ssh $SSH_OPTS "$REMOTE_USER@$REMOTE_HOST" \
+  "(crontab -l 2>/dev/null | grep -q '${SITE_NAME}/data/annotations.json') || ((crontab -l 2>/dev/null || true); echo '0 3 * * * mkdir -p $HISTORY_BACKUP_DIR && cp $REMOTE_DATA_PATH $HISTORY_BACKUP_DIR/annotations-daily-\$(date +\%Y\%m\%d).json && find $HISTORY_BACKUP_DIR -name \"annotations-*.json\" -mtime +30 -delete') | crontab - && echo '已设置每日自动备份'"
+
+sleep 3
 
 # ── 1. 本地构建 ──────────────────────────────────────────────────────
 echo "[1/3] 本地构建中..."
@@ -67,6 +79,8 @@ echo "[2/3] 远程清扫与同步..."
 ssh $SSH_OPTS "$REMOTE_USER@$REMOTE_HOST" \
   "mkdir -p $REMOTE_DIR && find $REMOTE_DIR -maxdepth 3 \( -name 'dist' -o -name '.next' -o -name 'standalone' \) -exec rm -rf {} + || true"
 
+sleep 5
+
 # 执行增量同步
 rsync -az --delete-after \
   -e "ssh $SSH_OPTS" \
@@ -74,14 +88,19 @@ rsync -az --delete-after \
   --exclude='*.map' \
   --exclude='*.log' \
   --exclude='logs/' \
+  --exclude='data/' \
   "$STANDALONE_DIR/" \
   "$REMOTE_USER@$REMOTE_HOST:$REMOTE_DIR/"
+
+sleep 3
 
 # ── 3. 恢复远程标注数据（必须在 PM2 重启前恢复，否则新进程会读到空文件）
 echo ""
 echo "[3/4] 恢复远程标注数据..."
 ssh $SSH_OPTS "$REMOTE_USER@$REMOTE_HOST" \
   "if [ -f $BACKUP_PATH ]; then mkdir -p $(dirname $REMOTE_DATA_PATH) && cp $BACKUP_PATH $REMOTE_DATA_PATH && echo '已恢复标注数据'; else echo '无备份数据，跳过恢复'; fi"
+
+sleep 3
 
 # ── 4. 服务器进程切换 ──────────────────────────────────────────────
 echo ""

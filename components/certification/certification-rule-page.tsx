@@ -3,7 +3,11 @@
 import { useState, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { ArrowLeft, Edit2, Check, X, Info, Settings, Plus } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
+import { ArrowLeft, Edit2, Check, Info, Settings } from 'lucide-react'
+
+/* ─── 届别类型 ─── */
+type GradeYear = '2024' | '2025' | '2026'
 import {
   Table,
   TableBody,
@@ -30,6 +34,7 @@ import {
   type CertificationRule,
   type LevelMapping,
   type RuleStatus,
+  type AbilityItem,
   defaultLevelMapping,
 } from '@/lib/types'
 import { initialRule, positionsList } from '@/lib/mock-data'
@@ -43,6 +48,411 @@ import Link from 'next/link'
 interface CertificationRulePageProps {
   isGlobal?: boolean
   positionId?: string
+}
+
+/* ─── 前端开发工程师各届能力项数据 ─── */
+const grade2024AbilityItems: AbilityItem[] = [
+  {
+    id: 'item-1-2024',
+    name: '岗位与行业认知',
+    abilityPoints: [
+      {
+        id: 'point-1-1-2024',
+        name: '前端行业发展趋势',
+        description: '了解前端开发行业的发展历程、主流技术栈及未来趋势，能够把握技术演进方向。',
+        mappingType: 'custom',
+        requiredLevel: '掌握',
+        weight: 18,
+        customMapping: [
+          { level: '未达标', min: 0, max: 55 },
+          { level: '了解', min: 56, max: 68 },
+          { level: '理解', min: 69, max: 78 },
+          { level: '掌握', min: 79, max: 88 },
+          { level: '熟练', min: 89, max: 95 },
+          { level: '精通', min: 96, max: 100 },
+        ],
+        relatedTasks: [
+          { id: 'task-1-2024', name: 'Web前端实训室-前端基础知识测试', maxScore: 100, weight: 60 },
+          { id: 'task-7-2024', name: '在线学习平台-技术调研报告', maxScore: 80, weight: 40 },
+        ],
+      },
+      {
+        id: 'point-1-2-2024',
+        name: '岗位职责与规范认知',
+        description: '清晰理解前端开发工程师的岗位职责，包括页面开发、性能优化、用户体验提升等核心工作内容。',
+        mappingType: 'inherit',
+        requiredLevel: '理解',
+        weight: 12,
+        relatedTasks: [],
+      },
+    ],
+  },
+  {
+    id: 'item-2-2024',
+    name: '专业技能',
+    abilityPoints: [
+      {
+        id: 'point-2-1-2024',
+        name: 'JavaScript 基础编程',
+        description: '熟练掌握 JavaScript 语言基础，包括 DOM 操作、事件处理、AJAX 等传统前端开发技能。',
+        mappingType: 'custom',
+        requiredLevel: '熟练',
+        weight: 20,
+        customMapping: [
+          { level: '未达标', min: 0, max: 50 },
+          { level: '了解', min: 51, max: 65 },
+          { level: '理解', min: 66, max: 75 },
+          { level: '掌握', min: 76, max: 85 },
+          { level: '熟练', min: 86, max: 92 },
+          { level: '精通', min: 93, max: 100 },
+        ],
+        relatedTasks: [
+          { id: 'task-2-2024', name: '软件工程实训室-JavaScript编程实践', maxScore: 100, weight: 50 },
+          { id: 'task-5-2024', name: '项目评审室-项目实战考核', maxScore: 150, weight: 30 },
+          { id: 'task-9-2024', name: 'Web前端实训室-性能优化实践', maxScore: 100, weight: 20 },
+        ],
+      },
+      {
+        id: 'point-2-2-2024',
+        name: 'jQuery 与 Bootstrap 应用',
+        description: '熟练使用 jQuery 进行 DOM 操作和事件处理，掌握 Bootstrap 响应式布局框架。',
+        mappingType: 'custom',
+        requiredLevel: '熟练',
+        weight: 17,
+        customMapping: [
+          { level: '未达标', min: 0, max: 50 },
+          { level: '了解', min: 51, max: 65 },
+          { level: '理解', min: 66, max: 75 },
+          { level: '掌握', min: 76, max: 85 },
+          { level: '熟练', min: 86, max: 92 },
+          { level: '精通', min: 93, max: 100 },
+        ],
+        relatedTasks: [
+          { id: 'task-3-2024', name: 'Web前端实训室-jQuery项目实战', maxScore: 100, weight: 70 },
+          { id: 'task-5-2024', name: '项目评审室-项目实战考核', maxScore: 150, weight: 30 },
+        ],
+      },
+      {
+        id: 'point-2-3-2024',
+        name: 'CSS 布局与样式',
+        description: '精通 CSS 布局技术，包括 Flexbox、Grid、响应式设计等，能够实现复杂的页面布局。',
+        mappingType: 'inherit',
+        requiredLevel: '掌握',
+        weight: 13,
+        relatedTasks: [
+          { id: 'task-4-2024', name: 'Web前端实训室-CSS布局与样式', maxScore: 100, weight: 100 },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'item-3-2024',
+    name: '软技能',
+    abilityPoints: [
+      {
+        id: 'point-3-1-2024',
+        name: '团队协作能力',
+        description: '具备良好的团队协作能力，能够与产品、设计、后端等角色有效沟通，推动项目顺利进行。',
+        mappingType: 'custom',
+        requiredLevel: '掌握',
+        weight: 10,
+        customMapping: [
+          { level: '未达标', min: 0, max: 55 },
+          { level: '了解', min: 56, max: 68 },
+          { level: '理解', min: 69, max: 78 },
+          { level: '掌握', min: 79, max: 88 },
+          { level: '熟练', min: 89, max: 95 },
+          { level: '精通', min: 96, max: 100 },
+        ],
+        relatedTasks: [
+          { id: 'task-8-2024', name: '协作学习空间-团队协作评估', maxScore: 100, weight: 100 },
+        ],
+      },
+      {
+        id: 'point-3-2-2024',
+        name: '技术文档能力',
+        description: '能够编写清晰、规范的技术文档，包括接口文档、组件文档、项目说明等。',
+        mappingType: 'inherit',
+        requiredLevel: '理解',
+        weight: 10,
+        relatedTasks: [
+          { id: 'task-7-2024', name: '在线学习平台-技术文档撰写', maxScore: 80, weight: 100 },
+        ],
+      },
+    ],
+  },
+]
+
+const grade2025AbilityItems: AbilityItem[] = [
+  {
+    id: 'item-1-2025',
+    name: '岗位与行业认知',
+    abilityPoints: [
+      {
+        id: 'point-1-1-2025',
+        name: '现代前端生态认知',
+        description: '深入理解现代前端工程化体系，包括模块化、组件化、构建工具链及前端架构演进。',
+        mappingType: 'custom',
+        requiredLevel: '掌握',
+        weight: 18,
+        customMapping: [
+          { level: '未达标', min: 0, max: 55 },
+          { level: '了解', min: 56, max: 68 },
+          { level: '理解', min: 69, max: 78 },
+          { level: '掌握', min: 79, max: 88 },
+          { level: '熟练', min: 89, max: 95 },
+          { level: '精通', min: 96, max: 100 },
+        ],
+        relatedTasks: [
+          { id: 'task-1-2025', name: 'Web前端实训室-前端工程化测试', maxScore: 100, weight: 60 },
+          { id: 'task-7-2025', name: '在线学习平台-框架对比分析', maxScore: 80, weight: 40 },
+        ],
+      },
+      {
+        id: 'point-1-2-2025',
+        name: '前端工程化思维',
+        description: '具备前端工程化思维，理解代码规范、版本控制、持续集成等开发流程。',
+        mappingType: 'inherit',
+        requiredLevel: '理解',
+        weight: 12,
+        relatedTasks: [],
+      },
+    ],
+  },
+  {
+    id: 'item-2-2025',
+    name: '专业技能',
+    abilityPoints: [
+      {
+        id: 'point-2-1-2025',
+        name: 'TypeScript 应用开发',
+        description: '熟练使用 TypeScript 进行类型安全的前端开发，掌握接口、泛型、类型推断等核心特性。',
+        mappingType: 'custom',
+        requiredLevel: '熟练',
+        weight: 20,
+        customMapping: [
+          { level: '未达标', min: 0, max: 50 },
+          { level: '了解', min: 51, max: 65 },
+          { level: '理解', min: 66, max: 75 },
+          { level: '掌握', min: 76, max: 85 },
+          { level: '熟练', min: 86, max: 92 },
+          { level: '精通', min: 93, max: 100 },
+        ],
+        relatedTasks: [
+          { id: 'task-2-2025', name: '软件工程实训室-TypeScript项目实战', maxScore: 100, weight: 50 },
+          { id: 'task-5-2025', name: '项目评审室-全栈项目考核', maxScore: 150, weight: 30 },
+          { id: 'task-9-2025', name: 'Web前端实训室-类型系统实践', maxScore: 100, weight: 20 },
+        ],
+      },
+      {
+        id: 'point-2-2-2025',
+        name: 'Vue / React 框架应用',
+        description: '熟练使用 Vue 或 React 框架进行组件化开发，理解响应式原理、Hooks、状态管理等核心概念。',
+        mappingType: 'custom',
+        requiredLevel: '熟练',
+        weight: 17,
+        customMapping: [
+          { level: '未达标', min: 0, max: 50 },
+          { level: '了解', min: 51, max: 65 },
+          { level: '理解', min: 66, max: 75 },
+          { level: '掌握', min: 76, max: 85 },
+          { level: '熟练', min: 86, max: 92 },
+          { level: '精通', min: 93, max: 100 },
+        ],
+        relatedTasks: [
+          { id: 'task-3-2025', name: 'React专项训练室-组件化开发实战', maxScore: 100, weight: 70 },
+          { id: 'task-5-2025', name: '项目评审室-全栈项目考核', maxScore: 150, weight: 30 },
+        ],
+      },
+      {
+        id: 'point-2-3-2025',
+        name: '前端构建工具链',
+        description: '掌握 Webpack / Vite 等构建工具的配置与优化，理解打包原理和性能优化策略。',
+        mappingType: 'inherit',
+        requiredLevel: '掌握',
+        weight: 13,
+        relatedTasks: [
+          { id: 'task-4-2025', name: 'Web前端实训室-构建工具配置实战', maxScore: 100, weight: 100 },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'item-3-2025',
+    name: '软技能',
+    abilityPoints: [
+      {
+        id: 'point-3-1-2025',
+        name: '团队协作与沟通',
+        description: '具备良好的团队协作能力，能够与产品、设计、后端等角色有效沟通，推动项目顺利进行。',
+        mappingType: 'custom',
+        requiredLevel: '掌握',
+        weight: 10,
+        customMapping: [
+          { level: '未达标', min: 0, max: 55 },
+          { level: '了解', min: 56, max: 68 },
+          { level: '理解', min: 69, max: 78 },
+          { level: '掌握', min: 79, max: 88 },
+          { level: '熟练', min: 89, max: 95 },
+          { level: '精通', min: 96, max: 100 },
+        ],
+        relatedTasks: [
+          { id: 'task-8-2025', name: '协作学习空间-敏捷开发协作评估', maxScore: 100, weight: 100 },
+        ],
+      },
+      {
+        id: 'point-3-2-2025',
+        name: '代码审查能力',
+        description: '能够进行有效的代码审查，发现潜在问题并提出改进建议，提升团队代码质量。',
+        mappingType: 'inherit',
+        requiredLevel: '理解',
+        weight: 10,
+        relatedTasks: [
+          { id: 'task-7-2025', name: '在线学习平台-代码审查报告', maxScore: 80, weight: 100 },
+        ],
+      },
+    ],
+  },
+]
+
+const grade2026AbilityItems: AbilityItem[] = [
+  {
+    id: 'item-1-2026',
+    name: '岗位与行业认知',
+    abilityPoints: [
+      {
+        id: 'point-1-1-2026',
+        name: '全栈前端架构认知',
+        description: '理解全栈前端架构理念，掌握服务端渲染、边缘计算、微前端等前沿技术方向。',
+        mappingType: 'custom',
+        requiredLevel: '掌握',
+        weight: 18,
+        customMapping: [
+          { level: '未达标', min: 0, max: 55 },
+          { level: '了解', min: 56, max: 68 },
+          { level: '理解', min: 69, max: 78 },
+          { level: '掌握', min: 79, max: 88 },
+          { level: '熟练', min: 89, max: 95 },
+          { level: '精通', min: 96, max: 100 },
+        ],
+        relatedTasks: [
+          { id: 'task-1-2026', name: 'Web前端实训室-架构设计答辩', maxScore: 100, weight: 60 },
+          { id: 'task-7-2026', name: '在线学习平台-技术趋势研究报告', maxScore: 80, weight: 40 },
+        ],
+      },
+      {
+        id: 'point-1-2-2026',
+        name: 'DevOps 与持续交付',
+        description: '理解 DevOps 理念，掌握 CI/CD 流程、容器化部署等现代交付实践。',
+        mappingType: 'inherit',
+        requiredLevel: '理解',
+        weight: 12,
+        relatedTasks: [],
+      },
+    ],
+  },
+  {
+    id: 'item-2-2026',
+    name: '专业技能',
+    abilityPoints: [
+      {
+        id: 'point-2-1-2026',
+        name: 'Next.js / Nuxt 全栈开发',
+        description: '熟练使用 Next.js 或 Nuxt.js 进行全栈开发，掌握 SSR/SSG、API Routes、边缘渲染等技术。',
+        mappingType: 'custom',
+        requiredLevel: '熟练',
+        weight: 20,
+        customMapping: [
+          { level: '未达标', min: 0, max: 50 },
+          { level: '了解', min: 51, max: 65 },
+          { level: '理解', min: 66, max: 75 },
+          { level: '掌握', min: 76, max: 85 },
+          { level: '熟练', min: 86, max: 92 },
+          { level: '精通', min: 93, max: 100 },
+        ],
+        relatedTasks: [
+          { id: 'task-2-2026', name: '软件工程实训室-全栈项目开发', maxScore: 100, weight: 50 },
+          { id: 'task-5-2026', name: '项目评审室-微前端架构考核', maxScore: 150, weight: 30 },
+          { id: 'task-9-2026', name: 'Web前端实训室-边缘渲染实践', maxScore: 100, weight: 20 },
+        ],
+      },
+      {
+        id: 'point-2-2-2026',
+        name: '微前端与模块联邦',
+        description: '掌握微前端架构设计与实现，理解 Module Federation、qiankun 等微前端方案。',
+        mappingType: 'custom',
+        requiredLevel: '熟练',
+        weight: 17,
+        customMapping: [
+          { level: '未达标', min: 0, max: 50 },
+          { level: '了解', min: 51, max: 65 },
+          { level: '理解', min: 66, max: 75 },
+          { level: '掌握', min: 76, max: 85 },
+          { level: '熟练', min: 86, max: 92 },
+          { level: '精通', min: 93, max: 100 },
+        ],
+        relatedTasks: [
+          { id: 'task-3-2026', name: 'React专项训练室-微前端拆分实战', maxScore: 100, weight: 70 },
+          { id: 'task-5-2026', name: '项目评审室-微前端架构考核', maxScore: 150, weight: 30 },
+        ],
+      },
+      {
+        id: 'point-2-3-2026',
+        name: 'Node.js 服务端基础',
+        description: '具备 Node.js 服务端开发能力，能够编写 API 接口、中间件，理解服务端运行原理。',
+        mappingType: 'inherit',
+        requiredLevel: '掌握',
+        weight: 13,
+        relatedTasks: [
+          { id: 'task-4-2026', name: 'Web前端实训室-Node.js后端开发', maxScore: 100, weight: 100 },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'item-3-2026',
+    name: '软技能',
+    abilityPoints: [
+      {
+        id: 'point-3-1-2026',
+        name: '跨团队协作与领导力',
+        description: '具备跨团队协作能力和一定的技术领导力，能够带领小团队完成复杂项目交付。',
+        mappingType: 'custom',
+        requiredLevel: '掌握',
+        weight: 10,
+        customMapping: [
+          { level: '未达标', min: 0, max: 55 },
+          { level: '了解', min: 56, max: 68 },
+          { level: '理解', min: 69, max: 78 },
+          { level: '掌握', min: 79, max: 88 },
+          { level: '熟练', min: 89, max: 95 },
+          { level: '精通', min: 96, max: 100 },
+        ],
+        relatedTasks: [
+          { id: 'task-8-2026', name: '协作学习空间-技术方案评审', maxScore: 100, weight: 100 },
+        ],
+      },
+      {
+        id: 'point-3-2-2026',
+        name: '系统设计与方案输出',
+        description: '能够独立完成前端系统方案设计，输出高质量的技术方案和架构文档。',
+        mappingType: 'inherit',
+        requiredLevel: '理解',
+        weight: 10,
+        relatedTasks: [
+          { id: 'task-7-2026', name: '在线学习平台-系统架构设计文档', maxScore: 80, weight: 100 },
+        ],
+      },
+    ],
+  },
+]
+
+const GRADE_ABILITY_ITEMS_MAP: Record<string, Record<GradeYear, AbilityItem[]>> = {
+  'pos-1': {
+    '2024': grade2024AbilityItems,
+    '2025': grade2025AbilityItems,
+    '2026': grade2026AbilityItems,
+  },
 }
 
 function formatLevelLabel(level: string): string {
@@ -82,49 +492,15 @@ interface TaskRowData {
   pointWeight: number
 }
 
-interface ScoringRuleCardProps {
-  rules: { min: number; max: number; label: string }[]
-  setRules: React.Dispatch<React.SetStateAction<{ min: number; max: number; label: string }[]>>
-}
-
-function ScoringRuleCard({ rules, setRules }: ScoringRuleCardProps) {
-  const addRule = () => { setRules([...rules, { min: 0, max: 0, label: '' }]) }
-  const removeRule = (index: number) => { setRules(rules.filter((_, i) => i !== index)) }
-  const updateRule = (index: number, field: string, value: string | number) => {
-    const newRules = [...rules]
-    newRules[index] = { ...newRules[index], [field]: value }
-    setRules(newRules)
-  }
-  return (
-    <div className="rounded-lg border border-border bg-card p-6">
-      <div className="space-y-3">
-        {rules.map((rule, index) => (
-          <div key={index} className="flex items-center gap-3">
-            <div className="flex items-center gap-2 flex-1">
-              <Input type="number" min={0} max={100} value={rule.min} onChange={(e) => updateRule(index, 'min', Number(e.target.value))} className="w-20 h-8 text-center" />
-              <span className="text-muted-foreground">%</span>
-              <span className="text-muted-foreground">~</span>
-              <Input type="number" min={0} max={100} value={rule.max} onChange={(e) => updateRule(index, 'max', Number(e.target.value))} className="w-20 h-8 text-center" />
-              <span className="text-muted-foreground">%</span>
-            </div>
-            <Input value={rule.label} onChange={(e) => updateRule(index, 'label', e.target.value)} placeholder="等级名称" className="w-32 h-8" />
-            <Button variant="ghost" size="sm" className="h-8 px-2 text-destructive" onClick={() => removeRule(index)}><X className="h-4 w-4" /></Button>
-          </div>
-        ))}
-      </div>
-      <Button variant="outline" size="sm" className="mt-4" onClick={addRule}><Plus className="mr-1 h-3.5 w-3.5" />添加档次</Button>
-    </div>
-  )
-}
-
 function WeightConfigDialog({
-  open, onOpenChange, title, items, onSave,
+  open, onOpenChange, title, items, onSave, variant = 'card',
 }: {
   open: boolean
   onOpenChange: (open: boolean) => void
   title: string
-  items: { id: string; name: string; weight: number }[]
+  items: { id: string; name: string; weight: number; relatedTasks?: { id: string; name: string }[] }[]
   onSave: (weights: Record<string, number>) => void
+  variant?: 'card' | 'table'
 }) {
   const [localWeights, setLocalWeights] = useState<Record<string, number>>({})
   useMemo(() => {
@@ -147,25 +523,100 @@ function WeightConfigDialog({
   }
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg" annotationContext="certification-rule">
+      <DialogContent className={variant === 'table' ? 'sm:max-w-4xl w-[900px]' : 'sm:max-w-lg'} annotationContext="certification-rule">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>配置各子节点权重，合计必须为 100%</DialogDescription>
+          <DialogDescription>
+            {variant === 'table'
+              ? '配置各能力点占岗位权重，合计必须为 100%'
+              : '配置各子节点权重，合计必须为 100%'
+            }
+          </DialogDescription>
         </DialogHeader>
-        <div className="py-4 space-y-3">
-          {items.map((item) => (
-            <div key={item.id} className="flex items-center gap-3 p-3 rounded-md bg-secondary/50 border border-border">
-              <span className="flex-1 text-sm font-medium truncate">{item.name}</span>
-              <div className="flex items-center gap-2">
-                <Input type="number" min={0} max={100} value={localWeights[item.id] ?? item.weight} onChange={(e) => handleChange(item.id, e.target.value)} className="w-20 h-8 text-center" />
-                <span className="text-muted-foreground text-sm">%</span>
-              </div>
+        {variant === 'table' ? (
+          <div className="py-4">
+            <div className="rounded-md border border-border overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/50 hover:bg-transparent">
+                    <TableHead className="w-[50%] text-xs font-medium">关联场景任务</TableHead>
+                    <TableHead className="w-[30%] text-xs font-medium">能力点</TableHead>
+                    <TableHead className="w-[20%] text-xs font-medium text-center">能力点占岗位权重</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {items.map((item) => {
+                    const tasks = item.relatedTasks && item.relatedTasks.length > 0 ? item.relatedTasks : null
+                    const rowSpan = tasks ? tasks.length : 1
+                    return tasks ? (
+                      tasks.map((task, idx) => (
+                        <TableRow key={`${item.id}-${task.id}`} className="hover:bg-transparent">
+                          <TableCell className="text-xs text-muted-foreground py-2.5">{task.name}</TableCell>
+                          {idx === 0 && (
+                            <>
+                              <TableCell rowSpan={rowSpan} className="text-sm font-medium align-middle py-2.5 bg-muted/20 border-l border-r border-border">
+                                {item.name}
+                              </TableCell>
+                              <TableCell rowSpan={rowSpan} className="text-center align-middle py-2.5 bg-muted/10">
+                                <div className="flex items-center justify-center gap-1">
+                                  <Input
+                                    type="number"
+                                    min={0}
+                                    max={100}
+                                    value={localWeights[item.id] ?? item.weight}
+                                    onChange={(e) => handleChange(item.id, e.target.value)}
+                                    className="w-16 h-7 text-center text-sm px-1"
+                                  />
+                                  <span className="text-muted-foreground text-xs">%</span>
+                                </div>
+                              </TableCell>
+                            </>
+                          )}
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow key={item.id} className="hover:bg-transparent">
+                        <TableCell className="text-xs text-muted-foreground py-2.5">--</TableCell>
+                        <TableCell className="text-sm font-medium py-2.5 bg-muted/20 border-l border-r border-border">{item.name}</TableCell>
+                        <TableCell className="text-center py-2.5 bg-muted/10">
+                          <div className="flex items-center justify-center gap-1">
+                            <Input
+                              type="number"
+                              min={0}
+                              max={100}
+                              value={localWeights[item.id] ?? item.weight}
+                              onChange={(e) => handleChange(item.id, e.target.value)}
+                              className="w-16 h-7 text-center text-sm px-1"
+                            />
+                            <span className="text-muted-foreground text-xs">%</span>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
+                </TableBody>
+              </Table>
             </div>
-          ))}
-          <div className={`text-sm font-medium text-right ${isValid ? 'text-green-600' : 'text-red-600'}`}>
-            当前合计：{total}% {isValid ? '✓' : '（必须为 100%）'}
+            <div className={`text-sm font-medium text-right mt-3 ${isValid ? 'text-green-600' : 'text-red-600'}`}>
+              当前合计：{total}% {isValid ? '✓' : '（必须为 100%）'}
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="py-4 space-y-3">
+            {items.map((item) => (
+              <div key={item.id} className="flex items-center gap-3 p-3 rounded-md bg-secondary/50 border border-border">
+                <span className="flex-1 text-sm font-medium truncate">{item.name}</span>
+                <div className="flex items-center gap-2">
+                  <Input type="number" min={0} max={100} value={localWeights[item.id] ?? item.weight} onChange={(e) => handleChange(item.id, e.target.value)} className="w-20 h-8 text-center" />
+                  <span className="text-muted-foreground text-sm">%</span>
+                </div>
+              </div>
+            ))}
+            <div className={`text-sm font-medium text-right ${isValid ? 'text-green-600' : 'text-red-600'}`}>
+              当前合计：{total}% {isValid ? '✓' : '（必须为 100%）'}
+            </div>
+          </div>
+        )}
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>取消</Button>
           <Button onClick={handleSave} disabled={!isValid}>保存</Button>
@@ -175,22 +626,24 @@ function WeightConfigDialog({
   )
 }
 
+function getGradeAbilityItems(positionId: string | undefined, grade: GradeYear): AbilityItem[] {
+  if (positionId && GRADE_ABILITY_ITEMS_MAP[positionId]?.[grade]) {
+    return GRADE_ABILITY_ITEMS_MAP[positionId][grade]
+  }
+  return grade2024AbilityItems
+}
+
 export function CertificationRulePage({ isGlobal = false, positionId }: CertificationRulePageProps) {
   const positionInfo = positionId ? positionsList.find((p) => p.id === positionId) : null
   const pageTitle = isGlobal ? '全局能力认定规则配置' : positionInfo?.name || '前端开发工程师'
-  const [rule, setRule] = useState<CertificationRule>(initialRule)
+  const [activeGrade, setActiveGrade] = useState<GradeYear>('2024')
+  const [rule, setRule] = useState<CertificationRule>(() => ({
+    ...initialRule,
+    abilityItems: getGradeAbilityItems(positionId, '2024'),
+  }))
   const [globalMapping, setGlobalMapping] = useState<LevelMapping[]>(defaultLevelMapping)
   const [globalConfigDialogOpen, setGlobalConfigDialogOpen] = useState(false)
   const { toast } = useToast()
-
-  const [scoringRules, setScoringRules] = useState([
-    { min: 95, max: 100, label: 'A+' },
-    { min: 85, max: 95, label: 'A' },
-    { min: 75, max: 85, label: 'B+' },
-    { min: 60, max: 75, label: 'B' },
-    { min: 0, max: 60, label: 'C' },
-  ])
-  const [scoringDialogOpen, setScoringDialogOpen] = useState(false)
 
   const [pointWeightDialogOpen, setPointWeightDialogOpen] = useState(false)
   const [taskWeightDialogOpen, setTaskWeightDialogOpen] = useState(false)
@@ -389,10 +842,15 @@ export function CertificationRulePage({ isGlobal = false, positionId }: Certific
   const scoreCalculationTip = '完成任务后，系统根据实际得分和任务权重计算换算分。完成某能力点关联的全部任务后，系统汇总换算分得出最终得分，并匹配对应掌握度等级。若无已完成任务，则不显示等级。'
 
   const pointWeightItems = useMemo(() => {
-    const items: { id: string; name: string; weight: number }[] = []
+    const items: { id: string; name: string; weight: number; relatedTasks: { id: string; name: string }[] }[] = []
     rule.abilityItems.forEach((item) => {
       item.abilityPoints.forEach((point) => {
-        items.push({ id: point.id, name: `${item.name} · ${point.name}`, weight: point.weight || 0 })
+        items.push({
+          id: point.id,
+          name: `${item.name} · ${point.name}`,
+          weight: point.weight || 0,
+          relatedTasks: point.relatedTasks.map((t) => ({ id: t.id, name: t.name })),
+        })
       })
     })
     return items
@@ -436,6 +894,30 @@ export function CertificationRulePage({ isGlobal = false, positionId }: Certific
             <p className="mt-2 text-muted-foreground">配置能力认定规则 · 为每个能力点选择关联任务并分配权重</p>
           </div>
 
+          {/* 届别 Tab */}
+          <div className="mb-6 flex gap-3 border-b border-border">
+            {(['2024', '2025', '2026'] as GradeYear[]).map((g) => (
+              <button
+                key={g}
+                onClick={() => {
+                  setActiveGrade(g)
+                  setRule((prev) => ({
+                    ...prev,
+                    abilityItems: getGradeAbilityItems(positionId, g),
+                  }))
+                }}
+                className={cn(
+                  'px-5 py-2.5 text-sm font-medium transition-all border-b-2 -mb-px',
+                  activeGrade === g
+                    ? 'border-primary text-primary'
+                    : 'border-transparent text-muted-foreground hover:text-foreground'
+                )}
+              >
+                {g} 届
+              </button>
+            ))}
+          </div>
+
           <div className="rounded-lg border border-border bg-card overflow-hidden">
             <Table>
               <TableHeader>
@@ -461,7 +943,6 @@ export function CertificationRulePage({ isGlobal = false, positionId }: Certific
                     </div>
                   </TableHead>
                   <TableHead className="w-[110px] text-center font-medium">岗位所需掌握度</TableHead>
-                  <TableHead className="w-[150px] text-center font-medium">岗位能力认定毕业标准</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -537,16 +1018,6 @@ export function CertificationRulePage({ isGlobal = false, positionId }: Certific
                         </span>
                       </TableCell>
                     )}
-                    {index === 0 && (
-                      <TableCell rowSpan={tableRows.length} className="text-center align-middle cursor-pointer hover:bg-secondary/50 border-l border-border" onClick={() => setScoringDialogOpen(true)}>
-                        <div className="space-y-1">
-                          {scoringRules.map((r) => (
-                            <div key={r.label} className="text-sm">{r.label}: {r.min}~{r.max}%</div>
-                          ))}
-                        </div>
-                        <div className="mt-2 text-xs text-muted-foreground">点击配置</div>
-                      </TableCell>
-                    )}
                   </TableRow>
                 ))}
               </TableBody>
@@ -580,25 +1051,13 @@ export function CertificationRulePage({ isGlobal = false, positionId }: Certific
           </DialogContent>
         </Dialog>
 
-        <Dialog open={scoringDialogOpen} onOpenChange={setScoringDialogOpen}>
-          <DialogContent className="max-w-lg">
-            <DialogHeader>
-              <DialogTitle>岗位能力认定毕业标准</DialogTitle>
-              <DialogDescription>为岗位能力认定配置得分与等级的映射关系</DialogDescription>
-            </DialogHeader>
-            <ScoringRuleCard rules={scoringRules} setRules={setScoringRules} />
-            <DialogFooter>
-              <Button onClick={() => setScoringDialogOpen(false)}>确定</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-
         <WeightConfigDialog
           open={pointWeightDialogOpen}
           onOpenChange={setPointWeightDialogOpen}
           title="配置能力点权重"
           items={pointWeightItems}
           onSave={handleSavePointWeights}
+          variant="table"
         />
 
         <WeightConfigDialog

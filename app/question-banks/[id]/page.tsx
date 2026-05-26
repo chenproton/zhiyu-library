@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react"
 import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, Plus, Search, Edit, Trash2, Eye, Upload, Copy, Users, Building2, ImageIcon, List, LayoutGrid, FolderInput } from "lucide-react"
+import { ArrowLeft, Plus, Search, Edit, Trash2, Eye, Upload, Copy, Users, Building2, ImageIcon, List, LayoutGrid, FolderInput, MoreHorizontal } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -26,6 +26,12 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ConfirmDialog } from "@/components/shared/confirm-dialog"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { BankFormDialog } from "@/components/question-banks/bank-form-dialog"
 import { QuestionFormDialog } from "@/components/questions/question-form-dialog"
@@ -460,48 +466,35 @@ export default function QuestionBankDetailPage() {
                     {formatDate(question.createdAt)}
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-1">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="size-8"
-                        onClick={() => setPreviewQuestion(question)}
-                      >
-                        <Eye />
-                        <span className="sr-only">预览</span>
-                      </Button>
-                      {canEdit && (
-                        <>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="size-8"
-                            onClick={() => handleCopyQuestion(question)}
-                          >
-                            <Copy />
-                            <span className="sr-only">复制</span>
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="size-8"
-                            onClick={() => handleQuestionEdit(question)}
-                          >
-                            <Edit />
-                            <span className="sr-only">编辑</span>
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="size-8 text-destructive hover:text-destructive"
-                            onClick={() => setDeleteConfirm(question)}
-                          >
-                            <Trash2 />
-                            <span className="sr-only">删除</span>
-                          </Button>
-                        </>
-                      )}
-                    </div>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="size-8">
+                          <MoreHorizontal className="size-4" />
+                          <span className="sr-only">操作菜单</span>
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => setPreviewQuestion(question)}>
+                          预览
+                        </DropdownMenuItem>
+                        {canEdit && (
+                          <>
+                            <DropdownMenuItem onClick={() => handleCopyQuestion(question)}>
+                              复制
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleQuestionEdit(question)}>
+                              编辑
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => setDeleteConfirm(question)}
+                              className="text-destructive focus:text-destructive"
+                            >
+                              删除
+                            </DropdownMenuItem>
+                          </>
+                        )}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
                 </TableRow>
               ))

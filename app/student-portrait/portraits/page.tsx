@@ -172,16 +172,14 @@ export default function StudentAbilityPortraitsPage() {
           <div className="rounded-lg border bg-white px-4 py-3">
             <div className="overflow-x-auto">
               <Table>
-                <TableHeader><TableRow><TableHead className="w-[100px]">学号</TableHead><TableHead className="w-[100px]">姓名</TableHead><TableHead className="w-[160px]">班级</TableHead><TableHead className="w-[140px]">专业</TableHead><TableHead className="w-[120px]">班级排名</TableHead><TableHead className="w-[120px]">专业排名</TableHead><TableHead className="sticky right-0 w-[140px] bg-white text-right">操作</TableHead></TableRow></TableHeader>
+                <TableHeader><TableRow><TableHead className="w-[100px]">学号</TableHead><TableHead className="w-[100px]">姓名</TableHead><TableHead className="w-[160px]">班级</TableHead><TableHead className="w-[140px]">专业</TableHead><TableHead className="sticky right-0 w-[140px] bg-white text-right">操作</TableHead></TableRow></TableHeader>
                 <TableBody>
-                  {filteredPortraits.length === 0 ? (<TableRow><TableCell colSpan={7} className="h-24 text-center text-muted-foreground">暂无画像记录</TableCell></TableRow>) : (filteredPortraits.map((portrait) => (
+                  {filteredPortraits.length === 0 ? (<TableRow><TableCell colSpan={5} className="h-24 text-center text-muted-foreground">暂无画像记录</TableCell></TableRow>) : (filteredPortraits.map((portrait) => (
                     <TableRow key={portrait.id}>
                       <TableCell><span className="text-sm text-muted-foreground">{portrait.studentId}</span></TableCell>
                       <TableCell><span className="text-sm font-medium">{portrait.studentName}</span></TableCell>
                       <TableCell><span className="text-sm">{portrait.className}</span></TableCell>
                       <TableCell><span className="text-sm text-muted-foreground">{portrait.majorName}</span></TableCell>
-                      <TableCell><span className="text-sm"><strong className="text-emerald-600">{portrait.classRank}</strong><span className="text-muted-foreground"> / {portrait.classTotal}</span></span></TableCell>
-                      <TableCell><span className="text-sm"><strong className="text-blue-600">{portrait.majorRank}</strong><span className="text-muted-foreground"> / {portrait.majorTotal}</span></span></TableCell>
                       <TableCell className="sticky right-0 bg-white text-right">
                         <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs" onClick={() => setPortraitModalOpen(true)}><Eye className="size-3" />查看学生画像</Button>
                       </TableCell>

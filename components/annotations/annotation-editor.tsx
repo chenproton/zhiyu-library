@@ -82,7 +82,7 @@ export function AnnotationEditor({ x, y, theme, onSave, onCancel }: AnnotationEd
           value={content}
           onChange={(e) => setContent(e.target.value)}
           placeholder="输入标注内容..."
-          className="w-full h-24 p-3 border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:border-transparent text-sm"
+          className="w-full h-72 p-3 border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:border-transparent text-sm"
           style={{ '--tw-ring-color': primaryColor } as React.CSSProperties}
         />
 

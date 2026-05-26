@@ -139,7 +139,8 @@ export default function LandingHomePage() {
     graduationProjectTopics, studentAbilityPortraits, positionsList,
   } = useData()
 
-  const [activeMethodTab, setActiveMethodTab] = useState("全部")
+  const [activeMethodCategory, setActiveMethodCategory] = useState("全部")
+  const [activeMethodSub, setActiveMethodSub] = useState("全部")
   const [activeResourceTab, setActiveResourceTab] = useState("题库")
   const [portraitMajor, setPortraitMajor] = useState("全部")
   const [selectedPositions, setSelectedPositions] = useState<string[]>(["全部"])
@@ -158,13 +159,36 @@ export default function LandingHomePage() {
   const publishedExams = exams.filter((e) => e.status === "published").slice(0, 4)
 
   /* ── 测评方式 ── */
-  const methodTabs = ["全部", ...evaluationCategories.map((c) => c.name)]
-  const filteredMethods = activeMethodTab === "全部"
-    ? evaluationMethods.filter((m) => m.enabled).slice(0, 4)
-    : evaluationMethods.filter((m) => {
+  const methodCategoryTabs = ["全部", ...evaluationCategories.map((c) => c.name)]
+
+  const availableSubCategories = useMemo(() => {
+    const subs = new Set<string>()
+    evaluationMethods.filter((m) => m.enabled).forEach((m) => {
+      if (activeMethodCategory === "全部") {
+        subs.add(m.subCategoryName || '-')
+      } else {
         const cat = evaluationCategories.find((c) => c.id === m.categoryId)
-        return m.enabled && cat?.name === activeMethodTab
-      }).slice(0, 4)
+        if (cat?.name === activeMethodCategory) {
+          subs.add(m.subCategoryName || '-')
+        }
+      }
+    })
+    return ["全部", ...Array.from(subs)]
+  }, [activeMethodCategory, evaluationMethods, evaluationCategories])
+
+  const filteredMethods = useMemo(() => {
+    let methods = evaluationMethods.filter((m) => m.enabled)
+    if (activeMethodCategory !== "全部") {
+      methods = methods.filter((m) => {
+        const cat = evaluationCategories.find((c) => c.id === m.categoryId)
+        return cat?.name === activeMethodCategory
+      })
+    }
+    if (activeMethodSub !== "全部") {
+      methods = methods.filter((m) => (m.subCategoryName || '-') === activeMethodSub)
+    }
+    return methods.slice(0, 8)
+  }, [evaluationMethods, activeMethodCategory, activeMethodSub, evaluationCategories])
 
   /* ── 测评资源 ── */
   const resourceBanks = questionBanks.filter((b) => b.status === "published").slice(0, 3)
@@ -193,7 +217,7 @@ export default function LandingHomePage() {
         <div style={{ position: "absolute", top: -80, right: -80, width: 300, height: 300, background: "rgba(255,255,255,0.04)", borderRadius: "50%" }} />
         <div style={{ position: "absolute", bottom: -60, left: "5%", width: 200, height: 200, background: "rgba(255,255,255,0.04)", borderRadius: "50%" }} />
         <div style={{ maxWidth: 720, margin: "0 auto", position: "relative", zIndex: 1 }}>
-          <h1 style={{ fontSize: 40, fontWeight: "bold", marginBottom: 12, letterSpacing: 1 }}>能力测评认定平台</h1>
+          <h1 style={{ fontSize: 40, fontWeight: "bold", marginBottom: 12, letterSpacing: 1 }}>能力测评中心</h1>
           <p style={{ fontSize: 15, opacity: 0.85, marginBottom: 28 }}>集测评资源、岗位能力认定、毕业设计、学生画像于一体的一站式能力成长平台</p>
           <div style={{
             background: "#fff", borderRadius: 50, padding: "5px 5px 5px 24px",
@@ -359,29 +383,42 @@ export default function LandingHomePage() {
 
         {/* ── 测评方式 ── */}
         <section style={{ marginBottom: 50 }}>
-          <SectionHeader title="测评方式库" />
-          <div style={{ display: "flex", gap: 10, marginBottom: 20, flexWrap: "wrap" }}>
-            {methodTabs.map((tab) => (
-              <button key={tab} onClick={() => setActiveMethodTab(tab)} style={{
-                padding: "7px 16px", background: activeMethodTab === tab ? "#2563eb" : "#fff",
-                color: activeMethodTab === tab ? "#fff" : "#64748b", borderRadius: 20, fontSize: 13,
-                cursor: "pointer", border: activeMethodTab === tab ? "1px solid #2563eb" : "1px solid #e2e8f0",
-                transition: "all 0.2s", display: "flex", alignItems: "center", gap: 6, fontWeight: 500,
-              }}>
-                {tab}
-                <span style={{
-                  background: activeMethodTab === tab ? "rgba(255,255,255,0.25)" : "#f1f5f9",
-                  color: activeMethodTab === tab ? "#fff" : "#64748b",
-                  padding: "1px 7px", borderRadius: 10, fontSize: 11,
-                }}>
-                  {tab === "全部" ? evaluationMethods.filter((m) => m.enabled).length :
-                    evaluationMethods.filter((m) => {
-                      const cat = evaluationCategories.find((c) => c.id === m.categoryId)
-                      return m.enabled && cat?.name === tab
-                    }).length}
-                </span>
-              </button>
-            ))}
+          <SectionHeader title="测评方式库" moreHref="/landingpage/evaluation-methods" />
+          <div style={{ background: "#fff", padding: "15px 20px", borderRadius: 10, marginBottom: 20, boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}>
+            {/* 一级分类 */}
+            <div style={{ display: "flex", alignItems: "center", padding: "8px 0", borderBottom: "1px dashed #f1f5f9", fontSize: 13 }}>
+              <span style={{ color: "#94a3b8", width: 80, flexShrink: 0 }}>一级分类：</span>
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                {methodCategoryTabs.map((tab) => (
+                  <span key={tab} onClick={() => { setActiveMethodCategory(tab); setActiveMethodSub("全部") }} style={{
+                    padding: "4px 12px", borderRadius: 4, cursor: "pointer",
+                    color: activeMethodCategory === tab ? "#2563eb" : "#64748b",
+                    background: activeMethodCategory === tab ? "#eff6ff" : "transparent",
+                    fontWeight: activeMethodCategory === tab ? 500 : 400,
+                    transition: "all 0.3s",
+                  }}>
+                    {tab}
+                  </span>
+                ))}
+              </div>
+            </div>
+            {/* 二级分类 */}
+            <div style={{ display: "flex", alignItems: "center", padding: "8px 0", fontSize: 13 }}>
+              <span style={{ color: "#94a3b8", width: 80, flexShrink: 0 }}>二级分类：</span>
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                {availableSubCategories.map((sub) => (
+                  <span key={sub} onClick={() => setActiveMethodSub(sub)} style={{
+                    padding: "4px 12px", borderRadius: 4, cursor: "pointer",
+                    color: activeMethodSub === sub ? "#2563eb" : "#64748b",
+                    background: activeMethodSub === sub ? "#eff6ff" : "transparent",
+                    fontWeight: activeMethodSub === sub ? 500 : 400,
+                    transition: "all 0.3s",
+                  }}>
+                    {sub}
+                  </span>
+                ))}
+              </div>
+            </div>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 20 }}>
             {filteredMethods.map((method, i) => {
@@ -397,21 +434,21 @@ export default function LandingHomePage() {
                     background: "#fff", borderRadius: 10, overflow: "hidden",
                     boxShadow: "0 1px 3px rgba(0,0,0,0.06)", transition: "all 0.25s", cursor: "pointer",
                   }}
-                    onClick={() => method.docLink && window.open(method.docLink, '_blank')}
-                    onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 8px 16px rgba(0,0,0,0.08)" }}
-                    onMouseLeave={(e) => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.06)" }}>
-                    <div style={{
-                      height: 110, background: covers[i % 4],
-                      display: "flex", alignItems: "center", justifyContent: "center", fontSize: 36,
-                    }}>{icons[i % 4]}</div>
-                    <div style={{ padding: 16 }}>
-                      <h3 style={{ fontSize: 14, marginBottom: 8, color: "#1e293b", fontWeight: 600 }}>{method.name}</h3>
-                      <p style={{ fontSize: 12, color: "#94a3b8", lineHeight: 1.6, marginBottom: 12, height: 36, overflow: "hidden" }}>
-                        {method.description || "暂无说明"}
-                      </p>
-                      <span style={{ fontSize: 13, color: "#2563eb", fontWeight: 500 }}>查看使用说明 ›</span>
-                    </div>
+                  onClick={() => method.docLink && window.open(method.docLink, '_blank')}
+                  onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 8px 16px rgba(0,0,0,0.08)" }}
+                  onMouseLeave={(e) => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.06)" }}>
+                  <div style={{
+                    height: 110, background: covers[i % 4],
+                    display: "flex", alignItems: "center", justifyContent: "center", fontSize: 36,
+                  }}>{icons[i % 4]}</div>
+                  <div style={{ padding: 16 }}>
+                    <h3 style={{ fontSize: 14, marginBottom: 8, color: "#1e293b", fontWeight: 600 }}>{method.name}</h3>
+                    <p style={{ fontSize: 12, color: "#94a3b8", lineHeight: 1.6, marginBottom: 12, height: 36, overflow: "hidden" }}>
+                      {method.description || "暂无说明"}
+                    </p>
+                    <span style={{ fontSize: 13, color: "#2563eb", fontWeight: 500 }}>查看使用说明 ›</span>
                   </div>
+                </div>
               )
             })}
             {filteredMethods.length === 0 && (

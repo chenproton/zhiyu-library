@@ -10,6 +10,8 @@ import {
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useData } from "@/components/providers/data-provider"
+import { PrdAnnotation } from "@/components/prd-annotation"
+import { getAnnotation } from "@/lib/prd-annotations"
 
 export default function GraduationTopicDetailPage() {
   const params = useParams()
@@ -45,6 +47,7 @@ export default function GraduationTopicDetailPage() {
   const remaining = topic.capacity - topic.appliedCount
 
   return (
+    <PrdAnnotation data={getAnnotation("lg-page")}>
     <div style={{ maxWidth: 1400, margin: "0 auto", padding: 24 }}>
       <div style={{ marginBottom: 24 }}>
         <Link href="/landingpage/graduation">
@@ -58,26 +61,34 @@ export default function GraduationTopicDetailPage() {
       <div style={{ background: "#fff", borderRadius: 12, border: "1px solid #e5e6eb", overflow: "hidden", marginBottom: 24 }}>
         <div style={{ padding: "24px 32px", background: "linear-gradient(135deg, #ec4899, #f472b6)", color: "white", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div>
+            <PrdAnnotation data={getAnnotation("lg-title")}>
             <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8 }}>{topic.name}</h1>
+            </PrdAnnotation>
+            <PrdAnnotation data={getAnnotation("lg-position")}>
             <p style={{ fontSize: 14, opacity: 0.9 }}>{topic.positionName} · {topic.college}</p>
+            </PrdAnnotation>
           </div>
+          <PrdAnnotation data={getAnnotation("lg-status")}>
           <span style={{ padding: "4px 12px", borderRadius: 20, fontSize: 12, fontWeight: 500, background: "rgba(255,255,255,0.2)" }}>
             {st.label}
           </span>
+          </PrdAnnotation>
         </div>
         <div style={{ padding: "24px 32px", display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 24 }}>
           {[
-            { icon: <Users style={{ width: 18, height: 18 }} />, label: "导师", value: topic.advisorName },
-            { icon: <MapPin style={{ width: 18, height: 18 }} />, label: "方向", value: topic.positionName },
-            { icon: <Calendar style={{ width: 18, height: 18 }} />, label: "时间范围", value: `${new Date(topic.startDate).toLocaleDateString("zh-CN")} ~ ${new Date(topic.endDate).toLocaleDateString("zh-CN")}` },
-            { icon: <CheckCircle2 style={{ width: 18, height: 18 }} />, label: "剩余名额", value: `${remaining}/${topic.capacity}` },
+            { icon: <Users style={{ width: 18, height: 18 }} />, label: "导师", value: topic.advisorName, aid: "lg-advisor" },
+            { icon: <MapPin style={{ width: 18, height: 18 }} />, label: "方向", value: topic.positionName, aid: "lg-position" },
+            { icon: <Calendar style={{ width: 18, height: 18 }} />, label: "时间范围", value: `${new Date(topic.startDate).toLocaleDateString("zh-CN")} ~ ${new Date(topic.endDate).toLocaleDateString("zh-CN")}`, aid: "lg-time-range" },
+            { icon: <CheckCircle2 style={{ width: 18, height: 18 }} />, label: "剩余名额", value: `${remaining}/${topic.capacity}`, aid: "lg-capacity" },
           ].map((item, i) => (
-            <div key={i} style={{ textAlign: "center", padding: "16px 0", background: "#f5f6f7", borderRadius: 8 }}>
+            <PrdAnnotation key={i} data={getAnnotation(item.aid!)}>
+            <div style={{ textAlign: "center", padding: "16px 0", background: "#f5f6f7", borderRadius: 8 }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, color: "#ec4899", marginBottom: 6 }}>
                 {item.icon} <span style={{ fontSize: 13, fontWeight: 500 }}>{item.label}</span>
               </div>
               <div style={{ fontSize: 16, fontWeight: 700 }}>{item.value}</div>
             </div>
+            </PrdAnnotation>
           ))}
         </div>
       </div>
@@ -85,6 +96,7 @@ export default function GraduationTopicDetailPage() {
       <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 24 }}>
         {/* 选题详情 */}
         <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+          <PrdAnnotation data={getAnnotation("lg-desc")}>
           <div style={{ background: "#fff", borderRadius: 12, border: "1px solid #e5e6eb", padding: 24 }}>
             <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
               <BookOpen style={{ width: 18, height: 18, color: "#3370ff" }} /> 选题描述
@@ -93,7 +105,9 @@ export default function GraduationTopicDetailPage() {
               {topic.description || "暂无详细描述，请咨询导师了解更多信息。"}
             </p>
           </div>
+          </PrdAnnotation>
 
+          <PrdAnnotation data={getAnnotation("lg-source")}>
           <div style={{ background: "#fff", borderRadius: 12, border: "1px solid #e5e6eb", padding: 24 }}>
             <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
               <FileText style={{ width: 18, height: 18, color: "#3370ff" }} /> 选题来源
@@ -110,7 +124,9 @@ export default function GraduationTopicDetailPage() {
               </div>
             </div>
           </div>
+          </PrdAnnotation>
 
+          <PrdAnnotation data={getAnnotation("lg-students")}>
           <div style={{ background: "#fff", borderRadius: 12, border: "1px solid #e5e6eb", padding: 24 }}>
             <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
               <Users style={{ width: 18, height: 18, color: "#3370ff" }} /> 已选学生
@@ -136,10 +152,12 @@ export default function GraduationTopicDetailPage() {
               </div>
             )}
           </div>
+          </PrdAnnotation>
         </div>
 
         {/* 侧边栏 */}
         <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+          <PrdAnnotation data={getAnnotation("lg-info")}>
           <div style={{ background: "#fff", borderRadius: 12, border: "1px solid #e5e6eb", padding: 24 }}>
             <h4 style={{ fontSize: 15, fontWeight: 600, marginBottom: 16 }}>选题信息</h4>
             <div style={{ display: "flex", flexDirection: "column", gap: 12, fontSize: 14 }}>
@@ -177,7 +195,9 @@ export default function GraduationTopicDetailPage() {
               </div>
             </div>
           </div>
+          </PrdAnnotation>
 
+          <PrdAnnotation data={getAnnotation("lg-apply-btn")}>
           <div style={{ background: "#fff", borderRadius: 12, border: "1px solid #e5e6eb", padding: 24 }}>
             <Button size="lg" style={{ width: "100%", background: remaining > 0 ? "#3370ff" : "#e5e6eb", color: remaining > 0 ? "white" : "#8f959e" }} disabled={remaining <= 0}>
               {remaining > 0 ? "申请选题" : "名额已满"}
@@ -188,8 +208,10 @@ export default function GraduationTopicDetailPage() {
               </p>
             )}
           </div>
+          </PrdAnnotation>
         </div>
       </div>
     </div>
+    </PrdAnnotation>
   )
 }

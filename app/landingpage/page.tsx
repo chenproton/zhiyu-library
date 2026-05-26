@@ -246,12 +246,17 @@ export default function LandingHomePage() {
             background: "#fff", borderRadius: 12, boxShadow: "0 1px 3px rgba(0,0,0,0.06)", padding: 24,
             display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 20,
           }}>
-            {stats.map((s, i) => (
-              <div key={i} style={{ textAlign: "center", borderRight: i < stats.length - 1 ? "1px solid #f1f5f9" : "none" }}>
-                <div style={{ fontSize: 28, fontWeight: "bold", color: "#2563eb", lineHeight: 1.2 }}>{s.num}</div>
-                <div style={{ fontSize: 13, color: "#94a3b8", marginTop: 6 }}>{s.label}</div>
-              </div>
-            ))}
+            {stats.map((s, i) => {
+              const statIds = ["lp-stat-eval", "lp-stat-bank", "lp-stat-exam", "lp-stat-usage", "lp-stat-position", "lp-stat-topic"]
+              return (
+                <PrdAnnotation key={i} data={getAnnotation(statIds[i])}>
+                <div style={{ textAlign: "center", borderRight: i < stats.length - 1 ? "1px solid #f1f5f9" : "none" }}>
+                  <div style={{ fontSize: 28, fontWeight: "bold", color: "#2563eb", lineHeight: 1.2 }}>{s.num}</div>
+                  <div style={{ fontSize: 13, color: "#94a3b8", marginTop: 6 }}>{s.label}</div>
+                </div>
+                </PrdAnnotation>
+              )
+            })}
           </div>
         </section>
         </PrdAnnotation>
@@ -266,6 +271,7 @@ export default function LandingHomePage() {
               const audience = getMockTargetAudience(exam.id)
               return (
                 <Link key={exam.id} href={`/landingpage/exams/${exam.id}`} className="block" style={{ textDecoration: "none", color: "inherit" }}>
+                  <PrdAnnotation data={getAnnotation("lp-exam-card")}>
                   <div
                     className="h-full cursor-pointer rounded-xl bg-white p-5 transition-all duration-300"
                     style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}
@@ -327,6 +333,7 @@ export default function LandingHomePage() {
                       </div>
                     )}
                   </div>
+                  </PrdAnnotation>
                 </Link>
               )
             })}
@@ -352,6 +359,7 @@ export default function LandingHomePage() {
               ]
               return (
                 <Link key={pos.id} href={`/landingpage/certifications/${pos.id}`} style={{ textDecoration: "none", color: "inherit" }}>
+                  <PrdAnnotation data={getAnnotation("lp-cert-card")}>
                   <div style={{
                     background: "#fff", borderRadius: 10, overflow: "hidden",
                     boxShadow: "0 1px 3px rgba(0,0,0,0.06)", transition: "all 0.25s", cursor: "pointer",
@@ -382,6 +390,7 @@ export default function LandingHomePage() {
                       </div>
                     </div>
                   </div>
+                  </PrdAnnotation>
                 </Link>
               )
             })}
@@ -439,7 +448,8 @@ export default function LandingHomePage() {
               ]
               const icons = ["📝", "💻", "🎤", "📁"]
               return (
-                <div key={method.id} style={{
+                <PrdAnnotation key={method.id} data={getAnnotation("lp-method-card")}>
+                <div style={{
                     background: "#fff", borderRadius: 10, overflow: "hidden",
                     boxShadow: "0 1px 3px rgba(0,0,0,0.06)", transition: "all 0.25s", cursor: "pointer",
                   }}
@@ -458,6 +468,7 @@ export default function LandingHomePage() {
                     <span style={{ fontSize: 13, color: "#2563eb", fontWeight: 500 }}>查看使用说明 ›</span>
                   </div>
                 </div>
+                </PrdAnnotation>
               )
             })}
             {filteredMethods.length === 0 && (
@@ -497,6 +508,7 @@ export default function LandingHomePage() {
                 ]
                 return (
                   <Link key={bank.id} href={`/landingpage/resources/banks/${bank.id}`} style={{ textDecoration: "none", color: "inherit" }}>
+                    <PrdAnnotation data={getAnnotation("lp-resource-bank-card")}>
                     <div style={{
                       background: "#fff", borderRadius: 10, overflow: "hidden",
                       boxShadow: "0 1px 3px rgba(0,0,0,0.06)", transition: "all 0.25s", cursor: "pointer",
@@ -522,6 +534,7 @@ export default function LandingHomePage() {
                         </div>
                       </div>
                     </div>
+                    </PrdAnnotation>
                   </Link>
                 )
               })}
@@ -539,6 +552,7 @@ export default function LandingHomePage() {
                 ]
                 return (
                   <Link key={exam.id} href={`/landingpage/resources/exams/${exam.id}`} style={{ textDecoration: "none", color: "inherit" }}>
+                    <PrdAnnotation data={getAnnotation("lp-resource-exam-card")}>
                     <div style={{
                       background: "#fff", borderRadius: 10, overflow: "hidden",
                       boxShadow: "0 1px 3px rgba(0,0,0,0.06)", transition: "all 0.25s", cursor: "pointer",
@@ -562,6 +576,7 @@ export default function LandingHomePage() {
                         </div>
                       </div>
                     </div>
+                    </PrdAnnotation>
                   </Link>
                 )
               })}
@@ -604,6 +619,7 @@ export default function LandingHomePage() {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
             {publishedTopics.map((topic) => (
               <Link key={topic.id} href={`/landingpage/graduation/${topic.id}`} style={{ textDecoration: "none", color: "inherit" }}>
+                <PrdAnnotation data={getAnnotation("lp-grad-card")}>
                 <div style={{
                   background: "#fff", borderRadius: 10, padding: 18,
                   boxShadow: "0 1px 3px rgba(0,0,0,0.06)", transition: "all 0.25s",
@@ -625,6 +641,7 @@ export default function LandingHomePage() {
                     }}>加入毕设选题</button>
                   </div>
                 </div>
+                </PrdAnnotation>
               </Link>
             ))}
             {publishedTopics.length === 0 && (
@@ -681,6 +698,7 @@ export default function LandingHomePage() {
                 ]
                 return (
                   <Link key={majorName} href={`/landingpage/portrait/major/${encodeURIComponent(majorName)}`} style={{ textDecoration: "none", color: "inherit" }}>
+                    <PrdAnnotation data={getAnnotation("lp-portrait-card")}>
                     <div style={{
                       background: "#fff", borderRadius: 10, overflow: "hidden",
                       boxShadow: "0 1px 3px rgba(0,0,0,0.06)", transition: "all 0.25s", cursor: "pointer",
@@ -711,6 +729,7 @@ export default function LandingHomePage() {
                         </div>
                       </div>
                     </div>
+                    </PrdAnnotation>
                   </Link>
                 )
               })}

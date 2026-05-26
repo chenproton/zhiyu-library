@@ -1267,6 +1267,397 @@ export const landingPageAnnotations: Record<string, AnnotationItem> = {
     title: "学生能力画像",
     content: "展示优秀学生能力画像排行。数据来源：后台「学生画像管理」/student-portrait/portraits。按总学分排序展示前 8 名。",
   },
+  "lp-stat-eval": {
+    id: "lp-stat-eval",
+    title: "测评方式数量",
+    content: "数据来源：后台「测评方式管理」/evaluation-methods 中 enabled=true（前台展示开启）的测评方式总数。",
+  },
+  "lp-stat-bank": {
+    id: "lp-stat-bank",
+    title: "题库数量",
+    content: "数据来源：后台「题库管理」/question-banks 中状态为「已发布」的题库总数。",
+  },
+  "lp-stat-exam": {
+    id: "lp-stat-exam",
+    title: "试卷数量",
+    content: "数据来源：后台「试卷管理」/exams 中的试卷总数（包含所有状态）。",
+  },
+  "lp-stat-usage": {
+    id: "lp-stat-usage",
+    title: "考试场次",
+    content: "数据来源：后台「考试管理」/exam-usage 中状态为「已发布」的考试场次数量。",
+  },
+  "lp-stat-position": {
+    id: "lp-stat-position",
+    title: "岗位认证项目",
+    content: "数据来源：后台「岗位能力认定规则配置」/job-ability 中的岗位列表总数。",
+  },
+  "lp-stat-topic": {
+    id: "lp-stat-topic",
+    title: "毕业选题",
+    content: "数据来源：后台「毕业设计选题管理」/graduation-project/topics 中的选题总数。",
+  },
+  "lp-exam-card": {
+    id: "lp-exam-card",
+    title: "考试卡片字段",
+    content: "考试卡片各字段来源：\n- 考试名称 → 后台「考试管理」/exam-usage → exam.name\n- 状态标签 → 后台「考试管理」→ exam.status\n- 考试描述 → 模拟数据（实际应来源于 exam.description）\n- 考试时长 → 后台「试卷管理」/exams → exam.duration\n- 题目数量 → 后台「试卷管理」→ exam.questions.length\n- 创建日期 → 后台「考试管理」→ exam.createdAt\n- 考试对象 → 模拟数据（实际应来源于 exam.targetAudience）",
+  },
+  "lp-cert-card": {
+    id: "lp-cert-card",
+    title: "岗位认证卡片字段",
+    content: "岗位认证卡片各字段来源：\n- 岗位名称 → 后台「岗位能力认定规则配置」/job-ability → pos.name\n- 创建人 → 后台岗位配置 → pos.updatedBy\n- 更新时间 → 后台岗位配置 → pos.lastUpdated\n- 适用专业 → 后台岗位配置 → pos.professionalDirection\n- 能力项数 → 后台岗位配置 → pos.relatedAbilityCount",
+  },
+  "lp-method-card": {
+    id: "lp-method-card",
+    title: "测评方式卡片字段",
+    content: "测评方式卡片各字段来源：\n- 方式名称 → 后台「测评方式管理」/evaluation-methods → method.name\n- 方式说明 → 后台「测评方式管理」→ method.description\n- 使用说明链接 → 后台「测评方式管理」→ method.docLink",
+  },
+  "lp-resource-bank-card": {
+    id: "lp-resource-bank-card",
+    title: "题库卡片字段",
+    content: "题库卡片各字段来源：\n- 题库名称 → 后台「题库管理」/question-banks → bank.name\n- 题目数量 → 后台「题库管理」→ bank.questionCount\n- 创建人 → 后台「题库管理」→ bank.creatorId\n- 共建人数 → 后台「题库管理」→ bank.collaboratorIds.length\n- 创建日期 → 后台「题库管理」→ bank.createdAt\n- 更新日期 → 后台「题库管理」→ bank.updatedAt\n- 版本号 → 后台「题库管理」→ bank.version",
+  },
+  "lp-resource-exam-card": {
+    id: "lp-resource-exam-card",
+    title: "试卷卡片字段",
+    content: "试卷卡片各字段来源：\n- 试卷名称 → 后台「试卷管理」/exams → exam.name\n- 考试时长 → 后台「试卷管理」→ exam.duration\n- 题目数量 → 后台「试卷管理」→ exam.questions.length\n- 总分 → 后台「试卷管理」→ 各题目分值累加\n- 版本号 → 后台「试卷管理」→ exam.version\n- 创建/更新日期 → 后台「试卷管理」→ exam.createdAt / exam.updatedAt",
+  },
+  "lp-grad-card": {
+    id: "lp-grad-card",
+    title: "毕业设计选题卡片字段",
+    content: "毕业设计选题卡片各字段来源：\n- 选题名称 → 后台「毕业设计选题管理」/graduation-project/topics → topic.name\n- 岗位方向 → 后台选题管理 → topic.positionName\n- 导师 → 后台选题管理 → topic.advisorName\n- 来源 → 后台选题管理 → topic.source（校内/企业）\n- 浏览次数 → 后台选题管理 → topic.appliedCount",
+  },
+  "lp-portrait-card": {
+    id: "lp-portrait-card",
+    title: "学生画像专业卡片字段",
+    content: "学生画像专业卡片各字段来源：\n- 专业名称 → 后台「学生画像管理」/student-portrait/portraits → majorName\n- 学生数量 → 后台「学生画像管理」→ 该专业下学生总数\n- 平均评级 → 后台「学生画像管理」→ 该专业学生 overallGrade 平均值\n- 平均学分 → 后台「学生画像管理」→ 该专业学生 totalCredits 平均值\n- 平均排名 → 后台「学生画像管理」→ 该专业学生 majorRank/majorTotal 平均值",
+  },
+}
+
+// ==================== 前台二级页面 ====================
+
+/** 考试详情页 /landingpage/exams/[id] */
+export const landingExamAnnotations: Record<string, AnnotationItem> = {
+  "le-page": {
+    id: "le-page",
+    title: "考试详情页",
+    content: "前台考试详情页，展示考试基本信息和题目列表。学生可在此页面查看考试详情并开始答题。所有数据来源于后台「考试管理」/exam-usage 和「试卷管理」/exams。",
+  },
+  "le-title": {
+    id: "le-title",
+    title: "考试名称",
+    content: "数据来源：后台「考试管理」/exam-usage → 考试名称字段。创建考试时填写，发布后在考试中心展示。",
+  },
+  "le-desc": {
+    id: "le-desc",
+    title: "考试描述",
+    content: "数据来源：后台「考试管理」/exam-usage → 考试描述字段。用于说明考试的目的、范围、注意事项等。",
+  },
+  "le-status": {
+    id: "le-status",
+    title: "考试状态",
+    content: "数据来源：后台「考试管理」/exam-usage → 状态字段。包括：草稿、未提交、审核中、已驳回、待发布、已发布。前台仅展示已发布状态的考试。",
+  },
+  "le-duration": {
+    id: "le-duration",
+    title: "考试时长",
+    content: "数据来源：后台「试卷管理」/exams → 考试时长字段。组卷时设置，单位为分钟。学生开始答题后开始倒计时。",
+  },
+  "le-question-count": {
+    id: "le-question-count",
+    title: "题目数量",
+    content: "数据来源：后台「试卷管理」/exams → 组卷结果中的题目总数。通过自动抽题或手动添加题目后生成。",
+  },
+  "le-total-score": {
+    id: "le-total-score",
+    title: "总分",
+    content: "数据来源：后台「试卷管理」/exams → 各题目分值之和。每道题在组卷时设置分值，系统累加计算总分。",
+  },
+  "le-time-status": {
+    id: "le-time-status",
+    title: "时间状态",
+    content: "模拟数据。实际应来源于后台「考试管理」/exam-usage 的考试时间配置（开始时间、结束时间），判断当前处于进行中/未开始/已结束状态。",
+  },
+  "le-target": {
+    id: "le-target",
+    title: "考试对象",
+    content: "数据来源：后台「考试管理」/exam-usage → 考试对象设置。可配置为学生（按班级/年级）或教师（指定人员）。",
+  },
+  "le-start-btn": {
+    id: "le-start-btn",
+    title: "开始考试按钮",
+    content: "学生点击后进入答题界面，开始倒计时。需判断考试时间状态，未开始或已结束则不可点击。",
+  },
+  "le-question-list": {
+    id: "le-question-list",
+    title: "题目列表",
+    content: "数据来源：后台「试卷管理」/exams → 组卷结果。展示所有题目内容、选项、分值。题目来源于关联题库或手动录入。",
+  },
+}
+
+/** 岗位认证详情页 /landingpage/certifications/[id] */
+export const landingCertAnnotations: Record<string, AnnotationItem> = {
+  "lc-page": {
+    id: "lc-page",
+    title: "岗位能力认证详情页",
+    content: "前台岗位能力认证详情页，展示岗位基本信息、能力项要求和达成标准。数据来源于后台「岗位能力认定规则配置」/job-ability。",
+  },
+  "lc-title": {
+    id: "lc-title",
+    title: "岗位名称",
+    content: "数据来源：后台「岗位能力认定规则配置」/job-ability → 岗位名称。岗位列表中配置的岗位信息。",
+  },
+  "lc-stats": {
+    id: "lc-stats",
+    title: "统计指标",
+    content: "数据来源：后台「岗位能力认定规则配置」/job-ability。\n- 能力项数 → 该岗位配置的能力项总数\n- 平均达成率 → 参与认证学生的平均达成率\n- 参与人数 → 选择该岗位的学生画像数量\n- 综合评级 → 按达成率分布计算的评级分布",
+  },
+  "lc-competency": {
+    id: "lc-competency",
+    title: "能力项列表",
+    content: "数据来源：后台「岗位能力认定规则配置」/job-ability → 能力项配置。每个能力项包含：能力名称、目标等级、达成标准说明。等级分为：了解、理解、掌握、熟练、精通。",
+  },
+  "lc-leaderboard": {
+    id: "lc-leaderboard",
+    title: "学生排行榜",
+    content: "模拟数据。实际应来源于后台「学生画像管理」/student-portrait/portraits 中该岗位关联学生的达成率和评级数据。",
+  },
+  "lc-grade-switch": {
+    id: "lc-grade-switch",
+    title: "届别切换",
+    content: "筛选不同年级（届别）的学生数据。模拟 2024/2025/2026 三届数据。",
+  },
+}
+
+/** 题库详情页 /landingpage/resources/banks/[id] */
+export const landingBankAnnotations: Record<string, AnnotationItem> = {
+  "lb-page": {
+    id: "lb-page",
+    title: "题库详情页",
+    content: "前台题库详情页，展示题库基本信息和题目预览。数据来源于后台「题库管理」/question-banks。",
+  },
+  "lb-title": {
+    id: "lb-title",
+    title: "题库名称",
+    content: "数据来源：后台「题库管理」/question-banks → 题库名称。新建题库时填写，支持编辑修改。",
+  },
+  "lb-desc": {
+    id: "lb-desc",
+    title: "题库描述",
+    content: "数据来源：后台「题库管理」/question-banks → 题库简介。描述题库的内容范围、适用场景等信息。",
+  },
+  "lb-question-count": {
+    id: "lb-question-count",
+    title: "题目数量",
+    content: "数据来源：后台「题库管理」/question-banks → questionCount 字段。题库中实际包含的题目总数，添加/删除题目后自动更新。",
+  },
+  "lb-creator": {
+    id: "lb-creator",
+    title: "创建者",
+    content: "数据来源：后台「题库管理」/question-banks → 创建人信息。记录创建该题库的用户。",
+  },
+  "lb-version": {
+    id: "lb-version",
+    title: "版本号",
+    content: "数据来源：后台「题库管理」/question-banks → version 字段。每次编辑保存后自动递增版本号。",
+  },
+  "lb-view-count": {
+    id: "lb-view-count",
+    title: "浏览次数",
+    content: "模拟数据。实际应记录前台用户访问该题库详情页的次数。",
+  },
+  "lb-apply-btn": {
+    id: "lb-apply-btn",
+    title: "申请共建按钮",
+    content: "学生/教师可申请成为该题库的共建人，获得编辑权限。申请需题库所有者审批。",
+  },
+  "lb-fav-btn": {
+    id: "lb-fav-btn",
+    title: "收藏题库按钮",
+    content: "用户可将题库加入个人收藏，方便快速访问。收藏状态保存在用户个人数据中。",
+  },
+  "lb-questions": {
+    id: "lb-questions",
+    title: "题目预览",
+    content: "数据来源：后台「题库管理」/question-banks 关联的题目数据。展示题目内容、题型、难度、知识点标签和选项。未登录用户仅展示前 8 题。",
+  },
+}
+
+/** 试卷详情页 /landingpage/resources/exams/[id] */
+export const landingPaperAnnotations: Record<string, AnnotationItem> = {
+  "lpr-page": {
+    id: "lpr-page",
+    title: "试卷详情页",
+    content: "前台试卷详情页，展示试卷基本信息、题型分布统计和题目概览。数据来源于后台「试卷管理」/exams。",
+  },
+  "lpr-title": {
+    id: "lpr-title",
+    title: "试卷名称",
+    content: "数据来源：后台「试卷管理」/exams → 试卷名称。新建/编辑试卷时填写。",
+  },
+  "lpr-desc": {
+    id: "lpr-desc",
+    title: "试卷描述",
+    content: "数据来源：后台「试卷管理」/exams → 试卷描述。说明试卷用途、适用范围等。",
+  },
+  "lpr-status": {
+    id: "lpr-status",
+    title: "试卷状态",
+    content: "数据来源：后台「试卷管理」/exams → 状态字段。包括：草稿、未提交、审核中、已驳回、待发布、已发布。前台仅展示已发布状态的试卷。",
+  },
+  "lpr-duration": {
+    id: "lpr-duration",
+    title: "考试时长",
+    content: "数据来源：后台「试卷管理」/exams → 考试时长。组卷时设置，单位为分钟。",
+  },
+  "lpr-question-count": {
+    id: "lpr-question-count",
+    title: "题目数量",
+    content: "数据来源：后台「试卷管理」/exams → 组卷结果中的题目总数。通过自动抽题或手动添加生成。",
+  },
+  "lpr-total-score": {
+    id: "lpr-total-score",
+    title: "总分",
+    content: "数据来源：后台「试卷管理」/exams → 各题目分值之和。组卷时为每道题设置分值。",
+  },
+  "lpr-version": {
+    id: "lpr-version",
+    title: "版本号",
+    content: "数据来源：后台「试卷管理」/exams → version 字段。每次编辑保存后自动递增。",
+  },
+  "lpr-type-stats": {
+    id: "lpr-type-stats",
+    title: "题型分布统计",
+    content: "数据来源：后台「试卷管理」/exams → 组卷结果。按题型（单选/多选/判断/填空/问答）统计题目数量和分值占比，以饼图形式展示。",
+  },
+  "lpr-questions": {
+    id: "lpr-questions",
+    title: "题目概览",
+    content: "数据来源：后台「试卷管理」/exams → 组卷结果。展示试卷中所有题目的内容、题型、难度、知识点标签和选项。",
+  },
+}
+
+/** 毕业设计详情页 /landingpage/graduation/[id] */
+export const landingGraduationAnnotations: Record<string, AnnotationItem> = {
+  "lg-page": {
+    id: "lg-page",
+    title: "毕业设计选题详情页",
+    content: "前台毕业设计选题详情页，展示选题信息、描述、已选学生等。数据来源于后台「毕业设计选题管理」/graduation-project/topics 和「毕业设计档案管理」/graduation-project/archives。",
+  },
+  "lg-title": {
+    id: "lg-title",
+    title: "选题名称",
+    content: "数据来源：后台「毕业设计选题管理」/graduation-project/topics → 课题名称。发布选题时填写。",
+  },
+  "lg-position": {
+    id: "lg-position",
+    title: "岗位/方向",
+    content: "数据来源：后台「毕业设计选题管理」/graduation-project/topics → 关联岗位。选题与岗位能力认定体系中的岗位关联。",
+  },
+  "lg-college": {
+    id: "lg-college",
+    title: "所属学院",
+    content: "数据来源：后台「毕业设计选题管理」/graduation-project/topics → 所属学院。选题发布时选择的学院/院系。",
+  },
+  "lg-status": {
+    id: "lg-status",
+    title: "选题状态",
+    content: "数据来源：后台「毕业设计选题管理」/graduation-project/topics → 状态字段。包括：草稿、待审核、已发布、已锁定。前台仅展示已发布状态的选题。",
+  },
+  "lg-advisor": {
+    id: "lg-advisor",
+    title: "导师",
+    content: "数据来源：后台「毕业设计选题管理」/graduation-project/topics → 导师姓名。发布选题时指定的指导教师。",
+  },
+  "lg-time-range": {
+    id: "lg-time-range",
+    title: "时间范围",
+    content: "数据来源：后台「毕业设计选题管理」/graduation-project/topics → 开始日期/结束日期。选题的有效时间范围。",
+  },
+  "lg-capacity": {
+    id: "lg-capacity",
+    title: "容量/剩余名额",
+    content: "数据来源：后台「毕业设计选题管理」/graduation-project/topics → 容量和已申请数。capacity 为选题最大容纳人数，appliedCount 为已申请人数，剩余名额 = capacity - appliedCount。",
+  },
+  "lg-desc": {
+    id: "lg-desc",
+    title: "选题描述",
+    content: "数据来源：后台「毕业设计选题管理」/graduation-project/topics → 选题描述。详细介绍选题背景、目标、要求等。",
+  },
+  "lg-source": {
+    id: "lg-source",
+    title: "选题来源",
+    content: "数据来源：后台「毕业设计选题管理」/graduation-project/topics → 来源字段。包括：校内场景课题（校内导师发布）和企业合作课题（企业导师参与）。",
+  },
+  "lg-students": {
+    id: "lg-students",
+    title: "已选学生",
+    content: "数据来源：后台「毕业设计档案管理」/graduation-project/archives。展示已选择该选题的学生列表、学号和当前阶段（开题/中期/过程/答辩）。",
+  },
+  "lg-info": {
+    id: "lg-info",
+    title: "侧边栏选题信息",
+    content: "集中展示选题的完整信息：课题名称、所属学院、导师、专业方向、容量、已申请、开始时间、结束时间。全部来源于后台「毕业设计选题管理」。",
+  },
+  "lg-apply-btn": {
+    id: "lg-apply-btn",
+    title: "申请选题按钮",
+    content: "学生点击后申请选择该毕业设计选题。需判断剩余名额，名额已满时按钮置灰不可点击。申请成功后更新已申请人数。",
+  },
+}
+
+/** 学生画像详情页 /landingpage/portrait/[id] */
+export const landingPortraitAnnotations: Record<string, AnnotationItem> = {
+  "lpo-page": {
+    id: "lpo-page",
+    title: "学生能力画像详情页",
+    content: "前台学生能力画像详情页，展示学生的综合能力分析、排名、课程成绩和成长趋势。数据来源于后台「学生画像管理」/student-portrait/portraits。",
+  },
+  "lpo-name": {
+    id: "lpo-name",
+    title: "学生姓名",
+    content: "数据来源：后台「学生画像管理」/student-portrait/portraits → 学生姓名。由系统根据学生档案自动生成。",
+  },
+  "lpo-class": {
+    id: "lpo-class",
+    title: "班级与专业",
+    content: "数据来源：后台「学生画像管理」/student-portrait/portraits → 班级名称、专业名称。与学生学籍信息关联。",
+  },
+  "lpo-grade": {
+    id: "lpo-grade",
+    title: "综合评级",
+    content: "数据来源：后台「学生画像管理」/student-portrait/portraits → 综合评级。根据各能力维度得分加权计算，分为 A/B/C/D/E 五级。",
+  },
+  "lpo-stats": {
+    id: "lpo-stats",
+    title: "统计指标",
+    content: "数据来源：后台「学生画像管理」/student-portrait/portraits。\n- 已完成课程 → completedCourses\n- 已完成场景 → completedScenes\n- 总学分 → totalCredits\n- 档案数 → archiveCount\n- 出勤率 → attendanceRate",
+  },
+  "lpo-domains": {
+    id: "lpo-domains",
+    title: "能力维度分析",
+    content: "数据来源：后台「学生画像管理」/student-portrait/portraits → domainScores。包含五个维度：行业认知(industry)、专业技能(professional)、实操技能(skill)、通用能力(general)、综合素质(quality)。每个维度包含得分和等级评定。",
+  },
+  "lpo-rank": {
+    id: "lpo-rank",
+    title: "排名信息",
+    content: "数据来源：后台「学生画像管理」/student-portrait/portraits → 排名数据。包含班级排名(classRank/classTotal)、专业排名(majorRank/majorTotal)、年级排名(yearRank/yearTotal)。",
+  },
+  "lpo-recommend": {
+    id: "lpo-recommend",
+    title: "推荐岗位",
+    content: "数据来源：后台「学生画像管理」/student-portrait/portraits → recommendPositions。根据学生能力维度得分与岗位要求匹配度计算，展示匹配度最高的前 3 个岗位。",
+  },
+  "lpo-courses": {
+    id: "lpo-courses",
+    title: "课程成绩",
+    content: "数据来源：后台「学生画像管理」/student-portrait/portraits → courseRecords。展示学生各门课程的最终成绩(finalScore)、等级(grade)和学分(credit)。",
+  },
+  "lpo-trend": {
+    id: "lpo-trend",
+    title: "成长趋势",
+    content: "数据来源：后台「学生画像管理」/student-portrait/portraits → domainScores。以柱状图形式展示各能力维度的得分分布，直观反映学生的能力优势与短板。",
+  },
 }
 
 // ==================== 合并所有标注 ====================
@@ -1290,6 +1681,12 @@ const allAnnotations: Record<string, AnnotationItem> = {
   ...evaluationMethodsAnnotations,
   ...studentPortraitAnnotations,
   ...landingPageAnnotations,
+  ...landingExamAnnotations,
+  ...landingCertAnnotations,
+  ...landingBankAnnotations,
+  ...landingPaperAnnotations,
+  ...landingGraduationAnnotations,
+  ...landingPortraitAnnotations,
 }
 
 /** 从 localStorage 读取用户覆盖 */
@@ -1351,6 +1748,18 @@ export function getAnnotationsByPage(page: string): Record<string, AnnotationIte
       return studentPortraitAnnotations
     case "landingpage":
       return landingPageAnnotations
+    case "landingpage-exams":
+      return landingExamAnnotations
+    case "landingpage-certifications":
+      return landingCertAnnotations
+    case "landingpage-banks":
+      return landingBankAnnotations
+    case "landingpage-papers":
+      return landingPaperAnnotations
+    case "landingpage-graduation":
+      return landingGraduationAnnotations
+    case "landingpage-portrait":
+      return landingPortraitAnnotations
     default:
       return {}
   }

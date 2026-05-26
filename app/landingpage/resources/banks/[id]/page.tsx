@@ -1,5 +1,7 @@
 "use client"
 
+import { PrdAnnotation } from "@/components/prd-annotation"
+import { getAnnotation } from "@/lib/prd-annotations"
 import Link from "next/link"
 import { useParams } from "next/navigation"
 import {
@@ -54,6 +56,7 @@ export default function QuestionBankDetailPage() {
   const viewCount = bankId === "bank-1" ? 1256 : bankId === "bank-2" ? 892 : 567
 
   return (
+    <PrdAnnotation data={getAnnotation("lb-page")}>
     <div style={{ maxWidth: 1400, margin: "0 auto", padding: 24 }}>
       <div style={{ marginBottom: 24 }}>
         <Link href="/landingpage/resources">
@@ -67,38 +70,57 @@ export default function QuestionBankDetailPage() {
       <div style={{ background: "#fff", borderRadius: 12, border: "1px solid #e5e6eb", overflow: "hidden", marginBottom: 24 }}>
         <div style={{ padding: "24px 32px", background: "linear-gradient(135deg, #3370ff, #60a5fa)", color: "white", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div>
-            <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8 }}>{bank.name}</h1>
-            <p style={{ fontSize: 14, opacity: 0.9 }}>{bank.description}</p>
+            <PrdAnnotation data={getAnnotation("lb-title")}>
+              <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8 }}>{bank.name}</h1>
+            </PrdAnnotation>
+            <PrdAnnotation data={getAnnotation("lb-desc")}>
+              <p style={{ fontSize: 14, opacity: 0.9 }}>{bank.description}</p>
+            </PrdAnnotation>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <Button size="sm" style={{ gap: 6, background: "rgba(255,255,255,0.9)", color: "#3370ff" }}>
-              <Plus style={{ width: 14, height: 14 }} /> 申请共建
-            </Button>
-            <Button size="sm" variant="outline" style={{ gap: 6, borderColor: "rgba(255,255,255,0.5)", color: "#fff", background: "transparent" }}>
-              <Heart style={{ width: 14, height: 14 }} /> 收藏题库
-            </Button>
+            <PrdAnnotation data={getAnnotation("lb-apply-btn")}>
+              <Button size="sm" style={{ gap: 6, background: "rgba(255,255,255,0.9)", color: "#3370ff" }}>
+                <Plus style={{ width: 14, height: 14 }} /> 申请共建
+              </Button>
+            </PrdAnnotation>
+            <PrdAnnotation data={getAnnotation("lb-fav-btn")}>
+              <Button size="sm" variant="outline" style={{ gap: 6, borderColor: "rgba(255,255,255,0.5)", color: "#fff", background: "transparent" }}>
+                <Heart style={{ width: 14, height: 14 }} /> 收藏题库
+              </Button>
+            </PrdAnnotation>
             {/* status tag removed */}
           </div>
         </div>
         <div style={{ padding: "24px 32px", display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 24 }}>
           {[
-            { icon: <ListOrdered style={{ width: 18, height: 18 }} />, label: "题目数量", value: `${bank.questionCount} 题` },
-            { icon: <User style={{ width: 18, height: 18 }} />, label: "创建者", value: bank.creatorId || "系统" },
-            { icon: <Clock style={{ width: 18, height: 18 }} />, label: "版本", value: bank.version },
+            { icon: <ListOrdered style={{ width: 18, height: 18 }} />, label: "题目数量", value: `${bank.questionCount} 题`, aid: "lb-question-count" as const },
+            { icon: <User style={{ width: 18, height: 18 }} />, label: "创建者", value: bank.creatorId || "系统", aid: "lb-creator" as const },
+            { icon: <Clock style={{ width: 18, height: 18 }} />, label: "版本", value: bank.version, aid: "lb-version" as const },
             { icon: <Database style={{ width: 18, height: 18 }} />, label: "共建人", value: "李老师" },
-            { icon: <Eye style={{ width: 18, height: 18 }} />, label: "浏览次数", value: `${viewCount} 次` },
-          ].map((item, i) => (
-            <div key={i} style={{ textAlign: "center", padding: "16px 0", background: "#f5f6f7", borderRadius: 8 }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, color: "#3370ff", marginBottom: 6 }}>
-                {item.icon} <span style={{ fontSize: 13, fontWeight: 500 }}>{item.label}</span>
-              </div>
-              <div style={{ fontSize: 18, fontWeight: 700 }}>{item.value}</div>
-            </div>
-          ))}
+            { icon: <Eye style={{ width: 18, height: 18 }} />, label: "浏览次数", value: `${viewCount} 次`, aid: "lb-view-count" as const },
+          ].map((item, i) => {
+            const inner = (
+              <>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, color: "#3370ff", marginBottom: 6 }}>
+                  {item.icon} <span style={{ fontSize: 13, fontWeight: 500 }}>{item.label}</span>
+                </div>
+                <div style={{ fontSize: 18, fontWeight: 700 }}>{item.value}</div>
+              </>
+            )
+            const wrapperStyle = { textAlign: "center" as const, padding: "16px 0", background: "#f5f6f7", borderRadius: 8 }
+            return item.aid ? (
+              <PrdAnnotation key={i} data={getAnnotation(item.aid)}>
+                <div style={wrapperStyle}>{inner}</div>
+              </PrdAnnotation>
+            ) : (
+              <div key={i} style={wrapperStyle}>{inner}</div>
+            )
+          })}
         </div>
       </div>
 
       {/* 题目预览 — 全宽 */}
+      <PrdAnnotation data={getAnnotation("lb-questions")}>
       <div style={{ background: "#fff", borderRadius: 12, border: "1px solid #e5e6eb", padding: 24 }}>
         <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
           <FileText style={{ width: 18, height: 18, color: "#3370ff" }} /> 题目预览
@@ -140,6 +162,8 @@ export default function QuestionBankDetailPage() {
           </div>
         )}
       </div>
+      </PrdAnnotation>
     </div>
+    </PrdAnnotation>
   )
 }

@@ -16,6 +16,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { useData } from "@/components/providers/data-provider"
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts"
 import type { Exam } from "@/lib/types"
+import { PrdAnnotation } from "@/components/prd-annotation"
+import { getAnnotation } from "@/lib/prd-annotations"
 
 /* ─── 状态颜色映射 ─── */
 const statusConfig: Record<string, { bg: string; color: string; label: string }> = {
@@ -141,6 +143,7 @@ export default function ExamDetailPage() {
   /* ─── 提交成功 ─── */
   if (submitted) {
     return (
+      <PrdAnnotation data={getAnnotation("le-page")}>
       <div style={{ maxWidth: 1400, margin: "0 auto", padding: 24 }}>
         <div style={{ marginBottom: 24 }}>
           <Link href="/landingpage/exams">
@@ -160,12 +163,14 @@ export default function ExamDetailPage() {
           </div>
         </div>
       </div>
+      </PrdAnnotation>
     )
   }
 
   /* ─── 答题中 ─── */
   if (started) {
     return (
+      <PrdAnnotation data={getAnnotation("le-page")}>
       <div style={{ maxWidth: 1400, margin: "0 auto", padding: 24 }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
           <h1 style={{ fontSize: 18, fontWeight: 700 }}>{exam.name}</h1>
@@ -253,11 +258,13 @@ export default function ExamDetailPage() {
           </div>
         </div>
       </div>
+      </PrdAnnotation>
     )
   }
 
   /* ─── 概览页 ─── */
   return (
+    <PrdAnnotation data={getAnnotation("le-page")}>
     <div style={{ maxWidth: 1400, margin: "0 auto", padding: 24 }}>
       <div style={{ marginBottom: 24 }}>
         <Link href="/landingpage/exams">
@@ -271,12 +278,20 @@ export default function ExamDetailPage() {
       <div style={{ background: "#fff", borderRadius: 12, border: "1px solid #e5e6eb", overflow: "hidden", marginBottom: 24 }}>
         <div style={{ padding: "24px 32px", background: "linear-gradient(135deg, #3370ff, #7c3aed)", color: "white", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div>
-            <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8 }}>{exam.name}</h1>
-            <p style={{ fontSize: 14, opacity: 0.9 }}>{exam.description}</p>
+            <PrdAnnotation data={getAnnotation("le-title")}>
+              <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8 }}>{exam.name}</h1>
+            </PrdAnnotation>
+            <PrdAnnotation data={getAnnotation("le-desc")}>
+              <p style={{ fontSize: 14, opacity: 0.9 }}>{exam.description}</p>
+            </PrdAnnotation>
           </div>
-          <span style={{ padding: "4px 12px", borderRadius: 20, fontSize: 12, fontWeight: 500, background: timeStatus.bg, color: timeStatus.color }}>
-            {timeStatus.label}
-          </span>
+          <PrdAnnotation data={getAnnotation("le-status")}>
+            <PrdAnnotation data={getAnnotation("le-time-status")}>
+              <span style={{ padding: "4px 12px", borderRadius: 20, fontSize: 12, fontWeight: 500, background: timeStatus.bg, color: timeStatus.color }}>
+                {timeStatus.label}
+              </span>
+            </PrdAnnotation>
+          </PrdAnnotation>
         </div>
         <div style={{ padding: "24px 32px", display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 24 }}>
           {[
@@ -285,12 +300,14 @@ export default function ExamDetailPage() {
             { icon: <BarChart3 style={{ width: 18, height: 18 }} />, label: "总分", value: `${totalScore} 分` },
             { icon: <Users style={{ width: 18, height: 18 }} />, label: "考试对象", value: `${targetAudience.type}（${targetAudience.detail}）` }
           ].map((item, i) => (
-            <div key={i} style={{ textAlign: "center", padding: "16px 0", background: "#f5f6f7", borderRadius: 8 }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, color: "#3370ff", marginBottom: 6 }}>
-                {item.icon} <span style={{ fontSize: 13, fontWeight: 500 }}>{item.label}</span>
+            <PrdAnnotation key={i} data={getAnnotation(["le-duration", "le-question-count", "le-total-score", "le-target"][i])}>
+              <div style={{ textAlign: "center", padding: "16px 0", background: "#f5f6f7", borderRadius: 8 }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, color: "#3370ff", marginBottom: 6 }}>
+                  {item.icon} <span style={{ fontSize: 13, fontWeight: 500 }}>{item.label}</span>
+                </div>
+                <div style={{ fontSize: 14, fontWeight: 700, padding: "0 8px" }}>{item.value}</div>
               </div>
-              <div style={{ fontSize: 14, fontWeight: 700, padding: "0 8px" }}>{item.value}</div>
-            </div>
+            </PrdAnnotation>
           ))}
         </div>
       </div>
@@ -327,15 +344,17 @@ export default function ExamDetailPage() {
                     </PieChart>
                   </ResponsiveContainer>
                 </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-                  {questionTypeStats.map((stat: typeof questionTypeStats[0]) => (
-                    <div key={stat.name} style={{ display: "flex", alignItems: "center", gap: 8, padding: 10, background: "#f5f6f7", borderRadius: 8 }}>
-                      <span style={{ width: 10, height: 10, borderRadius: "50%", background: stat.color, flexShrink: 0 }} />
-                      <span style={{ fontSize: 13, color: "#1f2329" }}>{stat.name}</span>
-                      <span style={{ fontSize: 12, color: "#8f959e", marginLeft: "auto" }}>{stat.count}题 / {stat.score}分</span>
-                    </div>
-                  ))}
-                </div>
+                <PrdAnnotation data={getAnnotation("le-question-list")}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                    {questionTypeStats.map((stat: typeof questionTypeStats[0]) => (
+                      <div key={stat.name} style={{ display: "flex", alignItems: "center", gap: 8, padding: 10, background: "#f5f6f7", borderRadius: 8 }}>
+                        <span style={{ width: 10, height: 10, borderRadius: "50%", background: stat.color, flexShrink: 0 }} />
+                        <span style={{ fontSize: 13, color: "#1f2329" }}>{stat.name}</span>
+                        <span style={{ fontSize: 12, color: "#8f959e", marginLeft: "auto" }}>{stat.count}题 / {stat.score}分</span>
+                      </div>
+                    ))}
+                  </div>
+                </PrdAnnotation>
               </>
             ) : (
               <div style={{ textAlign: "center", fontSize: 13, color: "#8f959e", padding: 20 }}>暂无题目数据</div>
@@ -355,18 +374,21 @@ export default function ExamDetailPage() {
             <p>5. 考试期间系统将自动保存答题进度。</p>
           </div>
           <div style={{ marginTop: 24, display: "flex", justifyContent: "center" }}>
-            {exam.status === "published" ? (
-              <Button size="lg" style={{ gap: 8, background: "#3370ff" }} onClick={() => setStarted(true)}>
-                <PlayCircle style={{ width: 20, height: 20 }} /> 开始考试
-              </Button>
-            ) : (
-              <Button size="lg" variant="outline" disabled>
-                {exam.status === "draft" || exam.status === "unsubmitted" || exam.status === "pending" || exam.status === "rejected" ? "考试未发布" : "考试已结束"}
-              </Button>
-            )}
+            <PrdAnnotation data={getAnnotation("le-start-btn")}>
+              {exam.status === "published" ? (
+                <Button size="lg" style={{ gap: 8, background: "#3370ff" }} onClick={() => setStarted(true)}>
+                  <PlayCircle style={{ width: 20, height: 20 }} /> 开始考试
+                </Button>
+              ) : (
+                <Button size="lg" variant="outline" disabled>
+                  {exam.status === "draft" || exam.status === "unsubmitted" || exam.status === "pending" || exam.status === "rejected" ? "考试未发布" : "考试已结束"}
+                </Button>
+              )}
+            </PrdAnnotation>
           </div>
         </div>
       </div>
     </div>
+    </PrdAnnotation>
   )
 }

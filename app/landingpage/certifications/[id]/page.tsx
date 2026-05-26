@@ -1,5 +1,8 @@
 "use client"
 
+import { PrdAnnotation } from "@/components/prd-annotation"
+import { getAnnotation } from "@/lib/prd-annotations"
+
 import Link from "next/link"
 import { useParams } from "next/navigation"
 import { useState, useMemo } from "react"
@@ -249,6 +252,7 @@ export default function CertificationDetailPage() {
   const st = statusMap[cert.ruleStatus] || statusMap.draft
 
   return (
+    <PrdAnnotation data={getAnnotation("lc-page")}>
     <div style={{ maxWidth: 1400, margin: "0 auto", padding: 24 }}>
       <div style={{ marginBottom: 24 }}>
         <Link href="/landingpage/certifications">
@@ -262,13 +266,16 @@ export default function CertificationDetailPage() {
       <div style={{ background: "#fff", borderRadius: 12, border: "1px solid #e5e6eb", overflow: "hidden", marginBottom: 24 }}>
         <div style={{ padding: "24px 32px", background: "linear-gradient(135deg, #f59e0b, #fbbf24)", color: "white", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div>
+            <PrdAnnotation data={getAnnotation("lc-title")}>
             <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 8 }}>{cert.name}</h1>
+            </PrdAnnotation>
             <p style={{ fontSize: 14, opacity: 0.9 }}>岗位代码：{cert.positionCode} · 适用专业：{cert.professionalDirection}</p>
           </div>
           {/* status tag removed */}
         </div>
 
         {/* 届别 Tab */}
+        <PrdAnnotation data={getAnnotation("lc-grade-switch")}>
         <div style={{ padding: "16px 32px 0", display: "flex", gap: 12, borderBottom: "1px solid #f0f0f0" }}>
           {(["2024", "2025", "2026"] as GradeYear[]).map((g) => (
             <button
@@ -295,8 +302,10 @@ export default function CertificationDetailPage() {
             </button>
           ))}
         </div>
+        </PrdAnnotation>
 
         {/* 指标 */}
+        <PrdAnnotation data={getAnnotation("lc-stats")}>
         <div style={{ padding: "24px 32px", display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 24 }}>
           {[
             { icon: <Clock style={{ width: 18, height: 18 }} />, label: "能力点", value: `${gradeData.totalPoints} 个` },
@@ -311,9 +320,11 @@ export default function CertificationDetailPage() {
             </div>
           ))}
         </div>
+        </PrdAnnotation>
       </div>
 
       {/* 能力认定要求 */}
+      <PrdAnnotation data={getAnnotation("lc-competency")}>
       <div style={{ background: "#fff", borderRadius: 12, border: "1px solid #e5e6eb", padding: 24, marginBottom: 24 }}>
         <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
           <Award style={{ width: 18, height: 18, color: "#f59e0b" }} /> 能力认定要求
@@ -407,8 +418,10 @@ export default function CertificationDetailPage() {
           </div>
         </div>
       </div>
+      </PrdAnnotation>
 
       {/* 认证排行榜 */}
+      <PrdAnnotation data={getAnnotation("lc-leaderboard")}>
       <div style={{ background: "#fff", borderRadius: 12, border: "1px solid #e5e6eb", padding: 24 }}>
         <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
           <Star style={{ width: 18, height: 18, color: "#f59e0b" }} /> 岗位能力认定排行榜
@@ -476,6 +489,8 @@ export default function CertificationDetailPage() {
           </div>
         )}
       </div>
+      </PrdAnnotation>
     </div>
+    </PrdAnnotation>
   )
 }

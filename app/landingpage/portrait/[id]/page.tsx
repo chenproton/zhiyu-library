@@ -10,6 +10,8 @@ import {
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useData } from "@/components/providers/data-provider"
+import { PrdAnnotation } from "@/components/prd-annotation"
+import { getAnnotation } from "@/lib/prd-annotations"
 
 const domainColors: Record<string, string> = {
   industry: "#3b82f6",
@@ -55,6 +57,7 @@ export default function PortraitDetailPage() {
   }
 
   return (
+    <PrdAnnotation data={getAnnotation("lpo-page")}>
     <div style={{ maxWidth: 1400, margin: "0 auto", padding: 24 }}>
       <div style={{ marginBottom: 24 }}>
         <Link href="/landingpage/portrait">
@@ -72,15 +75,22 @@ export default function PortraitDetailPage() {
               <UserCircle style={{ width: 32, height: 32 }} />
             </div>
             <div>
+              <PrdAnnotation data={getAnnotation("lpo-name")}>
               <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 4 }}>{portrait.studentName}</h1>
+              </PrdAnnotation>
+              <PrdAnnotation data={getAnnotation("lpo-class")}>
               <p style={{ fontSize: 14, opacity: 0.9 }}>{portrait.className} · {portrait.majorName}</p>
+              </PrdAnnotation>
             </div>
           </div>
+          <PrdAnnotation data={getAnnotation("lpo-grade")}>
           <div style={{ textAlign: "right" }}>
             <div style={{ fontSize: 28, fontWeight: 700 }}>{portrait.overallGrade}</div>
             <div style={{ fontSize: 12, opacity: 0.8 }}>综合评级</div>
           </div>
+          </PrdAnnotation>
         </div>
+        <PrdAnnotation data={getAnnotation("lpo-stats")}>
         <div style={{ padding: "24px 32px", display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 24 }}>
           {[
             { icon: <BookOpen style={{ width: 18, height: 18 }} />, label: "已完成课程", value: `${portrait.completedCourses} 门` },
@@ -97,10 +107,12 @@ export default function PortraitDetailPage() {
             </div>
           ))}
         </div>
+        </PrdAnnotation>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 24 }}>
         {/* 能力维度 */}
+        <PrdAnnotation data={getAnnotation("lpo-domains")}>
         <div style={{ background: "#fff", borderRadius: 12, border: "1px solid #e5e6eb", padding: 24 }}>
           <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
             <Target style={{ width: 18, height: 18, color: "#3370ff" }} /> 能力维度分析
@@ -124,8 +136,10 @@ export default function PortraitDetailPage() {
             ))}
           </div>
         </div>
+        </PrdAnnotation>
 
         {/* 排名信息 */}
+        <PrdAnnotation data={getAnnotation("lpo-rank")}>
         <div style={{ background: "#fff", borderRadius: 12, border: "1px solid #e5e6eb", padding: 24 }}>
           <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
             <Medal style={{ width: 18, height: 18, color: "#f59e0b" }} /> 排名信息
@@ -149,6 +163,7 @@ export default function PortraitDetailPage() {
             ))}
           </div>
 
+          <PrdAnnotation data={getAnnotation("lpo-recommend")}>
           <h4 style={{ fontSize: 15, fontWeight: 600, margin: "20px 0 12px" }}>推荐岗位</h4>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {portrait.recommendPositions.slice(0, 3).map((pos, i) => (
@@ -159,10 +174,13 @@ export default function PortraitDetailPage() {
               </div>
             ))}
           </div>
+          </PrdAnnotation>
         </div>
+        </PrdAnnotation>
       </div>
 
       {/* 课程成绩 */}
+      <PrdAnnotation data={getAnnotation("lpo-courses")}>
       <div style={{ background: "#fff", borderRadius: 12, border: "1px solid #e5e6eb", padding: 24, marginBottom: 24 }}>
         <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
           <BookOpen style={{ width: 18, height: 18, color: "#3370ff" }} /> 课程成绩
@@ -178,7 +196,10 @@ export default function PortraitDetailPage() {
         </div>
       </div>
 
+      </PrdAnnotation>
+
       {/* 成长趋势 */}
+      <PrdAnnotation data={getAnnotation("lpo-trend")}>
       <div style={{ background: "#fff", borderRadius: 12, border: "1px solid #e5e6eb", padding: 24 }}>
         <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
           <TrendingUp style={{ width: 18, height: 18, color: "#3370ff" }} /> 成长趋势
@@ -193,6 +214,8 @@ export default function PortraitDetailPage() {
           ))}
         </div>
       </div>
+      </PrdAnnotation>
     </div>
+    </PrdAnnotation>
   )
 }

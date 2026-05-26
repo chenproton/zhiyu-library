@@ -26,6 +26,8 @@ import { X, Upload, ImageIcon, UserPlus } from "lucide-react"
 import type { QuestionBank, QuestionBankFormData } from "@/lib/types"
 import { mockUsers, mockBatches } from "@/lib/mock-data"
 import { CoBuilderDialog } from "@/components/shared/co-builder-dialog"
+import { PrdAnnotation } from "@/components/prd-annotation"
+import { getAnnotation } from "@/lib/prd-annotations"
 
 interface BankFormDialogProps {
   open: boolean
@@ -121,7 +123,9 @@ export function BankFormDialog({
         <form onSubmit={handleSubmit}>
           <FieldGroup ref={fieldGroupRef} className="max-h-[60vh] overflow-y-auto py-4">
             <Field>
-              <FieldLabel htmlFor="name">题库名称</FieldLabel>
+              <FieldLabel htmlFor="name">
+                <PrdAnnotation data={getAnnotation("bf-name")}>题库名称</PrdAnnotation>
+              </FieldLabel>
               <Input
                 id="name"
                 value={name}
@@ -131,7 +135,9 @@ export function BankFormDialog({
               />
             </Field>
             <Field>
-              <FieldLabel htmlFor="description">题库简介</FieldLabel>
+              <FieldLabel htmlFor="description">
+                <PrdAnnotation data={getAnnotation("bf-description")}>题库简介</PrdAnnotation>
+              </FieldLabel>
               <Textarea
                 id="description"
                 value={description}
@@ -141,7 +147,9 @@ export function BankFormDialog({
               />
             </Field>
             <Field>
-              <FieldLabel>封面</FieldLabel>
+              <FieldLabel>
+                <PrdAnnotation data={getAnnotation("bf-cover")}>封面</PrdAnnotation>
+              </FieldLabel>
               <FieldDescription>支持上传 5MB 以内的图片文件</FieldDescription>
               <input
                 ref={fileInputRef}
@@ -178,7 +186,9 @@ export function BankFormDialog({
               )}
             </Field>
             <Field>
-              <FieldLabel>共建人</FieldLabel>
+              <FieldLabel>
+                <PrdAnnotation data={getAnnotation("bf-collaborators")}>共建人</PrdAnnotation>
+              </FieldLabel>
               <FieldDescription>选择可以共同维护此题库的用户</FieldDescription>
               {collaboratorIds.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-2">
@@ -208,7 +218,9 @@ export function BankFormDialog({
               </Button>
             </Field>
             <Field>
-              <FieldLabel>所属批次</FieldLabel>
+              <FieldLabel>
+                <PrdAnnotation data={getAnnotation("bf-batch")}>所属批次</PrdAnnotation>
+              </FieldLabel>
               <Select value={batchId || "none"} onValueChange={(v) => setBatchId(v === "none" ? "" : v)}>
                 <SelectTrigger>
                   <SelectValue placeholder="选择所属批次" />
@@ -227,7 +239,9 @@ export function BankFormDialog({
             </Field>
             {bank && (
               <Field>
-                <FieldLabel>当前版本号</FieldLabel>
+                <FieldLabel>
+                  <PrdAnnotation data={getAnnotation("bf-version")}>当前版本号</PrdAnnotation>
+                </FieldLabel>
                 <div className="flex h-9 items-center rounded-md border bg-muted/50 px-3 text-sm">
                   {bank.version}
                 </div>

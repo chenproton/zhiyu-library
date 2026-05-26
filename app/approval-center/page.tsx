@@ -48,6 +48,8 @@ import { useData } from "@/components/providers/data-provider"
 import { PageHeaderCard } from "@/components/shared/page-header-card"
 import { APPROVAL_TYPE_LABELS, APPROVAL_STATUS_LABELS } from "@/lib/types"
 import type { ApprovalType, ApprovalItem, ApprovalStatus } from "@/lib/types"
+import { PrdAnnotation } from "@/components/prd-annotation"
+import { getAnnotation } from "@/lib/prd-annotations"
 
 const typeTabs: { value: ApprovalType; label: string }[] = [
   { value: "questionBank", label: "题库" },
@@ -240,38 +242,38 @@ export default function ApprovalCenterPage() {
             <TableHeader>
               {typeTab === 'questionBank' && (
                 <TableRow>
-                  <TableHead className="w-[100px]">审批类型</TableHead>
-                  <TableHead className="w-[200px]">题库名称</TableHead>
-                  <TableHead className="w-[200px]">题库描述</TableHead>
-                  <TableHead className="w-[100px]">提交人</TableHead>
-                  <TableHead className="w-[150px]">提交时间</TableHead>
-                  <TableHead className="w-[100px]">状态</TableHead>
-                  <TableHead className="w-[150px]">备注</TableHead>
-                  <TableHead className="sticky right-0 w-[160px] bg-white text-right">操作</TableHead>
+                  <TableHead className="w-[100px]"><PrdAnnotation data={getAnnotation("ac-col-type")}>审批类型</PrdAnnotation></TableHead>
+                  <TableHead className="w-[200px]"><PrdAnnotation data={getAnnotation("ac-col-title")}>题库名称</PrdAnnotation></TableHead>
+                  <TableHead className="w-[200px]"><PrdAnnotation data={getAnnotation("ac-col-desc")}>题库描述</PrdAnnotation></TableHead>
+                  <TableHead className="w-[100px]"><PrdAnnotation data={getAnnotation("ac-col-submitter")}>提交人</PrdAnnotation></TableHead>
+                  <TableHead className="w-[150px]"><PrdAnnotation data={getAnnotation("ac-col-submit-time")}>提交时间</PrdAnnotation></TableHead>
+                  <TableHead className="w-[100px]"><PrdAnnotation data={getAnnotation("ac-col-status")}>状态</PrdAnnotation></TableHead>
+                  <TableHead className="w-[150px]"><PrdAnnotation data={getAnnotation("ac-col-remark")}>备注</PrdAnnotation></TableHead>
+                  <TableHead className="sticky right-0 w-[160px] bg-white text-right"><PrdAnnotation data={getAnnotation("ac-col-actions")}>操作</PrdAnnotation></TableHead>
                 </TableRow>
               )}
               {typeTab === 'exam' && (
                 <TableRow>
-                  <TableHead className="w-[100px]">审批类型</TableHead>
-                  <TableHead className="w-[200px]">试卷名称</TableHead>
-                  <TableHead className="w-[200px]">试卷描述</TableHead>
-                  <TableHead className="w-[100px]">提交人</TableHead>
-                  <TableHead className="w-[150px]">提交时间</TableHead>
-                  <TableHead className="w-[100px]">状态</TableHead>
-                  <TableHead className="w-[150px]">备注</TableHead>
-                  <TableHead className="sticky right-0 w-[160px] bg-white text-right">操作</TableHead>
+                  <TableHead className="w-[100px]"><PrdAnnotation data={getAnnotation("ac-col-type")}>审批类型</PrdAnnotation></TableHead>
+                  <TableHead className="w-[200px]"><PrdAnnotation data={getAnnotation("ac-col-title")}>试卷名称</PrdAnnotation></TableHead>
+                  <TableHead className="w-[200px]"><PrdAnnotation data={getAnnotation("ac-col-desc")}>试卷描述</PrdAnnotation></TableHead>
+                  <TableHead className="w-[100px]"><PrdAnnotation data={getAnnotation("ac-col-submitter")}>提交人</PrdAnnotation></TableHead>
+                  <TableHead className="w-[150px]"><PrdAnnotation data={getAnnotation("ac-col-submit-time")}>提交时间</PrdAnnotation></TableHead>
+                  <TableHead className="w-[100px]"><PrdAnnotation data={getAnnotation("ac-col-status")}>状态</PrdAnnotation></TableHead>
+                  <TableHead className="w-[150px]"><PrdAnnotation data={getAnnotation("ac-col-remark")}>备注</PrdAnnotation></TableHead>
+                  <TableHead className="sticky right-0 w-[160px] bg-white text-right"><PrdAnnotation data={getAnnotation("ac-col-actions")}>操作</PrdAnnotation></TableHead>
                 </TableRow>
               )}
               {typeTab === 'onlineExam' && (
                 <TableRow>
-                  <TableHead className="w-[100px]">审批类型</TableHead>
-                  <TableHead className="w-[200px]">考试名称</TableHead>
-                  <TableHead className="w-[200px]">考试描述</TableHead>
-                  <TableHead className="w-[100px]">提交人</TableHead>
-                  <TableHead className="w-[150px]">提交时间</TableHead>
-                  <TableHead className="w-[100px]">状态</TableHead>
-                  <TableHead className="w-[150px]">备注</TableHead>
-                  <TableHead className="sticky right-0 w-[160px] bg-white text-right">操作</TableHead>
+                  <TableHead className="w-[100px]"><PrdAnnotation data={getAnnotation("ac-col-type")}>审批类型</PrdAnnotation></TableHead>
+                  <TableHead className="w-[200px]"><PrdAnnotation data={getAnnotation("ac-col-title")}>考试名称</PrdAnnotation></TableHead>
+                  <TableHead className="w-[200px]"><PrdAnnotation data={getAnnotation("ac-col-desc")}>考试描述</PrdAnnotation></TableHead>
+                  <TableHead className="w-[100px]"><PrdAnnotation data={getAnnotation("ac-col-submitter")}>提交人</PrdAnnotation></TableHead>
+                  <TableHead className="w-[150px]"><PrdAnnotation data={getAnnotation("ac-col-submit-time")}>提交时间</PrdAnnotation></TableHead>
+                  <TableHead className="w-[100px]"><PrdAnnotation data={getAnnotation("ac-col-status")}>状态</PrdAnnotation></TableHead>
+                  <TableHead className="w-[150px]"><PrdAnnotation data={getAnnotation("ac-col-remark")}>备注</PrdAnnotation></TableHead>
+                  <TableHead className="sticky right-0 w-[160px] bg-white text-right"><PrdAnnotation data={getAnnotation("ac-col-actions")}>操作</PrdAnnotation></TableHead>
                 </TableRow>
               )}
             </TableHeader>
@@ -317,8 +319,10 @@ export default function ApprovalCenterPage() {
                           className="h-7 gap-1 text-xs text-blue-600"
                           onClick={() => setDetailDialog({ open: true, item })}
                         >
-                          <Eye className="size-3" />
-                          查看详情
+                          <PrdAnnotation data={getAnnotation("ac-col-actions")}>
+                            <Eye className="size-3" />
+                            查看详情
+                          </PrdAnnotation>
                         </Button>
                         {item.status === "pending" && (
                           <>
@@ -331,8 +335,10 @@ export default function ApprovalCenterPage() {
                                 setRemark("")
                               }}
                             >
-                              <CheckCircle2 className="mr-1 size-3.5" />
-                              同意
+                              <PrdAnnotation data={getAnnotation("ac-btn-approve")}>
+                                <CheckCircle2 className="mr-1 size-3.5" />
+                                同意
+                              </PrdAnnotation>
                             </Button>
                             <Button
                               variant="ghost"
@@ -343,8 +349,10 @@ export default function ApprovalCenterPage() {
                                 setRemark("")
                               }}
                             >
-                              <Ban className="mr-1 size-3.5" />
-                              驳回
+                              <PrdAnnotation data={getAnnotation("ac-btn-reject")}>
+                                <Ban className="mr-1 size-3.5" />
+                                驳回
+                              </PrdAnnotation>
                             </Button>
                           </>
                         )}

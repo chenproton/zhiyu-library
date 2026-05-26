@@ -56,6 +56,8 @@ import {
   CheckCircle,
 } from "lucide-react"
 import { PageHeaderCard } from "@/components/shared/page-header-card"
+import { PrdAnnotation } from "@/components/prd-annotation"
+import { getAnnotation } from "@/lib/prd-annotations"
 
 export function PositionListPage() {
   const router = useRouter()
@@ -258,13 +260,13 @@ export function PositionListPage() {
                     onCheckedChange={handleSelectAll}
                   />
                 </TableHead>
-                <TableHead>岗位名称</TableHead>
-                <TableHead>岗位编码</TableHead>
-                <TableHead>所属行业</TableHead>
-                <TableHead className="text-center">关联能力数</TableHead>
-                <TableHead>最后更新者</TableHead>
-                <TableHead>更新时间</TableHead>
-                <TableHead className="text-right">操作</TableHead>
+                <TableHead><PrdAnnotation data={getAnnotation("pl-col-name")}>岗位名称</PrdAnnotation></TableHead>
+                <TableHead><PrdAnnotation data={getAnnotation("pl-col-code")}>岗位编码</PrdAnnotation></TableHead>
+                <TableHead><PrdAnnotation data={getAnnotation("pl-col-direction")}>所属行业</PrdAnnotation></TableHead>
+                <TableHead className="text-center"><PrdAnnotation data={getAnnotation("pl-col-ability-count")}>关联能力数</PrdAnnotation></TableHead>
+                <TableHead><PrdAnnotation data={getAnnotation("pl-col-updater")}>最后更新者</PrdAnnotation></TableHead>
+                <TableHead><PrdAnnotation data={getAnnotation("pl-col-update-time")}>更新时间</PrdAnnotation></TableHead>
+                <TableHead className="text-right"><PrdAnnotation data={getAnnotation("pl-col-actions")}>操作</PrdAnnotation></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -305,8 +307,10 @@ export function PositionListPage() {
                     </TableCell>
                     <TableCell className="text-right">
                       <Button variant="outline" size="sm" onClick={() => handleConfig(position)}>
-                        <Settings2 className="mr-1 h-3.5 w-3.5" />
-                        配置认定规则
+                        <PrdAnnotation data={getAnnotation("pl-btn-config")}>
+                          <Settings2 className="mr-1 h-3.5 w-3.5" />
+                          配置认定规则
+                        </PrdAnnotation>
                       </Button>
                     </TableCell>
                   </TableRow>

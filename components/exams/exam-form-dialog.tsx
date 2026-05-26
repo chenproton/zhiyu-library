@@ -26,6 +26,8 @@ import { X, Upload, ImageIcon, UserPlus } from "lucide-react"
 import type { Exam, ExamFormData } from "@/lib/types"
 import { mockUsers, mockBatches } from "@/lib/mock-data"
 import { CoBuilderDialog } from "@/components/shared/co-builder-dialog"
+import { PrdAnnotation } from "@/components/prd-annotation"
+import { getAnnotation } from "@/lib/prd-annotations"
 
 interface ExamFormDialogProps {
   open: boolean
@@ -122,7 +124,9 @@ export function ExamFormDialog({
         <form onSubmit={handleSubmit}>
           <FieldGroup ref={fieldGroupRef} className="max-h-[60vh] overflow-y-auto py-4">
             <Field>
-              <FieldLabel htmlFor="name">试卷名称</FieldLabel>
+              <PrdAnnotation {...getAnnotation("ef-name")}>
+                <FieldLabel htmlFor="name">试卷名称</FieldLabel>
+              </PrdAnnotation>
               <Input
                 id="name"
                 value={name}
@@ -132,7 +136,9 @@ export function ExamFormDialog({
               />
             </Field>
             <Field>
-              <FieldLabel htmlFor="description">试卷简介</FieldLabel>
+              <PrdAnnotation {...getAnnotation("ef-description")}>
+                <FieldLabel htmlFor="description">试卷简介</FieldLabel>
+              </PrdAnnotation>
               <Textarea
                 id="description"
                 value={description}
@@ -142,7 +148,9 @@ export function ExamFormDialog({
               />
             </Field>
             <Field>
-              <FieldLabel>封面</FieldLabel>
+              <PrdAnnotation {...getAnnotation("ef-cover")}>
+                <FieldLabel>封面</FieldLabel>
+              </PrdAnnotation>
               <FieldDescription>支持上传 5MB 以内的图片文件</FieldDescription>
               <input
                 ref={fileInputRef}
@@ -179,7 +187,9 @@ export function ExamFormDialog({
               )}
             </Field>
             <Field>
-              <FieldLabel>共建人</FieldLabel>
+              <PrdAnnotation {...getAnnotation("ef-collaborators")}>
+                <FieldLabel>共建人</FieldLabel>
+              </PrdAnnotation>
               <FieldDescription>选择可以共同维护此试卷的用户</FieldDescription>
               {collaboratorIds.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-2">
@@ -209,7 +219,9 @@ export function ExamFormDialog({
               </Button>
             </Field>
             <Field>
-              <FieldLabel>所属批次</FieldLabel>
+              <PrdAnnotation {...getAnnotation("ef-batch")}>
+                <FieldLabel>所属批次</FieldLabel>
+              </PrdAnnotation>
               <Select value={batchId || "none"} onValueChange={(v) => setBatchId(v === "none" ? "" : v)}>
                 <SelectTrigger>
                   <SelectValue placeholder="选择所属批次" />
@@ -228,7 +240,9 @@ export function ExamFormDialog({
             </Field>
             {exam && (
               <Field>
-                <FieldLabel>当前版本号</FieldLabel>
+                <PrdAnnotation {...getAnnotation("ef-version")}>
+                  <FieldLabel>当前版本号</FieldLabel>
+                </PrdAnnotation>
                 <div className="flex h-9 items-center rounded-md border bg-muted/50 px-3 text-sm">
                   {exam.version}
                 </div>

@@ -788,7 +788,9 @@ export default function ExamUsagePage() {
           <ScrollArea className="max-h-[60vh]">
             <FieldGroup className="py-4">
               <Field>
-                <FieldLabel>选择试卷 *</FieldLabel>
+                <FieldLabel>
+                  <PrdAnnotation data={getAnnotation("ecd-exam-select")}>选择试卷 *</PrdAnnotation>
+                </FieldLabel>
                 <Popover open={examSelectOpen} onOpenChange={setExamSelectOpen}>
                   <PopoverTrigger asChild>
                     <Button
@@ -834,7 +836,9 @@ export default function ExamUsagePage() {
               </Field>
 
               <Field>
-                <FieldLabel>考试名称 *</FieldLabel>
+                <FieldLabel>
+                  <PrdAnnotation data={getAnnotation("ecd-exam-name")}>考试名称 *</PrdAnnotation>
+                </FieldLabel>
                 <Input
                   value={examName}
                   onChange={(e) => setExamName(e.target.value)}
@@ -843,7 +847,9 @@ export default function ExamUsagePage() {
               </Field>
 
               <Field>
-                <FieldLabel>考试简介</FieldLabel>
+                <FieldLabel>
+                  <PrdAnnotation data={getAnnotation("ecd-exam-desc")}>考试简介</PrdAnnotation>
+                </FieldLabel>
                 <Textarea
                   value={examDesc}
                   onChange={(e) => setExamDesc(e.target.value)}
@@ -853,7 +859,9 @@ export default function ExamUsagePage() {
               </Field>
 
               <Field>
-                <FieldLabel>考试须知</FieldLabel>
+                <FieldLabel>
+                  <PrdAnnotation data={getAnnotation("ecd-exam-notice")}>考试须知</PrdAnnotation>
+                </FieldLabel>
                 <Textarea
                   value={examNotice}
                   onChange={(e) => setExamNotice(e.target.value)}
@@ -863,7 +871,9 @@ export default function ExamUsagePage() {
               </Field>
 
               <Field>
-                <FieldLabel>考试封面</FieldLabel>
+                <FieldLabel>
+                  <PrdAnnotation data={getAnnotation("ecd-cover")}>考试封面</PrdAnnotation>
+                </FieldLabel>
                 <FieldDescription>支持上传 5MB 以内的图片文件</FieldDescription>
                 <input
                   ref={coverFileInputRef}
@@ -901,7 +911,9 @@ export default function ExamUsagePage() {
               </Field>
 
               <Field>
-                <FieldLabel>面向对象</FieldLabel>
+                <FieldLabel>
+                  <PrdAnnotation data={getAnnotation("ecd-target-audience")}>面向对象</PrdAnnotation>
+                </FieldLabel>
                 <div className="flex items-center gap-4">
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
@@ -926,7 +938,9 @@ export default function ExamUsagePage() {
 
               {targetAudience === 'student' && (
                 <Field>
-                  <FieldLabel>参考学生</FieldLabel>
+                  <FieldLabel>
+                    <PrdAnnotation data={getAnnotation("ecd-target-student")}>参考学生</PrdAnnotation>
+                  </FieldLabel>
                   <Popover open={orgPopoverOpen} onOpenChange={setOrgPopoverOpen}>
                     <PopoverTrigger asChild>
                       <Button variant="outline" className="w-full justify-between font-normal">
@@ -982,7 +996,9 @@ export default function ExamUsagePage() {
 
               {targetAudience === 'teacher' && (
                 <Field>
-                  <FieldLabel>参考人员</FieldLabel>
+                  <FieldLabel>
+                    <PrdAnnotation data={getAnnotation("ecd-target-teacher")}>参考人员</PrdAnnotation>
+                  </FieldLabel>
                   <div className="space-y-2">
                     {selectedTeacherIds.length > 0 && (
                       <div className="flex flex-wrap gap-1">
@@ -1017,7 +1033,9 @@ export default function ExamUsagePage() {
               )}
 
               <Field>
-                <FieldLabel>考试时间</FieldLabel>
+                <FieldLabel>
+                  <PrdAnnotation data={getAnnotation("ecd-open-type")}>考试时间</PrdAnnotation>
+                </FieldLabel>
                 <div className="space-y-2">
                   <label className="flex items-center gap-2 rounded border p-2 cursor-pointer hover:bg-muted">
                     <input type="radio" name="openType" checked={examOpenType === 'anytime'} onChange={() => setExamOpenType('anytime')} />

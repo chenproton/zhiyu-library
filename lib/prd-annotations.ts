@@ -759,6 +759,516 @@ export const homeAnnotations: Record<string, AnnotationItem> = {
   },
 }
 
+// ==================== 弹窗：新建/编辑题库 ====================
+
+export const bankFormAnnotations: Record<string, AnnotationItem> = {
+  "bf-name": {
+    id: "bf-name",
+    title: "题库名称",
+    content: "题库的名称标识，必填项。",
+  },
+  "bf-description": {
+    id: "bf-description",
+    title: "题库简介",
+    content: "题库的简要描述信息，帮助用户了解题库内容。",
+  },
+  "bf-cover": {
+    id: "bf-cover",
+    title: "封面",
+    content: "题库的封面图片，支持上传 5MB 以内的图片文件。",
+  },
+  "bf-collaborators": {
+    id: "bf-collaborators",
+    title: "共建人",
+    content: "选择可以共同维护此题库的用户。点击「选择共建人」打开用户选择弹窗。",
+  },
+  "bf-batch": {
+    id: "bf-batch",
+    title: "所属批次",
+    content: "题库关联的批次分组，下拉选择。可选择「不设置批次」。",
+  },
+  "bf-version": {
+    id: "bf-version",
+    title: "当前版本号",
+    content: "编辑时显示，不可修改。",
+  },
+}
+
+// ==================== 弹窗：新建/编辑试卷 ====================
+
+export const examFormAnnotations: Record<string, AnnotationItem> = {
+  "ef-name": {
+    id: "ef-name",
+    title: "试卷名称",
+    content: "试卷的名称标识，必填项。",
+  },
+  "ef-description": {
+    id: "ef-description",
+    title: "试卷简介",
+    content: "试卷的简要描述信息。",
+  },
+  "ef-cover": {
+    id: "ef-cover",
+    title: "封面",
+    content: "试卷的封面图片，支持上传 5MB 以内的图片文件。",
+  },
+  "ef-collaborators": {
+    id: "ef-collaborators",
+    title: "共建人",
+    content: "选择可以共同维护此试卷的用户。",
+  },
+  "ef-batch": {
+    id: "ef-batch",
+    title: "所属批次",
+    content: "试卷关联的批次分组。可选择「不设置批次」。",
+  },
+  "ef-version": {
+    id: "ef-version",
+    title: "当前版本号",
+    content: "编辑时显示，不可修改。",
+  },
+}
+
+// ==================== 弹窗：创建在线考试 ====================
+
+export const examCreateDialogAnnotations: Record<string, AnnotationItem> = {
+  "ecd-exam-select": {
+    id: "ecd-exam-select",
+    title: "选择试卷",
+    content: "使用 Popover + Command 搜索组件选择试卷。支持下拉展开和关键词搜索，展示试卷名称、总分、题目数量。",
+  },
+  "ecd-exam-name": {
+    id: "ecd-exam-name",
+    title: "考试名称",
+    content: "在线考试的名称标识，必填项。",
+  },
+  "ecd-exam-desc": {
+    id: "ecd-exam-desc",
+    title: "考试简介",
+    content: "考试的简要描述信息。",
+  },
+  "ecd-exam-notice": {
+    id: "ecd-exam-notice",
+    title: "考试须知",
+    content: "考试开始前向考生展示的注意事项和规则说明。默认包含 5 条常见考试须知。",
+  },
+  "ecd-cover": {
+    id: "ecd-cover",
+    title: "考试封面",
+    content: "考试的封面图片，支持上传 5MB 以内的图片文件。",
+  },
+  "ecd-target-audience": {
+    id: "ecd-target-audience",
+    title: "面向对象",
+    content: "选择考试的面向对象：学生或教师。选择学生时需配置「参考学生」，选择教师时需配置「参考人员」。",
+  },
+  "ecd-target-student": {
+    id: "ecd-target-student",
+    title: "参考学生",
+    content: "使用组织树结构（学院→年级→班级→学生）进行多选。支持搜索学生或班级，已选学生在底部以标签形式展示，可单个移除。",
+  },
+  "ecd-target-teacher": {
+    id: "ecd-target-teacher",
+    title: "参考人员",
+    content: "面向教师时，从用户列表中选择参考人员。",
+  },
+  "ecd-open-type": {
+    id: "ecd-open-type",
+    title: "考试时间类型",
+    content: "考试时间配置：随时开放、定时开放、手动开放三种模式。",
+  },
+  "ecd-duration": {
+    id: "ecd-duration",
+    title: "考试时长",
+    content: "考试的限时长度，单位为分钟。",
+  },
+}
+
+// ==================== 组卷编辑页 (exams/[id]) ====================
+
+export const examComposerAnnotations: Record<string, AnnotationItem> = {
+  "ec-page-title": {
+    id: "ec-page-title",
+    title: "组卷编辑",
+    content: "试卷的组卷编辑页面，支持查看试卷基本信息、拖拽调整题目顺序、修改题目分值、自动/手动抽题、预览试卷等操作。",
+  },
+  "ec-btn-edit-info": {
+    id: "ec-btn-edit-info",
+    title: "修改试卷基本信息",
+    content: "点击打开弹窗，修改试卷的名称、简介、封面、共建人、所属批次等基本信息。",
+  },
+  "ec-btn-submit": {
+    id: "ec-btn-submit",
+    title: "提交审批",
+    content: "将试卷提交审批。提交后试卷进入审批中状态，不可编辑。",
+  },
+  "ec-btn-delete": {
+    id: "ec-btn-delete",
+    title: "删除试卷",
+    content: "删除当前试卷。仅在草稿/未提交/已驳回状态下可操作。",
+  },
+  "ec-btn-preview": {
+    id: "ec-btn-preview",
+    title: "预览试卷",
+    content: "以前台考生视角预览试卷效果。",
+  },
+  "ec-btn-save": {
+    id: "ec-btn-save",
+    title: "保存试卷",
+    content: "保存当前试卷的题目和分值配置。",
+  },
+  "ec-btn-random": {
+    id: "ec-btn-random",
+    title: "自动抽题",
+    content: "点击打开自动抽题弹窗，按条件（题库、题型、难度、数量）从题库中自动抽取题目加入试卷。",
+  },
+  "ec-btn-manual": {
+    id: "ec-btn-manual",
+    title: "手动抽题",
+    content: "点击打开手动抽题弹窗，从题库中手动选择题加入试卷。",
+  },
+  "ec-btn-add-question": {
+    id: "ec-btn-add-question",
+    title: "新增题目",
+    content: "直接在当前试卷中新增一道题目。",
+  },
+  "ec-btn-batch-import": {
+    id: "ec-btn-batch-import",
+    title: "批量导入题目",
+    content: "批量导入题目到当前试卷。",
+  },
+  "ec-question-list": {
+    id: "ec-question-list",
+    content: "试卷题目列表。每道题显示：序号、题目内容、题型标签、分值输入框。在编辑模式下可拖拽调整顺序。",
+    title: "试卷题目列表",
+  },
+  "ec-question-score": {
+    id: "ec-question-score",
+    title: "题目分值",
+    content: "每道题在试卷中的分值。点击可修改，范围 1-100 分。",
+  },
+}
+
+// ==================== 审批中心 (approval-center) ====================
+
+export const approvalCenterAnnotations: Record<string, AnnotationItem> = {
+  "ac-page-title": {
+    id: "ac-page-title",
+    title: "审批中心",
+    content: "统一审批题目、题库、试卷、在线考试的提交申请。支持按审批类型（题库/试卷/考试）和状态筛选。",
+  },
+  "ac-stat-total": {
+    id: "ac-stat-total",
+    title: "审批总数",
+    content: "所有审批记录的总数量。",
+  },
+  "ac-stat-pending": {
+    id: "ac-stat-pending",
+    title: "待审批",
+    content: "状态为「待审批」的记录数量。",
+  },
+  "ac-stat-approved": {
+    id: "ac-stat-approved",
+    title: "已通过",
+    content: "状态为「已通过」的记录数量。",
+  },
+  "ac-stat-rejected": {
+    id: "ac-stat-rejected",
+    title: "已驳回",
+    content: "状态为「已驳回」的记录数量。",
+  },
+  "ac-tab-questionBank": {
+    id: "ac-tab-questionBank",
+    title: "题库审批",
+    content: "展示题库相关的审批申请。",
+  },
+  "ac-tab-exam": {
+    id: "ac-tab-exam",
+    title: "试卷审批",
+    content: "展示试卷相关的审批申请。",
+  },
+  "ac-tab-onlineExam": {
+    id: "ac-tab-onlineExam",
+    title: "考试审批",
+    content: "展示在线考试相关的审批申请。",
+  },
+  "ac-col-type": {
+    id: "ac-col-type",
+    title: "审批类型",
+    content: "审批对象的类型：题库、试卷、在线考试。",
+  },
+  "ac-col-title": {
+    id: "ac-col-title",
+    title: "标题",
+    content: "审批对象的名称（题库名称/试卷名称/考试名称）。",
+  },
+  "ac-col-desc": {
+    id: "ac-col-desc",
+    title: "描述",
+    content: "审批对象的描述信息。",
+  },
+  "ac-col-submitter": {
+    id: "ac-col-submitter",
+    title: "提交人",
+    content: "提交该审批申请的用户。",
+  },
+  "ac-col-submit-time": {
+    id: "ac-col-submit-time",
+    title: "提交时间",
+    content: "审批申请的提交时间。",
+  },
+  "ac-col-status": {
+    id: "ac-col-status",
+    title: "状态",
+    content: "审批当前状态：待审批（黄色）、已通过（绿色）、已驳回（红色）。",
+  },
+  "ac-col-remark": {
+    id: "ac-col-remark",
+    title: "备注",
+    content: "审批的备注信息。",
+  },
+  "ac-col-actions": {
+    id: "ac-col-actions",
+    title: "操作",
+    content: "查看详情、同意、驳回。待审批状态下显示同意和驳回按钮。",
+  },
+  "ac-btn-approve": {
+    id: "ac-btn-approve",
+    title: "同意审批",
+    content: "点击打开确认弹窗，填写审批备注（非必填）后确认通过。",
+  },
+  "ac-btn-reject": {
+    id: "ac-btn-reject",
+    title: "驳回审批",
+    content: "点击打开确认弹窗，填写驳回原因（非必填）后确认驳回。",
+  },
+}
+
+// ==================== 岗位能力认定规则配置列表 (job-ability) ====================
+
+export const positionListAnnotations: Record<string, AnnotationItem> = {
+  "pl-page-title": {
+    id: "pl-page-title",
+    title: "岗位能力认定规则配置",
+    content: "管理各岗位的能力认定规则配置。列表展示所有岗位，支持搜索、按行业筛选、批量发布等操作。点击「配置认定规则」进入详细配置页面。",
+  },
+  "pl-search": {
+    id: "pl-search",
+    title: "搜索岗位",
+    content: "按岗位名称或岗位编码关键词搜索。",
+  },
+  "pl-filter-direction": {
+    id: "pl-filter-direction",
+    title: "所属行业筛选",
+    content: "按岗位所属行业/专业方向筛选。",
+  },
+  "pl-col-name": {
+    id: "pl-col-name",
+    title: "岗位名称",
+    content: "岗位的名称标识。",
+  },
+  "pl-col-code": {
+    id: "pl-col-code",
+    title: "岗位编码",
+    content: "岗位的唯一编码标识。",
+  },
+  "pl-col-direction": {
+    id: "pl-col-direction",
+    title: "所属行业",
+    content: "岗位所属的行业或专业方向。",
+  },
+  "pl-col-ability-count": {
+    id: "pl-col-ability-count",
+    title: "关联能力数",
+    content: "该岗位关联的能力项数量。",
+  },
+  "pl-col-updater": {
+    id: "pl-col-updater",
+    title: "最后更新者",
+    content: "最后一次更新该岗位规则的用户。",
+  },
+  "pl-col-update-time": {
+    id: "pl-col-update-time",
+    title: "更新时间",
+    content: "规则的最后更新时间。",
+  },
+  "pl-col-actions": {
+    id: "pl-col-actions",
+    title: "操作",
+    content: "配置认定规则：点击进入岗位能力认定规则详细配置页面（/job-ability/config/[id]）。",
+  },
+  "pl-btn-config": {
+    id: "pl-btn-config",
+    title: "配置认定规则",
+    content: "点击进入该岗位的详细规则配置页面，可配置能力点权重、任务权重、等级映射等。",
+  },
+}
+
+// ==================== 测评方式管理 (evaluation-methods) ====================
+
+export const evaluationMethodsAnnotations: Record<string, AnnotationItem> = {
+  "em-page-title": {
+    id: "em-page-title",
+    title: "测评方式管理",
+    content: "管理测评方式分类与前台展示状态。支持按一级分类和二级分类组织测评方式，可控制是否在前台展示。",
+  },
+  "em-search": {
+    id: "em-search",
+    title: "搜索测评方式",
+    content: "按测评方式名称关键词搜索。",
+  },
+  "em-col-category": {
+    id: "em-col-category",
+    title: "一级分类",
+    content: "测评方式所属的一级分类，如过程评价、结果评价等。",
+  },
+  "em-col-sub-category": {
+    id: "em-col-sub-category",
+    title: "二级分类",
+    content: "测评方式所属的二级分类。",
+  },
+  "em-col-method": {
+    id: "em-col-method",
+    title: "测评方式",
+    content: "测评方式的具体名称。",
+  },
+  "em-col-enabled": {
+    id: "em-col-enabled",
+    title: "前台展示",
+    content: "控制该测评方式是否在前台（landingpage）展示。关闭后前台不显示。",
+  },
+  "em-col-description": {
+    id: "em-col-description",
+    title: "测评方式说明",
+    content: "测评方式的详细说明描述。",
+  },
+  "em-col-doc-link": {
+    id: "em-col-doc-link",
+    title: "文档链接",
+    content: "测评方式相关文档的外部链接，点击可跳转到对应文档页面。",
+  },
+  "em-col-tasks": {
+    id: "em-col-tasks",
+    title: "管理场景任务",
+    content: "查看和管理该测评方式关联的场景任务数量。",
+  },
+  "em-col-actions": {
+    id: "em-col-actions",
+    title: "操作",
+    content: "编辑测评方式的说明和文档链接。",
+  },
+}
+
+// ==================== 学生画像管理 (student-portrait/portraits) ====================
+
+export const studentPortraitAnnotations: Record<string, AnnotationItem> = {
+  "sp-page-title": {
+    id: "sp-page-title",
+    title: "学生画像管理",
+    content: "基于课程任务、实践场景、毕设评价、档案材料等全量数据，自动生成学生能力画像。支持按专业和班级筛选，手动调整画像数据。",
+  },
+  "sp-btn-generate": {
+    id: "sp-btn-generate",
+    title: "手动更新画像",
+    content: "点击启动画像生成引擎，重新计算所有学生能力画像。",
+  },
+  "sp-btn-config-time": {
+    id: "sp-btn-config-time",
+    title: "画像更新时间",
+    content: "配置画像数据的自动更新周期和时间。",
+  },
+  "sp-btn-module-config": {
+    id: "sp-btn-module-config",
+    title: "学生画像模块配置",
+    content: "配置学生画像页面展示哪些模块和数据维度。",
+  },
+  "sp-nav-major-class": {
+    id: "sp-nav-major-class",
+    title: "专业-班级导航",
+    content: "左侧导航栏，按专业分组展示班级。点击班级可筛选右侧学生列表。支持搜索专业和班级。",
+  },
+  "sp-search": {
+    id: "sp-search",
+    title: "搜索学生",
+    content: "按姓名、学号、班级或岗位关键词搜索学生画像。",
+  },
+  "sp-filter-grade": {
+    id: "sp-filter-grade",
+    title: "等级筛选",
+    content: "按能力画像等级筛选：全部、A-优秀、B-良好、C-中等、D-及格、E-不及格。",
+  },
+  "sp-col-student-id": {
+    id: "sp-col-student-id",
+    title: "学号",
+    content: "学生的学号。",
+  },
+  "sp-col-student-name": {
+    id: "sp-col-student-name",
+    title: "姓名",
+    content: "学生姓名。",
+  },
+  "sp-col-class": {
+    id: "sp-col-class",
+    title: "班级",
+    content: "学生所属班级。",
+  },
+  "sp-col-major": {
+    id: "sp-col-major",
+    title: "专业",
+    content: "学生所属专业。",
+  },
+  "sp-col-actions": {
+    id: "sp-col-actions",
+    title: "操作",
+    content: "查看学生画像详情。",
+  },
+}
+
+// ==================== 前台首页 (landingpage) ====================
+
+export const landingPageAnnotations: Record<string, AnnotationItem> = {
+  "lp-hero": {
+    id: "lp-hero",
+    title: "能力测评中心前台首页",
+    content: "前台门户首页，面向学生和教师展示测评资源、考试、岗位认证、毕业设计等内容。所有展示数据均来源于后台管理页面的配置。",
+  },
+  "lp-stats": {
+    id: "lp-stats",
+    title: "数据看板",
+    content: "展示平台核心数据指标。数据来源：\n- 测评方式数量 → 后台「测评方式管理」/evaluation-methods\n- 题库数量 → 后台「题库管理」/question-banks（已发布状态）\n- 试卷数量 → 后台「试卷管理」/exams（已发布状态）\n- 考试场次 → 后台「考试管理」/exam-usage（已发布状态）\n- 岗位认证项目 → 后台「岗位能力认定规则配置」/job-ability\n- 毕业选题 → 后台「毕业设计选题管理」/graduation-project/topics",
+  },
+  "lp-exam-center": {
+    id: "lp-exam-center",
+    title: "考试中心",
+    content: "展示所有已发布的考试卡片。数据来源：后台「考试管理」/exam-usage 中状态为「已发布」的考试。包含考试名称、描述、时长、题量、日期、考试对象等信息。",
+  },
+  "lp-certifications": {
+    id: "lp-certifications",
+    title: "岗位能力认证项目库",
+    content: "展示岗位能力认证项目卡片。数据来源：后台「岗位能力认定规则配置」/job-ability 中的岗位列表。包含岗位名称、创建人、更新时间、适用专业、能力项数量等。",
+  },
+  "lp-evaluation-methods": {
+    id: "lp-evaluation-methods",
+    title: "测评方式库",
+    content: "展示前台启用的测评方式卡片。数据来源：后台「测评方式管理」/evaluation-methods 中「前台展示」开关为开启状态的测评方式。包含测评方式名称、说明、文档链接等。",
+  },
+  "lp-resources": {
+    id: "lp-resources",
+    title: "测评资源库",
+    content: "展示已发布的题库和试卷资源。数据来源：\n- 题库 → 后台「题库管理」/question-banks（已发布状态）\n- 试卷 → 后台「试卷管理」/exams（已发布状态）",
+  },
+  "lp-graduation": {
+    id: "lp-graduation",
+    title: "毕业设计选题",
+    content: "展示已发布的毕业设计选题。数据来源：后台「毕业设计选题管理」/graduation-project/topics（已发布状态）。",
+  },
+  "lp-portraits": {
+    id: "lp-portraits",
+    title: "学生能力画像",
+    content: "展示优秀学生能力画像排行。数据来源：后台「学生画像管理」/student-portrait/portraits。按总学分排序展示前 8 名。",
+  },
+}
+
 // ==================== 合并所有标注 ====================
 
 const allAnnotations: Record<string, AnnotationItem> = {
@@ -771,6 +1281,15 @@ const allAnnotations: Record<string, AnnotationItem> = {
   ...sceneTaskResultsAnnotations,
   ...jobAbilityConfigAnnotations,
   ...homeAnnotations,
+  ...bankFormAnnotations,
+  ...examFormAnnotations,
+  ...examCreateDialogAnnotations,
+  ...examComposerAnnotations,
+  ...approvalCenterAnnotations,
+  ...positionListAnnotations,
+  ...evaluationMethodsAnnotations,
+  ...studentPortraitAnnotations,
+  ...landingPageAnnotations,
 }
 
 /** 从 localStorage 读取用户覆盖 */
@@ -814,6 +1333,24 @@ export function getAnnotationsByPage(page: string): Record<string, AnnotationIte
       return sceneTaskResultsAnnotations
     case "job-ability-config":
       return jobAbilityConfigAnnotations
+    case "bank-form":
+      return bankFormAnnotations
+    case "exam-form":
+      return examFormAnnotations
+    case "exam-create-dialog":
+      return examCreateDialogAnnotations
+    case "exam-composer":
+      return examComposerAnnotations
+    case "approval-center":
+      return approvalCenterAnnotations
+    case "position-list":
+      return positionListAnnotations
+    case "evaluation-methods":
+      return evaluationMethodsAnnotations
+    case "student-portrait":
+      return studentPortraitAnnotations
+    case "landingpage":
+      return landingPageAnnotations
     default:
       return {}
   }

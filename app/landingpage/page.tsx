@@ -8,6 +8,8 @@ import {
   MapPin, Zap, Eye, Search, ClipboardList,
 } from "lucide-react"
 import { useData } from "@/components/providers/data-provider"
+import { PrdAnnotation } from "@/components/prd-annotation"
+import { getAnnotation } from "@/lib/prd-annotations"
 
 function SectionHeader({ title, subtitle, moreHref }: { title: string; subtitle?: string; moreHref?: string }) {
   return (
@@ -237,8 +239,9 @@ export default function LandingHomePage() {
       {/* ═══ 主内容 ═══ */}
       <div style={{ maxWidth: 1280, margin: "0 auto", padding: "40px 20px 0" }}>
 
-        {/* ── 数据看板 ── */}
-        <section style={{ marginBottom: 50 }}>
+        <PrdAnnotation data={getAnnotation("lp-stats")}>
+          {/* ── 数据看板 ── */}
+          <section style={{ marginBottom: 50 }}>
           <div style={{
             background: "#fff", borderRadius: 12, boxShadow: "0 1px 3px rgba(0,0,0,0.06)", padding: 24,
             display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 20,
@@ -251,9 +254,11 @@ export default function LandingHomePage() {
             ))}
           </div>
         </section>
+        </PrdAnnotation>
 
-        {/* ── 考试中心 ── */}
-        <section style={{ marginBottom: 50 }}>
+        <PrdAnnotation data={getAnnotation("lp-exam-center")}>
+          {/* ── 考试中心 ── */}
+          <section style={{ marginBottom: 50 }}>
           <SectionHeader title="考试中心" subtitle="所有已发布的考试" moreHref="/landingpage/exams" />
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {publishedExams.map((exam) => {
@@ -330,9 +335,11 @@ export default function LandingHomePage() {
             )}
           </div>
         </section>
+        </PrdAnnotation>
 
-        {/* ── 岗位能力认证 ── */}
-        <section style={{ marginBottom: 50 }}>
+        <PrdAnnotation data={getAnnotation("lp-certifications")}>
+          {/* ── 岗位能力认证 ── */}
+          <section style={{ marginBottom: 50 }}>
           <SectionHeader title="岗位能力认证项目库" moreHref="/landingpage/certifications" />
           <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 16 }}>
             {positionsList.slice(0, 5).map((pos, i) => {
@@ -380,9 +387,11 @@ export default function LandingHomePage() {
             })}
           </div>
         </section>
+        </PrdAnnotation>
 
-        {/* ── 测评方式 ── */}
-        <section style={{ marginBottom: 50 }}>
+        <PrdAnnotation data={getAnnotation("lp-evaluation-methods")}>
+          {/* ── 测评方式 ── */}
+          <section style={{ marginBottom: 50 }}>
           <SectionHeader title="测评方式库" moreHref="/landingpage/evaluation-methods" />
           <div style={{ background: "#fff", padding: "15px 20px", borderRadius: 10, marginBottom: 20, boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}>
             {/* 一级分类 */}
@@ -456,9 +465,11 @@ export default function LandingHomePage() {
             )}
           </div>
         </section>
+        </PrdAnnotation>
 
-        {/* ── 测评资源 ── */}
-        <section style={{ marginBottom: 50 }}>
+        <PrdAnnotation data={getAnnotation("lp-resources")}>
+          {/* ── 测评资源 ── */}
+          <section style={{ marginBottom: 50 }}>
           <SectionHeader title="测评资源库" moreHref="/landingpage/resources" />
           <div style={{ display: "flex", gap: 30, borderBottom: "1px solid #e2e8f0", marginBottom: 20 }}>
             {["题库", "试卷库"].map((tab) => (
@@ -560,9 +571,11 @@ export default function LandingHomePage() {
             </div>
           )}
         </section>
+        </PrdAnnotation>
 
-        {/* ── 毕业设计 ── */}
-        <section style={{ marginBottom: 50 }}>
+        <PrdAnnotation data={getAnnotation("lp-graduation")}>
+          {/* ── 毕业设计 ── */}
+          <section style={{ marginBottom: 50 }}>
           <SectionHeader title="毕业设计选题中心" subtitle="去选题中心" moreHref="/landingpage/graduation" />
           <div style={{ background: "#fff", padding: "15px 20px", borderRadius: 10, marginBottom: 20, boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}>
             {[
@@ -619,9 +632,11 @@ export default function LandingHomePage() {
             )}
           </div>
         </section>
+        </PrdAnnotation>
 
-        {/* ── 学生画像排行榜 ── */}
-        <section style={{ marginBottom: 50 }}>
+        <PrdAnnotation data={getAnnotation("lp-portraits")}>
+          {/* ── 学生画像排行榜 ── */}
+          <section style={{ marginBottom: 50 }}>
           <SectionHeader title="学生画像排行榜" subtitle="按岗位查看关联专业排行榜" />
           <div style={{ background: "#fff", borderRadius: 10, padding: 24, boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}>
             {/* 岗位筛选 — 平铺多选，模拟20个，可展开 */}
@@ -708,6 +723,7 @@ export default function LandingHomePage() {
             </div>
           </div>
         </section>
+        </PrdAnnotation>
 
       </div>
     </div>

@@ -40,17 +40,26 @@ cd "$SCRIPT_DIR"
 
 # ── 0. 备份远程标注数据 ──────────────────────────────────────────────
 echo "[0/4] 备份远程标注数据..."
-ssh $SSH_OPTS "$REMOTE_USER@$REMOTE_HOST" \
-  "rm -f $BACKUP_PATH; if [ -f $REMOTE_DATA_PATH ]; then cp $REMOTE_DATA_PATH $BACKUP_PATH && echo '已备份远程标注数据'; else echo '远程无标注数据，跳过备份'; fi"
-
-# 同时保存多份历史备份（保留最近 30 天）
-echo "[0.5/4] 保存历史备份..."
-ssh $SSH_OPTS "$REMOTE_USER@$REMOTE_HOST" \
-  "mkdir -p $HISTORY_BACKUP_DIR && if [ -f $REMOTE_DATA_PATH ]; then cp $REMOTE_DATA_PATH $HISTORY_BACKUP_DIR/annotations-$(date +%Y%m%d-%H%M%S).json && find $HISTORY_BACKUP_DIR -name 'annotations-*.json' -mtime +30 -delete && echo '已保存历史备份（保留30天）'; else echo '无标注数据，跳过历史备份'; fi"
-
-# 设置每日自动备份（仅首次）
-ssh $SSH_OPTS "$REMOTE_USER@$REMOTE_HOST" \
-  "(crontab -l 2>/dev/null | grep -q '${SITE_NAME}/data/annotations.json') || ((crontab -l 2>/dev/null || true); echo '0 3 * * * mkdir -p $HISTORY_BACKUP_DIR && cp $REMOTE_DATA_PATH $HISTORY_BACKUP_DIR/annotations-daily-\$(date +\%Y\%m\%d).json && find $HISTORY_BACKUP_DIR -name \"annotations-*.json\" -mtime +30 -delete') | crontab - && echo '已设置每日自动备份'"
+ssh $SSH_OPTS "$REMOTE_USER@$REMOTE_HOST" "bash -s" << EOF
+  rm -f $BACKUP_PATH
+  if [ -f $REMOTE_DATA_PATH ]; then
+    cp $REMOTE_DATA_PATH $BACKUP_PATH && echo '已备份远程标注数据'
+  else
+    echo '远程无标注数据，跳过备份'
+  fi
+  mkdir -p $HISTORY_BACKUP_DIR
+  if [ -f $REMOTE_DATA_PATH ]; then
+    cp $REMOTE_DATA_PATH $HISTORY_BACKUP_DIR/annotations-\$(date +%Y%m%d-%H%M%S).json
+    find $HISTORY_BACKUP_DIR -name 'annotations-*.json' -mtime +30 -delete
+    echo '已保存历史备份（保留30天）'
+  else
+    echo '无标注数据，跳过历史备份'
+  fi
+  if ! crontab -l 2>/dev/null | grep -q '${SITE_NAME}/data/annotations.json'; then
+    (crontab -l 2>/dev/null || true; echo '0 3 * * * mkdir -p $HISTORY_BACKUP_DIR && cp $REMOTE_DATA_PATH $HISTORY_BACKUP_DIR/annotations-daily-\$(date +\%Y\%m\%d).json && find $HISTORY_BACKUP_DIR -name "annotations-*.json" -mtime +30 -delete') | crontab -
+    echo '已设置每日自动备份'
+  fi
+EOF
 
 sleep 3
 

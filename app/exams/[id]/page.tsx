@@ -21,6 +21,8 @@ import type { Question, ExamQuestion, ExamFormData } from "@/lib/types"
 import { QUESTION_TYPE_LABELS, canPerformAction } from "@/lib/types"
 import { cn } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
+import { PrdAnnotation } from "@/components/prd-annotation"
+import { getAnnotation } from "@/lib/prd-annotations"
 
 export default function ExamComposerPage() {
   const params = useParams()
@@ -187,31 +189,41 @@ export default function ExamComposerPage() {
           {!isPreview && (
             <div className="flex items-center gap-2">
               {canEdit && (
-                <Button variant="outline" size="sm" onClick={() => setFormOpen(true)}>
-                  <Edit className="mr-1 size-4" />
-                  修改试卷基本信息
-                </Button>
+                <PrdAnnotation {...getAnnotation("ec-btn-edit-info")}>
+                  <Button variant="outline" size="sm" onClick={() => setFormOpen(true)}>
+                    <Edit className="mr-1 size-4" />
+                    修改试卷基本信息
+                  </Button>
+                </PrdAnnotation>
               )}
               {canSubmit && (
-                <Button variant="outline" size="sm" onClick={() => updateExamStatus(examId, 'submit')}>
-                  <Send className="mr-1 size-4" />
-                  提交审批
-                </Button>
+                <PrdAnnotation {...getAnnotation("ec-btn-submit")}>
+                  <Button variant="outline" size="sm" onClick={() => updateExamStatus(examId, 'submit')}>
+                    <Send className="mr-1 size-4" />
+                    提交审批
+                  </Button>
+                </PrdAnnotation>
               )}
               {canDelete && (
-                <Button variant="outline" size="sm" className="text-destructive hover:text-destructive" onClick={handleExamDelete}>
-                  <Trash2 className="mr-1 size-4" />
-                  删除
-                </Button>
+                <PrdAnnotation {...getAnnotation("ec-btn-delete")}>
+                  <Button variant="outline" size="sm" className="text-destructive hover:text-destructive" onClick={handleExamDelete}>
+                    <Trash2 className="mr-1 size-4" />
+                    删除
+                  </Button>
+                </PrdAnnotation>
               )}
-              <Button variant="outline" size="sm" onClick={() => router.push('/landingpage/resources/exams/exam-1?returnUrl=' + encodeURIComponent('/exams/' + examId))}>
-                <MonitorPlay className="mr-1 size-4" />
-                预览试卷
-              </Button>
-              <Button size="sm" onClick={() => toast({ title: "保存成功", description: "试卷已保存" })}>
-                <Save className="mr-1 size-4" />
-                保存试卷
-              </Button>
+              <PrdAnnotation {...getAnnotation("ec-btn-preview")}>
+                <Button variant="outline" size="sm" onClick={() => router.push('/landingpage/resources/exams/exam-1?returnUrl=' + encodeURIComponent('/exams/' + examId))}>
+                  <MonitorPlay className="mr-1 size-4" />
+                  预览试卷
+                </Button>
+              </PrdAnnotation>
+              <PrdAnnotation {...getAnnotation("ec-btn-save")}>
+                <Button size="sm" onClick={() => toast({ title: "保存成功", description: "试卷已保存" })}>
+                  <Save className="mr-1 size-4" />
+                  保存试卷
+                </Button>
+              </PrdAnnotation>
             </div>
           )}
         </div>
@@ -229,38 +241,46 @@ export default function ExamComposerPage() {
           </div>
           {canEdit && (
             <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setRandomDialogOpen(true)}
-              >
-                <Wand2 className="mr-1 size-4" />
-                自动抽题
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => alert("此处参考 1.0 版本页面功能即可")}
-              >
-                <Hand className="mr-1 size-4" />
-                手动抽题
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => alert("此处参考 1.0 版本页面功能即可")}
-              >
-                <Plus className="mr-1 size-4" />
-                新增题目
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => alert("此处参考 1.0 版本页面功能即可")}
-              >
-                <FileUp className="mr-1 size-4" />
-                批量导入题目
-              </Button>
+              <PrdAnnotation {...getAnnotation("ec-btn-random")}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setRandomDialogOpen(true)}
+                >
+                  <Wand2 className="mr-1 size-4" />
+                  自动抽题
+                </Button>
+              </PrdAnnotation>
+              <PrdAnnotation {...getAnnotation("ec-btn-manual")}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => alert("此处参考 1.0 版本页面功能即可")}
+                >
+                  <Hand className="mr-1 size-4" />
+                  手动抽题
+                </Button>
+              </PrdAnnotation>
+              <PrdAnnotation {...getAnnotation("ec-btn-add-question")}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => alert("此处参考 1.0 版本页面功能即可")}
+                >
+                  <Plus className="mr-1 size-4" />
+                  新增题目
+                </Button>
+              </PrdAnnotation>
+              <PrdAnnotation {...getAnnotation("ec-btn-batch-import")}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => alert("此处参考 1.0 版本页面功能即可")}
+                >
+                  <FileUp className="mr-1 size-4" />
+                  批量导入题目
+                </Button>
+              </PrdAnnotation>
             </div>
           )}
         </div>

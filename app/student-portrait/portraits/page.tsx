@@ -38,6 +38,8 @@ import { useData } from "@/components/providers/data-provider"
 import { useToast } from "@/hooks/use-toast"
 import { StudentPortraitModal } from "@/components/shared/student-portrait-modal"
 import type { StudentAbilityPortrait, EvaluationGrade, AbilityDomainScore } from "@/lib/types"
+import { PrdAnnotation } from "@/components/prd-annotation"
+import { getAnnotation } from "@/lib/prd-annotations"
 
 export default function StudentAbilityPortraitsPage() {
   const { studentAbilityPortraits, portraitUpdateConfig, updateStudentAbilityPortrait, updatePortraitUpdateConfig } = useData()
@@ -114,9 +116,9 @@ export default function StudentAbilityPortraitsPage() {
       <div className="mb-4 flex items-center justify-between">
         <div><h1 className="text-2xl font-bold tracking-tight">学生画像管理</h1><p className="text-muted-foreground">基于课程任务、实践场景、毕设评价、档案材料等全量数据，自动生成学生能力画像</p></div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => setGenerateOpen(true)}><RefreshCw className="mr-2 size-4" />手动更新画像</Button>
-          <Button variant="outline" onClick={() => setConfigOpen(true)}><Settings className="mr-2 size-4" />画像更新时间</Button>
-          <Button variant="outline" onClick={() => setModuleConfigOpen(true)}><SlidersHorizontal className="mr-2 size-4" />学生画像模块配置</Button>
+          <PrdAnnotation data={getAnnotation("sp-btn-generate")}><Button variant="outline" onClick={() => setGenerateOpen(true)}><RefreshCw className="mr-2 size-4" />手动更新画像</Button></PrdAnnotation>
+          <PrdAnnotation data={getAnnotation("sp-btn-config-time")}><Button variant="outline" onClick={() => setConfigOpen(true)}><Settings className="mr-2 size-4" />画像更新时间</Button></PrdAnnotation>
+          <PrdAnnotation data={getAnnotation("sp-btn-module-config")}><Button variant="outline" onClick={() => setModuleConfigOpen(true)}><SlidersHorizontal className="mr-2 size-4" />学生画像模块配置</Button></PrdAnnotation>
         </div>
       </div>
 
@@ -172,7 +174,7 @@ export default function StudentAbilityPortraitsPage() {
           <div className="rounded-lg border bg-white px-4 py-3">
             <div className="overflow-x-auto">
               <Table>
-                <TableHeader><TableRow><TableHead className="w-[100px]">学号</TableHead><TableHead className="w-[100px]">姓名</TableHead><TableHead className="w-[160px]">班级</TableHead><TableHead className="w-[140px]">专业</TableHead><TableHead className="sticky right-0 w-[140px] bg-white text-right">操作</TableHead></TableRow></TableHeader>
+                <TableHeader><TableRow><TableHead className="w-[100px]"><PrdAnnotation data={getAnnotation("sp-col-student-id")}>学号</PrdAnnotation></TableHead><TableHead className="w-[100px]"><PrdAnnotation data={getAnnotation("sp-col-student-name")}>姓名</PrdAnnotation></TableHead><TableHead className="w-[160px]"><PrdAnnotation data={getAnnotation("sp-col-class")}>班级</PrdAnnotation></TableHead><TableHead className="w-[140px]"><PrdAnnotation data={getAnnotation("sp-col-major")}>专业</PrdAnnotation></TableHead><TableHead className="sticky right-0 w-[140px] bg-white text-right"><PrdAnnotation data={getAnnotation("sp-col-actions")}>操作</PrdAnnotation></TableHead></TableRow></TableHeader>
                 <TableBody>
                   {filteredPortraits.length === 0 ? (<TableRow><TableCell colSpan={5} className="h-24 text-center text-muted-foreground">暂无画像记录</TableCell></TableRow>) : (filteredPortraits.map((portrait) => (
                     <TableRow key={portrait.id}>
@@ -181,7 +183,7 @@ export default function StudentAbilityPortraitsPage() {
                       <TableCell><span className="text-sm">{portrait.className}</span></TableCell>
                       <TableCell><span className="text-sm text-muted-foreground">{portrait.majorName}</span></TableCell>
                       <TableCell className="sticky right-0 bg-white text-right">
-                        <Button variant="ghost" size="sm" className="h-7 gap-1 text-xs" onClick={() => setPortraitModalOpen(true)}><Eye className="size-3" />查看学生画像</Button>
+                        <PrdAnnotation data={getAnnotation("sp-col-actions")}><Button variant="ghost" size="sm" className="h-7 gap-1 text-xs" onClick={() => setPortraitModalOpen(true)}><Eye className="size-3" />查看学生画像</Button></PrdAnnotation>
                       </TableCell>
                     </TableRow>
                   )))}

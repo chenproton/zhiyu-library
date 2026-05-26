@@ -19,6 +19,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { useData } from "@/components/providers/data-provider"
 import { PageHeaderCard } from "@/components/shared/page-header-card"
 import type { EvaluationMethod } from "@/lib/types"
+import { PrdAnnotation } from "@/components/prd-annotation"
+import { getAnnotation } from "@/lib/prd-annotations"
 
 export default function EvaluationMethodsPage() {
   const {
@@ -118,14 +120,14 @@ export default function EvaluationMethodsPage() {
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/30 hover:bg-muted/30">
-              <TableHead className="w-[120px]">一级分类</TableHead>
-              <TableHead className="w-[120px]">二级分类</TableHead>
-              <TableHead className="w-[140px]">测评方式</TableHead>
-              <TableHead className="w-[90px] text-center">前台展示</TableHead>
-              <TableHead className="min-w-[200px]">测评方式说明</TableHead>
-              <TableHead className="w-[160px]">文档链接</TableHead>
-              <TableHead className="w-[120px] text-center">管理场景任务</TableHead>
-              <TableHead className="w-[100px] text-right">操作</TableHead>
+              <TableHead className="w-[120px]"><PrdAnnotation data={getAnnotation("em-col-category")}>一级分类</PrdAnnotation></TableHead>
+              <TableHead className="w-[120px]"><PrdAnnotation data={getAnnotation("em-col-sub-category")}>二级分类</PrdAnnotation></TableHead>
+              <TableHead className="w-[140px]"><PrdAnnotation data={getAnnotation("em-col-method")}>测评方式</PrdAnnotation></TableHead>
+              <TableHead className="w-[90px] text-center"><PrdAnnotation data={getAnnotation("em-col-enabled")}>前台展示</PrdAnnotation></TableHead>
+              <TableHead className="min-w-[200px]"><PrdAnnotation data={getAnnotation("em-col-description")}>测评方式说明</PrdAnnotation></TableHead>
+              <TableHead className="w-[160px]"><PrdAnnotation data={getAnnotation("em-col-doc-link")}>文档链接</PrdAnnotation></TableHead>
+              <TableHead className="w-[120px] text-center"><PrdAnnotation data={getAnnotation("em-col-tasks")}>管理场景任务</PrdAnnotation></TableHead>
+              <TableHead className="w-[100px] text-right"><PrdAnnotation data={getAnnotation("em-col-actions")}>操作</PrdAnnotation></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

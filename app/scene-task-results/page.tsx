@@ -923,18 +923,14 @@ function SceneTaskTab() {
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Button variant="outline" size="sm" className="h-7 text-xs" asChild>
-                          <Link href={`/scene-task-results/${item.submissionId}`}>
-                            <Eye className="mr-1 h-3 w-3" />
-                            查看
-                          </Link>
+                        <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => window.open('http://111.170.170.202:3003/approvals/grading', '_blank')}>
+                          <Eye className="mr-1 h-3 w-3" />
+                          查看
                         </Button>
                         {item.status === "pending" ? (
-                          <Button size="sm" className="h-7 text-xs" asChild>
-                            <Link href={`/scene-task-results/${item.submissionId}`}>
-                              <PenLine className="mr-1 h-3 w-3" />
-                              评分
-                            </Link>
+                          <Button size="sm" className="h-7 text-xs" onClick={() => window.open('http://111.170.170.202:3003/approvals/grading', '_blank')}>
+                            <PenLine className="mr-1 h-3 w-3" />
+                            评分
                           </Button>
                         ) : (
                           <Button variant="ghost" size="sm" className="h-7 text-xs text-green-600" disabled>

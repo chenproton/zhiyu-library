@@ -2146,9 +2146,9 @@ export const mockEvaluationCategories: EvaluationMethodCategory[] = [
 // 二级测评方式（含三级 subCategoryName）
 export const mockEvaluationMethods: EvaluationMethod[] = [
   // 平台通用 / 知识
-  { id: 'method-1-1', categoryId: 'cat-platform', subCategoryName: '知识', name: '题库', enabled: true, relatedTaskIds: ['st-1'], description: '通过题库系统对学生进行知识掌握程度的考核，支持客观题与主观题混合组卷。', docLink: 'https://www.baidu.com' },
-  { id: 'method-1-2', categoryId: 'cat-platform', subCategoryName: '知识', name: '试卷', enabled: true, relatedTaskIds: ['st-2'], description: '以标准化试卷形式，系统检验学生对课程知识点的理解、记忆与综合运用能力。', docLink: 'https://www.baidu.com' },
-  { id: 'method-1-3', categoryId: 'cat-platform', subCategoryName: '知识', name: '随堂测', enabled: true, relatedTaskIds: ['st-3'], description: '课堂实时进行的简短测验，快速反馈学生对当堂教学内容的掌握情况。', docLink: 'https://www.baidu.com' },
+  { id: 'method-1-1', categoryId: 'cat-platform', subCategoryName: '知识评价', name: '题库', enabled: true, relatedTaskIds: ['st-1'], description: '通过题库系统对学生进行知识掌握程度的考核，支持客观题与主观题混合组卷。', docLink: 'https://www.baidu.com' },
+  { id: 'method-1-2', categoryId: 'cat-platform', subCategoryName: '知识评价', name: '试卷', enabled: true, relatedTaskIds: ['st-2'], description: '以标准化试卷形式，系统检验学生对课程知识点的理解、记忆与综合运用能力。', docLink: 'https://www.baidu.com' },
+  { id: 'method-1-3', categoryId: 'cat-platform', subCategoryName: '知识评价', name: '随堂测', enabled: true, relatedTaskIds: ['st-3'], description: '课堂实时进行的简短测验，快速反馈学生对当堂教学内容的掌握情况。', docLink: 'https://www.baidu.com' },
   // 平台通用 / 过程评价
   { id: 'method-2-1', categoryId: 'cat-platform', subCategoryName: '过程评价', name: '现场问答', enabled: true, relatedTaskIds: ['st-4'], description: '以口头问答形式，在真实教学场景中检验学生对知识点的即时反应与表达。', docLink: 'https://www.baidu.com' },
   // 平台通用 / 成果评价

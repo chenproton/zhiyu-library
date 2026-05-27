@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useRef } from "react"
 import { useRouter } from "next/navigation"
+import { cn } from "@/lib/utils"
 import { Plus, Search, BookOpen, Video, GraduationCap, PlayCircle, X, ChevronDown, MoreHorizontal, Eye, Pencil, Trash2, Clock, CheckCircle2, XCircle, Share2, ImageIcon, Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -78,6 +79,7 @@ export interface ExamUsage {
   participantCount: number
   passCount?: number
   status: 'pending' | 'active' | 'ended'
+  approvalStatus?: 'draft' | 'pending' | 'toPublish' | 'published'
   targetAudience?: 'student' | 'teacher'
   teacherIds?: string[]
 }
@@ -270,6 +272,7 @@ export const mockUsages: ExamUsage[] = [
     participantCount: 42,
     passCount: 38,
     status: 'active',
+    approvalStatus: 'published',
     targetAudience: 'student',
   },
   {
@@ -301,6 +304,7 @@ export const mockUsages: ExamUsage[] = [
     participantCount: 0,
     passCount: 0,
     status: 'pending',
+    approvalStatus: 'pending',
     targetAudience: 'teacher',
     teacherIds: ['user-1', 'user-2'],
   },
@@ -324,6 +328,13 @@ export const mockUsages: ExamUsage[] = [
 const USAGE_TYPE_LABELS: Record<UsageType, string> = {
   quiz: '随堂测',
   exam: '教学考试',
+}
+
+const APPROVAL_STATUS_LABELS: Record<NonNullable<ExamUsage['approvalStatus']>, string> = {
+  draft: '草稿',
+  pending: '审批中',
+  toPublish: '待发布',
+  published: '已发布',
 }
 
 const SCENE_TYPE_LABELS: Record<SceneType, string> = {
@@ -659,6 +670,9 @@ export default function ExamUsagePage() {
                   <PrdAnnotation data={getAnnotation("eu-col-scene")}>使用场景</PrdAnnotation>
                 </TableHead>
                 <TableHead className="w-[100px]">
+                  <PrdAnnotation data={getAnnotation("eu-col-approval-status")}>状态</PrdAnnotation>
+                </TableHead>
+                <TableHead className="w-[100px]">
                   <PrdAnnotation data={getAnnotation("eu-col-target")}>面向对象</PrdAnnotation>
                 </TableHead>
                 <TableHead className="w-[160px]">
@@ -687,7 +701,7 @@ export default function ExamUsagePage() {
             <TableBody>
               {filteredUsages.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={10} className="h-24 text-center text-muted-foreground">
+                  <TableCell colSpan={11} className="h-24 text-center text-muted-foreground">
                     暂无使用记录
                   </TableCell>
                 </TableRow>
@@ -700,6 +714,20 @@ export default function ExamUsagePage() {
                         {getDisplayTypeIcon(usage.displayType)}
                         <span className="text-sm">{getDisplayTypeLabel(usage.displayType)}</span>
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      {usage.displayType === '教学考试' && usage.approvalStatus ? (
+                        <Badge variant="outline" className={cn(
+                          usage.approvalStatus === 'draft' && 'bg-gray-100 text-gray-600 border-gray-200',
+                          usage.approvalStatus === 'pending' && 'bg-blue-50 text-blue-600 border-blue-200',
+                          usage.approvalStatus === 'toPublish' && 'bg-amber-50 text-amber-600 border-amber-200',
+                          usage.approvalStatus === 'published' && 'bg-green-50 text-green-600 border-green-200',
+                        )}>
+                          {APPROVAL_STATUS_LABELS[usage.approvalStatus]}
+                        </Badge>
+                      ) : (
+                        <span className="text-sm text-muted-foreground">-</span>
+                      )}
                     </TableCell>
                     <TableCell>
                       <span className="text-sm">

@@ -13,6 +13,20 @@ import { Badge } from "@/components/ui/badge"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Textarea } from "@/components/ui/textarea"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog"
 import { useData } from "@/components/providers/data-provider"
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts"
 import type { Exam } from "@/lib/types"
@@ -75,6 +89,8 @@ export default function ExamDetailPage() {
   const [answers, setAnswers] = useState<Record<string, string | string[]>>({})
   const [submitted, setSubmitted] = useState(false)
   const [timeLeft, setTimeLeft] = useState(0)
+  const [examAccessState, setExamAccessState] = useState<'not-in-range' | 'not-started' | 'started'>('started')
+  const [showAudienceDialog, setShowAudienceDialog] = useState(false)
 
   useEffect(() => {
     if (started && exam && !submitted) {
@@ -285,20 +301,32 @@ export default function ExamDetailPage() {
               <p style={{ fontSize: 14, opacity: 0.9 }}>{exam.description}</p>
             </PrdAnnotation>
           </div>
-          <PrdAnnotation data={getAnnotation("le-status")}>
-            <PrdAnnotation data={getAnnotation("le-time-status")}>
-              <span style={{ padding: "4px 12px", borderRadius: 20, fontSize: 12, fontWeight: 500, background: timeStatus.bg, color: timeStatus.color }}>
-                {timeStatus.label}
-              </span>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <PrdAnnotation data={getAnnotation("le-status")}>
+              <PrdAnnotation data={getAnnotation("le-time-status")}>
+                <span style={{ padding: "4px 12px", borderRadius: 20, fontSize: 12, fontWeight: 500, background: timeStatus.bg, color: timeStatus.color }}>
+                  {timeStatus.label}
+                </span>
+              </PrdAnnotation>
             </PrdAnnotation>
-          </PrdAnnotation>
+            <Select value={examAccessState} onValueChange={(v) => setExamAccessState(v as typeof examAccessState)}>
+              <SelectTrigger className="w-[140px] h-8 text-xs bg-white/20 border-white/30 text-white hover:bg-white/30">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="not-in-range">不在范围</SelectItem>
+                <SelectItem value="not-started">考试未开始</SelectItem>
+                <SelectItem value="started">考试已开始</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
         <div style={{ padding: "24px 32px", display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 24 }}>
           {[
             { icon: <Clock style={{ width: 18, height: 18 }} />, label: "考试时长", value: `${exam.duration} 分钟` },
             { icon: <ListOrdered style={{ width: 18, height: 18 }} />, label: "题目数量", value: `${exam.questions.length} 题` },
             { icon: <BarChart3 style={{ width: 18, height: 18 }} />, label: "总分", value: `${totalScore} 分` },
-            { icon: <Users style={{ width: 18, height: 18 }} />, label: "考试对象", value: `${targetAudience.type}（${targetAudience.detail}）` }
+            { icon: <Users style={{ width: 18, height: 18 }} />, label: "考试对象", value: `${targetAudience.type}（${targetAudience.detail}）`, clickable: examAccessState === 'not-in-range' }
           ].map((item, i) => (
             <PrdAnnotation key={i} data={getAnnotation(["le-duration", "le-question-count", "le-total-score", "le-target"][i])}>
               <div style={{ textAlign: "center", padding: "16px 0", background: "#f5f6f7", borderRadius: 8 }}>
@@ -375,19 +403,54 @@ export default function ExamDetailPage() {
           </div>
           <div style={{ marginTop: 24, display: "flex", justifyContent: "center" }}>
             <PrdAnnotation data={getAnnotation("le-start-btn")}>
-              {exam.status === "published" ? (
+              {examAccessState === 'started' && exam.status === "published" ? (
                 <Button size="lg" style={{ gap: 8, background: "#3370ff" }} onClick={() => setStarted(true)}>
                   <PlayCircle style={{ width: 20, height: 20 }} /> 开始考试
                 </Button>
               ) : (
-                <Button size="lg" variant="outline" disabled>
-                  {exam.status === "draft" || exam.status === "unsubmitted" || exam.status === "pending" || exam.status === "rejected" ? "考试未发布" : "考试已结束"}
+                <Button size="lg" variant="outline" disabled style={{ gap: 8 }}>
+                  <PlayCircle style={{ width: 20, height: 20 }} />
+                  {examAccessState === 'not-in-range' ? '您不在本次考试范围内' : examAccessState === 'not-started' ? '考试尚未开始' : exam.status === "draft" || exam.status === "unsubmitted" || exam.status === "pending" || exam.status === "rejected" ? "考试未发布" : "考试已结束"}
                 </Button>
               )}
             </PrdAnnotation>
           </div>
         </div>
       </div>
+
+      {/* 考试对象名单弹窗 */}
+      <Dialog open={showAudienceDialog} onOpenChange={setShowAudienceDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>考试人员名单</DialogTitle>
+            <DialogDescription>
+              {targetAudience.type}：{targetAudience.detail}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-2 space-y-2 max-h-[300px] overflow-y-auto">
+            {examId === 'exam-4' ? (
+              <>
+                {['张三', '李四', '王五'].map((name, i) => (
+                  <div key={i} className="flex items-center gap-3 p-2 rounded-md bg-slate-50">
+                    <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-medium">{name[0]}</div>
+                    <span className="text-sm">{name}</span>
+                  </div>
+                ))}
+              </>
+            ) : (
+              <>
+                {['张小明', '李华', '王芳', '赵强', '孙丽', '周杰', '吴敏', '郑伟'].map((name, i) => (
+                  <div key={i} className="flex items-center gap-3 p-2 rounded-md bg-slate-50">
+                    <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-medium">{name[0]}</div>
+                    <span className="text-sm">{name}</span>
+                    <span className="text-xs text-muted-foreground ml-auto">{targetAudience.detail.split('、')[i % 2] || targetAudience.detail}</span>
+                  </div>
+                ))}
+              </>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
     </PrdAnnotation>
   )

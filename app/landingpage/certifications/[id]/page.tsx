@@ -380,31 +380,9 @@ export default function CertificationDetailPage() {
                         <div style={{ fontSize: 14, fontWeight: 600, color: "#1e293b", marginBottom: 10 }}>{c.name}</div>
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 12, marginBottom: 8 }}>
                           <span style={{ color: "#64748b" }}>
-                            <Flag style={{ width: 12, height: 12, display: "inline", verticalAlign: "middle" }} /> 目标：<strong>{LEVELS[c.target - 1]}</strong>
-                            <span style={{ marginLeft: 8, color: "#2563eb" }}>当前：{LEVELS[c.current - 1]}</span>
+                            <Flag style={{ width: 12, height: 12, display: "inline", verticalAlign: "middle" }} /> 目标掌握度：<strong>{LEVELS[c.target - 1]}</strong>
                           </span>
                           {statusNode}
-                        </div>
-                        <div style={{ position: "relative", margin: "28px 8px 24px" }}>
-                          <div style={{ height: 6, background: "#f0f0f0", borderRadius: 3, position: "relative" }}>
-                            <div style={{ height: "100%", borderRadius: 3, background: "linear-gradient(90deg, #2563eb, #60a5fa)", width: `${fillPct}%`, transition: "width 0.8s ease" }} />
-                            {LEVELS.map((lbl, i) => {
-                              const idx = i + 1
-                              const reached = idx <= c.current
-                              const isTarget = idx === c.target
-                              return (
-                                <div key={i} style={{ position: "absolute", top: -4, left: `${(i / 4) * 100}%`, transform: "translateX(-50%)", display: "flex", flexDirection: "column", alignItems: "center" }}>
-                                  {isTarget && (
-                                    <div style={{ position: "absolute", top: -20, transform: "translateX(-50%)", width: 16, height: 16, background: "#722ed1", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 8, boxShadow: "0 0 0 3px rgba(114,46,209,0.15)" }}>
-                                      <Flag style={{ width: 8, height: 8 }} />
-                                    </div>
-                                  )}
-                                  <div style={{ width: 12, height: 12, borderRadius: "50%", border: "2px solid", borderColor: reached ? "#2563eb" : isTarget ? "#722ed1" : "#d9d9d9", background: reached ? "#2563eb" : "#fff" }} />
-                                  <div style={{ position: "absolute", top: 16, fontSize: 11, color: reached ? "#2563eb" : isTarget ? "#722ed1" : "#94a3b8", fontWeight: reached || isTarget ? 600 : 400, whiteSpace: "nowrap" }}>{lbl}</div>
-                                </div>
-                              )
-                            })}
-                          </div>
                         </div>
                         <div style={{ fontSize: 12, color: "#64748b", lineHeight: 1.6, padding: 8, background: "#fafafa", borderRadius: 6, borderLeft: "3px solid #2563eb" }}>
                           {c.desc}

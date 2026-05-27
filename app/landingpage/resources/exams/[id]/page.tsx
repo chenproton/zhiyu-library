@@ -207,27 +207,13 @@ export default function PaperDetailPage() {
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 {paper.questions.slice(0, 8).map((q, i) => (
                   <div key={q.id} style={{ padding: 14, background: "#f5f6f7", borderRadius: 8 }}>
-                    <div style={{ display: "flex", alignItems: "flex-start", gap: 10, marginBottom: 8 }}>
+                    <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
                       <span style={{ width: 22, height: 22, borderRadius: "50%", background: "#f59e0b", color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 600, flexShrink: 0 }}>{i + 1}</span>
                       <div style={{ flex: 1 }}>
-                        <span style={{ fontSize: 14, fontWeight: 500 }}>{q.content}</span>
-                        <span style={{ marginLeft: 8, fontSize: 11, color: "#8f959e" }}>({q.score}分)</span>
+                        <span style={{ fontSize: 14, fontWeight: 500 }} dangerouslySetInnerHTML={{ __html: q.content }} />
+                        <span style={{ marginLeft: 8, fontSize: 11, color: "#8f959e" }}>({typeLabels[q.type] || q.type} · {q.score}分)</span>
                       </div>
                     </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                      <Badge variant="outline" style={{ fontSize: 10 }}>{typeLabels[q.type] || q.type}</Badge>
-                      {q.difficulty && <Badge variant="outline" style={{ fontSize: 10, color: q.difficulty === "easy" ? "#16a34a" : q.difficulty === "hard" ? "#dc2626" : "#f59e0b" }}>{q.difficulty === "easy" ? "简单" : q.difficulty === "hard" ? "困难" : "中等"}</Badge>}
-                      {q.knowledgePoints?.map((kp, j) => (
-                        <span key={j} style={{ fontSize: 11, padding: "2px 8px", borderRadius: 4, background: "#fff7ed", color: "#d97706" }}>{kp}</span>
-                      ))}
-                    </div>
-                    {q.options && q.options.length > 0 && (
-                      <div style={{ marginTop: 8, paddingLeft: 32, display: "flex", flexDirection: "column", gap: 4 }}>
-                        {q.options.map((opt, j) => (
-                          <span key={j} style={{ fontSize: 13, color: "#646a73" }}>{String.fromCharCode(65 + j)}. {opt}</span>
-                        ))}
-                      </div>
-                    )}
                   </div>
                 ))}
                 {paper.questions.length > 8 && (

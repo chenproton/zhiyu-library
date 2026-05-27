@@ -470,7 +470,7 @@ function formatLevelLabel(level: string): string {
 
 function formatLevelMapping(mapping: LevelMapping[]): string {
   return mapping
-    .map((level) => `${formatLevelLabel(level.level)}：${level.min}~${level.max}%`)
+    .map((level) => `${formatLevelLabel(level.level)}：${level.min}~${level.max}`)
     .join('，')
 }
 
@@ -1045,7 +1045,6 @@ export function CertificationRulePage({ isGlobal = false, positionId }: Certific
                     <Input type="number" min={0} max={100} value={level.min} onChange={(e) => { const newMapping = [...editingTaskMapping.mapping]; newMapping[idx] = { ...newMapping[idx], min: parseInt(e.target.value, 10) || 0 }; setEditingTaskMapping({ ...editingTaskMapping, mapping: newMapping }) }} className="w-20 h-8 text-center" />
                     <span className="text-muted-foreground">~</span>
                     <Input type="number" min={0} max={100} value={level.max} onChange={(e) => { const newMapping = [...editingTaskMapping.mapping]; newMapping[idx] = { ...newMapping[idx], max: parseInt(e.target.value, 10) || 0 }; setEditingTaskMapping({ ...editingTaskMapping, mapping: newMapping }) }} className="w-20 h-8 text-center" />
-                    <span className="text-muted-foreground text-sm">%</span>
                   </div>
                 </div>
               ))}

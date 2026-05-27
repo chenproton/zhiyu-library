@@ -67,7 +67,7 @@ export const evaluationNavigationConfig: PlatformNavigationConfig = {
       label: "学生画像管理",
       icon: "userCircle",
       children: [
-        { id: "sp-archives", label: "学生档案管理", href: "/student-portrait/archives", matchers: ["/student-portrait/archives"] },
+        // { id: "sp-archives", label: "学生档案管理", href: "/student-portrait/archives", matchers: ["/student-portrait/archives"] },
         { id: "sp-portraits", label: "学生画像管理", href: "/student-portrait/portraits", matchers: ["/student-portrait/portraits"] },
       ],
     },

@@ -345,10 +345,10 @@ export default function QuestionBanksPage() {
                       <BankStatusActions
                         status={bank.status}
                         onView={() => router.push(`/question-banks/${bank.id}`)}
-                        onEdit={() => handleEdit(bank)}
-                        onDelete={() => handleDelete(bank)}
-                        onStatusChange={(action) => updateQuestionBankStatus(bank.id, action)}
-                        onInvite={() => handleInvite(bank)}
+                        onEdit={bank.isDraftPool ? undefined : () => handleEdit(bank)}
+                        onDelete={bank.isDraftPool ? undefined : () => handleDelete(bank)}
+                        onStatusChange={bank.isDraftPool ? undefined : (action) => updateQuestionBankStatus(bank.id, action)}
+                        onInvite={bank.isDraftPool ? undefined : () => handleInvite(bank)}
                       />
                     </TableCell>
                   </TableRow>

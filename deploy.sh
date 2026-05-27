@@ -24,9 +24,15 @@ PUBLIC_DIR="$SCRIPT_DIR/public"
 
 # 标注数据备份配置
 ANNOTATION_DATA_FILE="data/annotations.json"
+PRD_ANNOTATION_DATA_FILE="data/prd-annotations-overrides.json"
 REMOTE_DATA_PATH="$REMOTE_DIR/$ANNOTATION_DATA_FILE"
+REMOTE_PRD_DATA_PATH="$REMOTE_DIR/$PRD_ANNOTATION_DATA_FILE"
 BACKUP_PATH="/tmp/annotations-backup-${SITE_NAME}.json"
-HISTORY_BACKUP_DIR="/var/backups/${SITE_NAME}"
+PRD_BACKUP_PATH="/tmp/prd-annotations-backup-${SITE_NAME}.json"
+HISTORY_BACKUP_DIR="/var/backups/annotation-systems/${SITE_NAME}"
+ANNOTATIONS_HISTORY="$HISTORY_BACKUP_DIR/annotations"
+PRD_HISTORY="$HISTORY_BACKUP_DIR/prd-annotations"
+CRON_CMD="0 * * * * mkdir -p $ANNOTATIONS_HISTORY $PRD_HISTORY && [ -f $REMOTE_DATA_PATH ] && cp $REMOTE_DATA_PATH $ANNOTATIONS_HISTORY/annotations-\$(date +\%Y\%m\%d-\%H\%M\%S).json; [ -f $REMOTE_PRD_DATA_PATH ] && cp $REMOTE_PRD_DATA_PATH $PRD_HISTORY/prd-annotations-\$(date +\%Y\%m\%d-\%H\%M\%S).json"
 
 SSH_OPTS="-o StrictHostKeyChecking=no -o ConnectTimeout=15 -o ServerAliveInterval=60 -o ServerAliveCountMax=3 -p $SSH_PORT"
 
@@ -41,24 +47,39 @@ cd "$SCRIPT_DIR"
 # ── 0. 备份远程标注数据 ──────────────────────────────────────────────
 echo "[0/4] 备份远程标注数据..."
 ssh $SSH_OPTS "$REMOTE_USER@$REMOTE_HOST" "bash -s" << EOF
-  rm -f $BACKUP_PATH
+  set -e
+
+  # 临时备份（部署恢复用）
+  rm -f $BACKUP_PATH $PRD_BACKUP_PATH
   if [ -f $REMOTE_DATA_PATH ]; then
-    cp $REMOTE_DATA_PATH $BACKUP_PATH && echo '已备份远程标注数据'
+    cp $REMOTE_DATA_PATH $BACKUP_PATH && echo '已备份系统一标注数据'
   else
-    echo '远程无标注数据，跳过备份'
+    echo '系统一无标注数据，跳过备份'
   fi
-  mkdir -p $HISTORY_BACKUP_DIR
+  if [ -f $REMOTE_PRD_DATA_PATH ]; then
+    cp $REMOTE_PRD_DATA_PATH $PRD_BACKUP_PATH && echo '已备份系统二 PRD 标注数据'
+  else
+    echo '系统二无 PRD 标注数据，跳过备份'
+  fi
+
+  # 历史备份（永久保留，带时间戳）
+  ANNOTATIONS_HISTORY="$HISTORY_BACKUP_DIR/annotations"
+  PRD_HISTORY="$HISTORY_BACKUP_DIR/prd-annotations"
+  mkdir -p "$ANNOTATIONS_HISTORY" "$PRD_HISTORY"
+
   if [ -f $REMOTE_DATA_PATH ]; then
-    cp $REMOTE_DATA_PATH $HISTORY_BACKUP_DIR/annotations-\$(date +%Y%m%d-%H%M%S).json
-    find $HISTORY_BACKUP_DIR -name 'annotations-*.json' -mtime +30 -delete
-    echo '已保存历史备份（保留30天）'
-  else
-    echo '无标注数据，跳过历史备份'
+    cp $REMOTE_DATA_PATH "$ANNOTATIONS_HISTORY/annotations-\$(date +%Y%m%d-%H%M%S).json"
+    echo "已保存系统一历史备份到 $ANNOTATIONS_HISTORY"
   fi
-  if ! crontab -l 2>/dev/null | grep -q '${SITE_NAME}/data/annotations.json'; then
-    (crontab -l 2>/dev/null || true; echo '0 3 * * * mkdir -p $HISTORY_BACKUP_DIR && cp $REMOTE_DATA_PATH $HISTORY_BACKUP_DIR/annotations-daily-\$(date +\%Y\%m\%d).json && find $HISTORY_BACKUP_DIR -name "annotations-*.json" -mtime +30 -delete') | crontab -
-    echo '已设置每日自动备份'
+  if [ -f $REMOTE_PRD_DATA_PATH ]; then
+    cp $REMOTE_PRD_DATA_PATH "$PRD_HISTORY/prd-annotations-\$(date +%Y%m%d-%H%M%S).json"
+    echo "已保存系统二历史备份到 $PRD_HISTORY"
   fi
+
+  # 设置每小时自动备份（永久保留，不自动删除旧备份）
+  # 清理旧配置，确保不重复添加
+  (crontab -l 2>/dev/null | grep -v 'annotation-systems/${SITE_NAME}' | grep -v '${SITE_NAME}/data/annotations.json' || true; echo "$CRON_CMD") | crontab -
+  echo '已设置每小时自动备份（永久保留在项目外 /var/backups/annotation-systems/${SITE_NAME}）'
 EOF
 
 sleep 3
@@ -106,8 +127,22 @@ sleep 3
 # ── 3. 恢复远程标注数据（必须在 PM2 重启前恢复，否则新进程会读到空文件）
 echo ""
 echo "[3/4] 恢复远程标注数据..."
-ssh $SSH_OPTS "$REMOTE_USER@$REMOTE_HOST" \
-  "if [ -f $BACKUP_PATH ]; then mkdir -p $(dirname $REMOTE_DATA_PATH) && cp $BACKUP_PATH $REMOTE_DATA_PATH && echo '已恢复标注数据'; else echo '无备份数据，跳过恢复'; fi"
+ssh $SSH_OPTS "$REMOTE_USER@$REMOTE_HOST" "bash -s" << EOF
+  if [ -f $BACKUP_PATH ]; then
+    mkdir -p $REMOTE_DIR/data
+    cp $BACKUP_PATH $REMOTE_DATA_PATH
+    echo '已恢复系统一标注数据'
+  else
+    echo '无系统一备份，跳过恢复'
+  fi
+  if [ -f $PRD_BACKUP_PATH ]; then
+    mkdir -p $REMOTE_DIR/data
+    cp $PRD_BACKUP_PATH $REMOTE_PRD_DATA_PATH
+    echo '已恢复系统二 PRD 标注数据'
+  else
+    echo '无系统二备份，跳过恢复'
+  fi
+EOF
 
 sleep 3
 

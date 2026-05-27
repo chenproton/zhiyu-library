@@ -66,31 +66,60 @@ export function AnnotationEditProvider({
     setAnnotationsVisible((prev) => !prev)
   }, [])
 
-  // Load from localStorage on mount
+  // Load from server first, fallback to localStorage
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY)
-      if (saved) setOverrides(JSON.parse(saved))
-    } catch {
-      // ignore
+    async function load() {
+      let hasServerData = false
+      try {
+        const res = await fetch('/api/prd-annotations')
+        if (res.ok) {
+          const data = await res.json()
+          const hasOverrides = data.overrides && Object.keys(data.overrides).length > 0
+          const hasFloating = data.floatingAnnotations && data.floatingAnnotations.length > 0
+          if (hasOverrides) {
+            setOverrides(data.overrides)
+          }
+          if (hasFloating) {
+            setFloatingAnnotations(data.floatingAnnotations)
+          }
+          hasServerData = hasOverrides || hasFloating
+        }
+      } catch {
+        // ignore
+      }
+
+      if (!hasServerData) {
+        try {
+          const saved = localStorage.getItem(STORAGE_KEY)
+          if (saved) setOverrides(JSON.parse(saved))
+        } catch {
+          // ignore
+        }
+        try {
+          const saved = localStorage.getItem(FLOATING_KEY)
+          if (saved) setFloatingAnnotations(JSON.parse(saved))
+        } catch {
+          // ignore
+        }
+      }
     }
-    try {
-      const saved = localStorage.getItem(FLOATING_KEY)
-      if (saved) setFloatingAnnotations(JSON.parse(saved))
-    } catch {
-      // ignore
-    }
+    load()
   }, [])
 
-  // Persist overrides
+  // Persist to localStorage and sync to server
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(overrides))
-  }, [overrides])
-
-  // Persist floating annotations
-  useEffect(() => {
     localStorage.setItem(FLOATING_KEY, JSON.stringify(floatingAnnotations))
-  }, [floatingAnnotations])
+
+    const payload = { overrides, floatingAnnotations }
+    fetch('/api/prd-annotations', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }).catch(() => {
+      // ignore network errors
+    })
+  }, [overrides, floatingAnnotations])
 
   const toggleEditMode = useCallback(() => {
     setIsEditMode((prev) => !prev)

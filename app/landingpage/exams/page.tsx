@@ -19,6 +19,8 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { useData } from "@/components/providers/data-provider"
+import { PrdAnnotation } from "@/components/prd-annotation"
+import { getAnnotation } from "@/lib/prd-annotations"
 
 const myExams = [
   { id: "exam-1", name: "前端基础测试", status: "进行中", type: "随堂测", time: "2024-03-15 14:00", duration: 60, questionCount: 20, description: "考察 JavaScript、React 基础知识", college: "信息技术学院", major: "电子计算机", targetAudience: "2024级前端1班、2024级前端2班" },
@@ -72,6 +74,7 @@ export default function ExamListPage() {
 
   return (
     <div className="min-h-screen bg-[#f5f7fa]">
+      <PrdAnnotation data={getAnnotation("lex-page")}>
       {/* Hero */}
       <div
         className="relative overflow-hidden px-6 py-10 text-white"
@@ -90,13 +93,16 @@ export default function ExamListPage() {
               </Button>
             </Link>
           </div>
-          <h1 className="text-2xl font-bold">考试中心</h1>
-          <p className="mt-1 text-sm text-white/80">查看和管理你的所有考试，随时开始答题</p>
+          <PrdAnnotation data={getAnnotation("lex-hero")}>
+            <h1 className="text-2xl font-bold">考试中心</h1>
+            <p className="mt-1 text-sm text-white/80">查看和管理你的所有考试，随时开始答题</p>
+          </PrdAnnotation>
         </div>
       </div>
 
       <div className="mx-auto max-w-7xl px-6 py-6">
         {/* Stats */}
+        <PrdAnnotation data={getAnnotation("lex-stats")}>
         <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {stats.map((s) => (
             <div
@@ -119,8 +125,10 @@ export default function ExamListPage() {
             </div>
           ))}
         </div>
+        </PrdAnnotation>
 
         {/* Tabs + Search */}
+        <PrdAnnotation data={getAnnotation("lex-tabs")}>
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2">
             {(["my", "all"] as const).map((t) => (
@@ -177,8 +185,10 @@ export default function ExamListPage() {
             </div>
           </div>
         </div>
+        </PrdAnnotation>
 
         {/* Grid */}
+        <PrdAnnotation data={getAnnotation("lex-list")}>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {examsList.map((exam) => {
             const meta = statusMeta[exam.status] || statusMeta["未开始"]
@@ -251,6 +261,7 @@ export default function ExamListPage() {
             )
           })}
         </div>
+        </PrdAnnotation>
 
         {examsList.length === 0 && (
           <div className="rounded-xl bg-white py-20 text-center text-sm text-gray-400" style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
@@ -259,6 +270,7 @@ export default function ExamListPage() {
           </div>
         )}
       </div>
+      </PrdAnnotation>
     </div>
   )
 }

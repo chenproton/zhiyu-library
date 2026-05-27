@@ -20,6 +20,8 @@ import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { useData } from "@/components/providers/data-provider"
+import { PrdAnnotation } from "@/components/prd-annotation"
+import { getAnnotation } from "@/lib/prd-annotations"
 
 const dimensions = [
   { name: "专业技能", score: 82, fullMark: 100, icon: BookOpen, color: "#2563eb" },
@@ -49,6 +51,7 @@ export default function PortraitPage() {
 
   return (
     <div className="min-h-screen bg-[#f5f7fa]">
+      <PrdAnnotation data={getAnnotation("lpl-page")}>
       {/* Hero */}
       <div
         className="relative overflow-hidden px-6 py-10 text-white"
@@ -63,8 +66,10 @@ export default function PortraitPage() {
               </Button>
             </Link>
           </div>
-          <h1 className="text-2xl font-bold">学生画像</h1>
-          <p className="mt-1 text-sm text-white/80">全方位记录你的成长轨迹，助力职业发展规划</p>
+          <PrdAnnotation data={getAnnotation("lpl-hero")}>
+            <h1 className="text-2xl font-bold">学生画像</h1>
+            <p className="mt-1 text-sm text-white/80">全方位记录你的成长轨迹，助力职业发展规划</p>
+          </PrdAnnotation>
         </div>
       </div>
 
@@ -287,6 +292,7 @@ export default function PortraitPage() {
           </div>
         </section>
       </div>
+      </PrdAnnotation>
     </div>
   )
 }

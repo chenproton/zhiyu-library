@@ -18,6 +18,8 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useData } from "@/components/providers/data-provider"
+import { PrdAnnotation } from "@/components/prd-annotation"
+import { getAnnotation } from "@/lib/prd-annotations"
 
 /* 模拟我的认证岗位 */
 const myCertIds = ["pos-1", "pos-2"]
@@ -75,6 +77,7 @@ export default function CertificationsPage() {
 
   return (
     <div className="min-h-screen bg-[#f5f7fa]">
+      <PrdAnnotation data={getAnnotation("lcl-page")}>
       {/* Hero */}
       <div
         className="relative overflow-hidden px-6 py-10 text-white"
@@ -89,8 +92,10 @@ export default function CertificationsPage() {
               </Button>
             </Link>
           </div>
-          <h1 className="text-2xl font-bold">能力认定</h1>
-          <p className="mt-1 text-sm text-white/80">岗位技能认证，量化职业能力，助力求职发展</p>
+          <PrdAnnotation data={getAnnotation("lcl-hero")}>
+            <h1 className="text-2xl font-bold">能力认定</h1>
+            <p className="mt-1 text-sm text-white/80">岗位技能认证，量化职业能力，助力求职发展</p>
+          </PrdAnnotation>
         </div>
       </div>
 
@@ -230,6 +235,7 @@ export default function CertificationsPage() {
           </div>
         )}
       </div>
+      </PrdAnnotation>
     </div>
   )
 }

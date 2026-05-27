@@ -21,6 +21,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
+import { PrdAnnotation } from "@/components/prd-annotation"
+import { getAnnotation } from "@/lib/prd-annotations"
 
 const todos = [
   { id: 1, type: "exam", title: "《Python程序设计》期末统考", time: "今天 14:00", urgent: true },
@@ -60,6 +62,7 @@ const deadlines = [
 export default function WorkspacePage() {
   return (
     <div className="pb-8">
+      <PrdAnnotation data={getAnnotation("lw-page")}>
       {/* Header */}
       <section className="border-b bg-white">
         <div className="mx-auto flex max-w-7xl items-center gap-3 px-6 py-4">
@@ -69,7 +72,9 @@ export default function WorkspacePage() {
               返回首页
             </Button>
           </Link>
-          <h1 className="text-lg font-bold">我的工作台</h1>
+          <PrdAnnotation data={getAnnotation("lw-hero")}>
+            <h1 className="text-lg font-bold">我的工作台</h1>
+          </PrdAnnotation>
         </div>
       </section>
 
@@ -262,6 +267,7 @@ export default function WorkspacePage() {
           </div>
         </div>
       </section>
+      </PrdAnnotation>
     </div>
   )
 }

@@ -19,6 +19,8 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { useData } from "@/components/providers/data-provider"
+import { PrdAnnotation } from "@/components/prd-annotation"
+import { getAnnotation } from "@/lib/prd-annotations"
 
 // categories removed per request
 
@@ -85,6 +87,7 @@ export default function ResourcesPage() {
 
   return (
     <div className="min-h-screen bg-[#f5f7fa]">
+      <PrdAnnotation data={getAnnotation("lrl-page")}>
       {/* Hero */}
       <div
         className="relative overflow-hidden px-6 py-10 text-white"
@@ -99,8 +102,10 @@ export default function ResourcesPage() {
               </Button>
             </Link>
           </div>
-          <h1 className="text-2xl font-bold">测评资源</h1>
-          <p className="mt-1 text-sm text-white/80">丰富的题库与试卷资源，覆盖多学科多场景</p>
+          <PrdAnnotation data={getAnnotation("lrl-hero")}>
+            <h1 className="text-2xl font-bold">测评资源</h1>
+            <p className="mt-1 text-sm text-white/80">丰富的题库与试卷资源，覆盖多学科多场景</p>
+          </PrdAnnotation>
         </div>
       </div>
 
@@ -231,6 +236,7 @@ export default function ResourcesPage() {
           </div>
         )}
       </div>
+      </PrdAnnotation>
     </div>
   )
 }

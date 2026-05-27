@@ -1660,6 +1660,212 @@ export const landingPortraitAnnotations: Record<string, AnnotationItem> = {
   },
 }
 
+// ==================== Landingpage 列表页 ====================
+
+export const landingExamListAnnotations: Record<string, AnnotationItem> = {
+  "lex-page": {
+    id: "lex-page",
+    title: "考试中心列表页",
+    content: "展示当前学生的考试列表，支持查看我的考试和全部考试。包含考试状态筛选、院系/专业筛选和搜索功能。",
+  },
+  "lex-hero": {
+    id: "lex-hero",
+    title: "页面标题区",
+    content: "考试中心页面头部，展示页面标题和简介说明。",
+  },
+  "lex-stats": {
+    id: "lex-stats",
+    title: "统计面板",
+    content: "展示考试数量统计：全部考试、进行中、未开始、已结束。",
+  },
+  "lex-tabs": {
+    id: "lex-tabs",
+    title: "Tab 切换",
+    content: "切换「我的考试」和「全部考试」两个视图。",
+  },
+  "lex-filter": {
+    id: "lex-filter",
+    title: "筛选与搜索",
+    content: "支持按考试名称搜索，按二级院系和适用专业筛选。",
+  },
+  "lex-list": {
+    id: "lex-list",
+    title: "考试卡片列表",
+    content: "以卡片形式展示考试信息，包含考试名称、状态、时长、题量、考试时间、考试对象等。点击卡片进入考试详情页。",
+  },
+}
+
+export const landingCertListAnnotations: Record<string, AnnotationItem> = {
+  "lcl-page": {
+    id: "lcl-page",
+    title: "能力认定列表页",
+    content: "展示当前学生的能力认定/证书列表。支持查看我的认证岗位、感兴趣岗位和全部岗位。",
+  },
+  "lcl-hero": {
+    id: "lcl-hero",
+    title: "页面标题区",
+    content: "能力认定页面头部，展示页面标题和简介说明。",
+  },
+  "lcl-stats": {
+    id: "lcl-stats",
+    title: "统计面板",
+    content: "展示认证岗位、行业、专业、通过率等统计数据。",
+  },
+  "lcl-tabs": {
+    id: "lcl-tabs",
+    title: "Tab 切换",
+    content: "切换「我的认证岗位」「感兴趣岗位」「全部岗位」三个视图。",
+  },
+  "lcl-filter": {
+    id: "lcl-filter",
+    title: "筛选与搜索",
+    content: "支持按岗位名称搜索，按院系和专业筛选。",
+  },
+  "lcl-list": {
+    id: "lcl-list",
+    title: "岗位认证卡片列表",
+    content: "以卡片形式展示岗位认证信息，包含岗位名称、编码、方向、关联能力数、状态等。点击查看详情进入岗位能力认定详情页。",
+  },
+}
+
+export const landingEvalMethodAnnotations: Record<string, AnnotationItem> = {
+  "lem-page": {
+    id: "lem-page",
+    title: "测评方式页",
+    content: "展示学校支持的各类测评方式说明，帮助学生了解不同测评形式的要求和特点。",
+  },
+  "lem-hero": {
+    id: "lem-hero",
+    title: "页面标题区",
+    content: "测评方式页面头部，展示页面标题和简介说明。",
+  },
+  "lem-list": {
+    id: "lem-list",
+    title: "测评方式列表",
+    content: "展示各种测评方式的详细介绍，包括考试、项目实践、作品评审等。",
+  },
+}
+
+export const landingGraduationListAnnotations: Record<string, AnnotationItem> = {
+  "lgl-page": {
+    id: "lgl-page",
+    title: "毕设列表页",
+    content: "展示毕业设计相关资源和信息列表。支持查看毕设课题、进度和成果。",
+  },
+  "lgl-hero": {
+    id: "lgl-hero",
+    title: "页面标题区",
+    content: "毕业设计页面头部，展示页面标题和简介说明。",
+  },
+  "lgl-stats": {
+    id: "lgl-stats",
+    title: "统计面板",
+    content: "展示毕设相关统计信息。",
+  },
+  "lgl-list": {
+    id: "lgl-list",
+    title: "毕设资源列表",
+    content: "展示毕业设计课题、档案、评价等相关信息列表。点击查看详情。",
+  },
+}
+
+export const landingPortraitListAnnotations: Record<string, AnnotationItem> = {
+  "lpl-page": {
+    id: "lpl-page",
+    title: "学生画像列表页",
+    content: "展示学生画像相关列表信息，支持查看学生能力画像和成长档案。",
+  },
+  "lpl-hero": {
+    id: "lpl-hero",
+    title: "页面标题区",
+    content: "学生画像页面头部，展示页面标题和简介说明。",
+  },
+  "lpl-stats": {
+    id: "lpl-stats",
+    title: "统计面板",
+    content: "展示学生画像相关统计数据。",
+  },
+  "lpl-list": {
+    id: "lpl-list",
+    title: "学生画像列表",
+    content: "展示学生能力画像列表，包含学生基本信息、能力维度得分等。点击可查看详情。",
+  },
+}
+
+export const landingPortraitMajorAnnotations: Record<string, AnnotationItem> = {
+  "lpm-page": {
+    id: "lpm-page",
+    title: "专业画像页",
+    content: "展示按专业维度统计的学生能力画像数据，反映各专业学生的整体能力水平。",
+  },
+  "lpm-hero": {
+    id: "lpm-hero",
+    title: "页面标题区",
+    content: "专业画像页面头部，展示当前专业名称和统计概览。",
+  },
+  "lpm-chart": {
+    id: "lpm-chart",
+    title: "能力维度图表",
+    content: "以图表形式展示该专业学生在各能力维度上的平均得分分布。",
+  },
+  "lpm-list": {
+    id: "lpm-list",
+    title: "学生列表",
+    content: "展示该专业下的学生能力画像列表。",
+  },
+}
+
+export const landingResourceListAnnotations: Record<string, AnnotationItem> = {
+  "lrl-page": {
+    id: "lrl-page",
+    title: "资源列表页",
+    content: "展示学习资源列表，包括试卷资源和题库资源。支持查看资源详情。",
+  },
+  "lrl-hero": {
+    id: "lrl-hero",
+    title: "页面标题区",
+    content: "资源中心页面头部，展示页面标题和简介说明。",
+  },
+  "lrl-tabs": {
+    id: "lrl-tabs",
+    title: "资源分类",
+    content: "切换查看试卷资源和题库资源。",
+  },
+  "lrl-list": {
+    id: "lrl-list",
+    title: "资源卡片列表",
+    content: "以卡片形式展示试卷或题库资源信息。点击卡片可查看详情。",
+  },
+}
+
+export const landingWorkspaceAnnotations: Record<string, AnnotationItem> = {
+  "lw-page": {
+    id: "lw-page",
+    title: "工作台页",
+    content: "学生个人工作台，汇总展示待办事项、最近考试、学习进度等个人相关信息。",
+  },
+  "lw-hero": {
+    id: "lw-hero",
+    title: "页面标题区",
+    content: "工作台页面头部，展示欢迎语和个人信息概览。",
+  },
+  "lw-todo": {
+    id: "lw-todo",
+    title: "待办事项",
+    content: "展示当前学生的待办任务列表，包括待考试、待提交作业等。",
+  },
+  "lw-recent": {
+    id: "lw-recent",
+    title: "最近活动",
+    content: "展示最近参与的考试、学习的资源等近期活动记录。",
+  },
+  "lw-progress": {
+    id: "lw-progress",
+    title: "学习进度",
+    content: "展示当前学习进度和完成情况统计。",
+  },
+}
+
 // ==================== 合并所有标注 ====================
 
 const allAnnotations: Record<string, AnnotationItem> = {
@@ -1687,6 +1893,14 @@ const allAnnotations: Record<string, AnnotationItem> = {
   ...landingPaperAnnotations,
   ...landingGraduationAnnotations,
   ...landingPortraitAnnotations,
+  ...landingExamListAnnotations,
+  ...landingCertListAnnotations,
+  ...landingEvalMethodAnnotations,
+  ...landingGraduationListAnnotations,
+  ...landingPortraitListAnnotations,
+  ...landingPortraitMajorAnnotations,
+  ...landingResourceListAnnotations,
+  ...landingWorkspaceAnnotations,
 }
 
 /** 从 localStorage 读取用户覆盖 */
@@ -1760,6 +1974,22 @@ export function getAnnotationsByPage(page: string): Record<string, AnnotationIte
       return landingGraduationAnnotations
     case "landingpage-portrait":
       return landingPortraitAnnotations
+    case "landingpage-exams-list":
+      return landingExamListAnnotations
+    case "landingpage-certifications-list":
+      return landingCertListAnnotations
+    case "landingpage-evaluation-methods":
+      return landingEvalMethodAnnotations
+    case "landingpage-graduation-list":
+      return landingGraduationListAnnotations
+    case "landingpage-portrait-list":
+      return landingPortraitListAnnotations
+    case "landingpage-portrait-major":
+      return landingPortraitMajorAnnotations
+    case "landingpage-resources-list":
+      return landingResourceListAnnotations
+    case "landingpage-workspace":
+      return landingWorkspaceAnnotations
     default:
       return {}
   }

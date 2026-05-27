@@ -13,6 +13,8 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useData } from "@/components/providers/data-provider"
+import { PrdAnnotation } from "@/components/prd-annotation"
+import { getAnnotation } from "@/lib/prd-annotations"
 
 export default function EvaluationMethodsListPage() {
   const { evaluationCategories, evaluationMethods } = useData()
@@ -90,6 +92,7 @@ export default function EvaluationMethodsListPage() {
 
   return (
     <div className="min-h-screen bg-[#f5f7fa]">
+      <PrdAnnotation data={getAnnotation("lem-page")}>
       {/* Hero */}
       <div
         className="relative overflow-hidden px-6 py-10 text-white"
@@ -104,8 +107,10 @@ export default function EvaluationMethodsListPage() {
               </Button>
             </Link>
           </div>
-          <h1 className="text-2xl font-bold">测评方式库</h1>
-          <p className="mt-1 text-sm text-white/80">覆盖知识测评、过程评价、成果评价及行业专属测评方式</p>
+          <PrdAnnotation data={getAnnotation("lem-hero")}>
+            <h1 className="text-2xl font-bold">测评方式库</h1>
+            <p className="mt-1 text-sm text-white/80">覆盖知识测评、过程评价、成果评价及行业专属测评方式</p>
+          </PrdAnnotation>
         </div>
       </div>
 
@@ -283,6 +288,7 @@ export default function EvaluationMethodsListPage() {
           </div>
         )}
       </div>
+      </PrdAnnotation>
     </div>
   )
 }

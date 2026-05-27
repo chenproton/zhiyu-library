@@ -20,6 +20,8 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { useData } from "@/components/providers/data-provider"
+import { PrdAnnotation } from "@/components/prd-annotation"
+import { getAnnotation } from "@/lib/prd-annotations"
 
 const myProgress = [
   { stage: "选题申请", status: "completed", date: "2024-05-10" },
@@ -87,6 +89,7 @@ export default function GraduationPage() {
 
   return (
     <div className="min-h-screen bg-[#f5f7fa]">
+      <PrdAnnotation data={getAnnotation("lgl-page")}>
       {/* Hero */}
       <div
         className="relative overflow-hidden px-6 py-10 text-white"
@@ -101,8 +104,10 @@ export default function GraduationPage() {
               </Button>
             </Link>
           </div>
-          <h1 className="text-2xl font-bold">毕业设计</h1>
-          <p className="mt-1 text-sm text-white/80">选题申请、进度跟踪、导师沟通一站式管理</p>
+          <PrdAnnotation data={getAnnotation("lgl-hero")}>
+            <h1 className="text-2xl font-bold">毕业设计</h1>
+            <p className="mt-1 text-sm text-white/80">选题申请、进度跟踪、导师沟通一站式管理</p>
+          </PrdAnnotation>
         </div>
       </div>
 
@@ -307,6 +312,7 @@ export default function GraduationPage() {
           )}
         </section>
       </div>
+      </PrdAnnotation>
     </div>
   )
 }

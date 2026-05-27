@@ -18,6 +18,8 @@ import {
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useData } from "@/components/providers/data-provider"
+import { PrdAnnotation } from "@/components/prd-annotation"
+import { getAnnotation } from "@/lib/prd-annotations"
 import { StudentPortraitModal } from "@/components/shared/student-portrait-modal"
 
 const gradeMap: Record<string, number> = { A: 5, B: 4, C: 3, D: 2, E: 1 }
@@ -67,6 +69,7 @@ export default function MajorPortraitPage() {
 
   return (
     <div className="min-h-screen bg-[#f5f7fa]">
+      <PrdAnnotation data={getAnnotation("lpm-page")}>
       {/* Hero */}
       <div
         className="relative overflow-hidden px-6 py-10 text-white"
@@ -85,8 +88,10 @@ export default function MajorPortraitPage() {
               </Button>
             </Link>
           </div>
-          <h1 className="text-2xl font-bold">{majorName} 学生排行榜</h1>
-          <p className="mt-1 text-sm text-white/80">专业内学生能力画像排名，综合评级与学分统计</p>
+          <PrdAnnotation data={getAnnotation("lpm-hero")}>
+            <h1 className="text-2xl font-bold">{majorName} 学生排行榜</h1>
+            <p className="mt-1 text-sm text-white/80">专业内学生能力画像排名，综合评级与学分统计</p>
+          </PrdAnnotation>
         </div>
       </div>
 
@@ -264,6 +269,7 @@ export default function MajorPortraitPage() {
         open={portraitModalOpen}
         onOpenChange={setPortraitModalOpen}
       />
+      </PrdAnnotation>
     </div>
   )
 }

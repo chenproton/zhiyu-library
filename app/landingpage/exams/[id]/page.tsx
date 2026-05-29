@@ -6,7 +6,7 @@ import { useParams } from "next/navigation"
 import {
   ArrowLeft, Clock, FileText, CheckCircle2, AlertCircle, Send,
   ListOrdered, Signal, Trophy, Calendar, PlayCircle, BarChart3,
-  ChevronRight, BookOpen, Users,
+  ChevronRight, BookOpen, Users, Info, UserX, UserCheck,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -309,16 +309,6 @@ export default function ExamDetailPage() {
                 </span>
               </PrdAnnotation>
             </PrdAnnotation>
-            <Select value={examAccessState} onValueChange={(v) => setExamAccessState(v as typeof examAccessState)}>
-              <SelectTrigger className="w-[140px] h-8 text-xs bg-white/20 border-white/30 text-white hover:bg-white/30">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="not-in-range">不在范围</SelectItem>
-                <SelectItem value="not-started">考试未开始</SelectItem>
-                <SelectItem value="started">考试已开始</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
         </div>
         <div style={{ padding: "24px 32px", display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 24 }}>
@@ -326,14 +316,33 @@ export default function ExamDetailPage() {
             { icon: <Clock style={{ width: 18, height: 18 }} />, label: "考试时长", value: `${exam.duration} 分钟` },
             { icon: <ListOrdered style={{ width: 18, height: 18 }} />, label: "题目数量", value: `${exam.questions.length} 题` },
             { icon: <BarChart3 style={{ width: 18, height: 18 }} />, label: "总分", value: `${totalScore} 分` },
-            { icon: <Users style={{ width: 18, height: 18 }} />, label: "考试对象", value: `${targetAudience.type}（${targetAudience.detail}）`, clickable: examAccessState === 'not-in-range' }
+            { icon: <Users style={{ width: 18, height: 18 }} />, label: "考试对象", value: `${targetAudience.type}（${targetAudience.detail}）`, clickable: examAccessState === 'not-in-range', key: 'audience' }
           ].map((item, i) => (
             <PrdAnnotation key={i} data={getAnnotation(["le-duration", "le-question-count", "le-total-score", "le-target"][i])}>
-              <div style={{ textAlign: "center", padding: "16px 0", background: "#f5f6f7", borderRadius: 8 }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, color: "#3370ff", marginBottom: 6 }}>
+              <div
+                style={{
+                  textAlign: "center",
+                  padding: "16px 0",
+                  background: item.clickable ? "#fff7ed" : "#f5f6f7",
+                  borderRadius: 8,
+                  cursor: item.clickable ? "pointer" : "default",
+                  border: item.clickable ? "1px dashed #f97316" : "1px solid transparent",
+                  transition: "all 0.2s",
+                }}
+                onClick={() => item.clickable && setShowAudienceDialog(true)}
+                onMouseEnter={(e) => { if (item.clickable) { e.currentTarget.style.background = "#ffedd5" } }}
+                onMouseLeave={(e) => { if (item.clickable) { e.currentTarget.style.background = "#fff7ed" } }}
+              >
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, color: item.clickable ? "#f97316" : "#3370ff", marginBottom: 6 }}>
                   {item.icon} <span style={{ fontSize: 13, fontWeight: 500 }}>{item.label}</span>
                 </div>
-                <div style={{ fontSize: 14, fontWeight: 700, padding: "0 8px" }}>{item.value}</div>
+                <div style={{ fontSize: 14, fontWeight: 700, padding: "0 8px", display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}>
+                  {item.value}
+                  {item.clickable && <Info style={{ width: 14, height: 14, opacity: 0.7 }} />}
+                </div>
+                {item.clickable && (
+                  <div style={{ fontSize: 11, color: "#f97316", marginTop: 4 }}>点击查看范围详情</div>
+                )}
               </div>
             </PrdAnnotation>
           ))}
@@ -391,9 +400,21 @@ export default function ExamDetailPage() {
         </div>
 
         <div style={{ background: "#fff", borderRadius: 12, border: "1px solid #e5e6eb", padding: 24 }}>
-          <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
-            <BookOpen style={{ width: 18, height: 18, color: "#3370ff" }} /> 考试须知
-          </h3>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+            <h3 style={{ fontSize: 16, fontWeight: 600, display: "flex", alignItems: "center", gap: 8 }}>
+              <BookOpen style={{ width: 18, height: 18, color: "#3370ff" }} /> 考试须知
+            </h3>
+            <Select value={examAccessState} onValueChange={(v) => setExamAccessState(v as typeof examAccessState)}>
+              <SelectTrigger className="w-[140px] h-8 text-xs" style={{ background: "#f5f6f7", border: "1px solid #e5e6eb" }}>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="not-in-range">不在范围</SelectItem>
+                <SelectItem value="not-started">考试未开始</SelectItem>
+                <SelectItem value="started">考试已开始</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 12, fontSize: 14, color: "#646a73" }}>
             <p>1. 请在规定时间内完成所有题目，超时将自动提交。</p>
             <p>2. 单选题每题只有一个正确答案，多选题有多个正确答案。</p>
@@ -420,33 +441,87 @@ export default function ExamDetailPage() {
 
       {/* 考试对象名单弹窗 */}
       <Dialog open={showAudienceDialog} onOpenChange={setShowAudienceDialog}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>考试人员名单</DialogTitle>
+            <DialogTitle>考试范围详情</DialogTitle>
             <DialogDescription>
-              {targetAudience.type}：{targetAudience.detail}
+              本次考试面向 {targetAudience.type}：{targetAudience.detail}
             </DialogDescription>
           </DialogHeader>
-          <div className="py-2 space-y-2 max-h-[300px] overflow-y-auto">
-            {examId === 'exam-4' ? (
-              <>
-                {['张三', '李四', '王五'].map((name, i) => (
-                  <div key={i} className="flex items-center gap-3 p-2 rounded-md bg-slate-50">
-                    <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-medium">{name[0]}</div>
-                    <span className="text-sm">{name}</span>
+          <div className="py-2 space-y-4 max-h-[400px] overflow-y-auto">
+            {/* 说明提示 */}
+            <div className="flex items-start gap-2 p-3 rounded-md bg-amber-50 border border-amber-200 text-amber-800 text-sm">
+              <Info className="w-4 h-4 mt-0.5 shrink-0" />
+              <div>
+                <p className="font-medium">您不在本次考试范围内</p>
+                <p className="text-xs text-amber-700 mt-1">
+                  管理员从以下班级中指定了部分人员参加考试。下方橙色标记的人员为实际参考对象，灰色标记的人员未被选中。
+                </p>
+              </div>
+            </div>
+
+            {/* 班级分组展示 */}
+            {targetAudience.detail.split('、').map((className, classIdx) => {
+              // 模拟班级全体学生与实际参考学生
+              const allStudents = classIdx === 0
+                ? ['张小明', '李华', '王芳', '赵强', '孙丽', '周杰', '吴敏', '郑伟', '陈静', '刘洋']
+                : ['钱多多', '孙小美', '周大伟', '吴小敏', '郑小伟', '王小明', '李小华', '赵小芳']
+              const selectedStudents = classIdx === 0
+                ? ['张小明', '李华', '王芳', '赵强', '孙丽']
+                : ['钱多多', '孙小美', '周大伟']
+
+              return (
+                <div key={classIdx} className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-sm font-semibold text-slate-700">{className}</h4>
+                    <span className="text-xs text-slate-500">
+                      已选 {selectedStudents.length} / {allStudents.length} 人
+                    </span>
                   </div>
-                ))}
-              </>
-            ) : (
-              <>
-                {['张小明', '李华', '王芳', '赵强', '孙丽', '周杰', '吴敏', '郑伟'].map((name, i) => (
-                  <div key={i} className="flex items-center gap-3 p-2 rounded-md bg-slate-50">
-                    <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-medium">{name[0]}</div>
-                    <span className="text-sm">{name}</span>
-                    <span className="text-xs text-muted-foreground ml-auto">{targetAudience.detail.split('、')[i % 2] || targetAudience.detail}</span>
+                  <div className="grid grid-cols-2 gap-2">
+                    {allStudents.map((name, i) => {
+                      const isSelected = selectedStudents.includes(name)
+                      return (
+                        <div
+                          key={i}
+                          className={`flex items-center gap-2 p-2 rounded-md border text-sm ${
+                            isSelected
+                              ? 'bg-orange-50 border-orange-200 text-orange-800'
+                              : 'bg-slate-50 border-slate-100 text-slate-400'
+                          }`}
+                        >
+                          {isSelected ? (
+                            <UserCheck className="w-3.5 h-3.5 text-orange-500 shrink-0" />
+                          ) : (
+                            <UserX className="w-3.5 h-3.5 text-slate-300 shrink-0" />
+                          )}
+                          <span className="truncate">{name}</span>
+                          {!isSelected && (
+                            <span className="text-[10px] text-slate-300 ml-auto shrink-0">未选中</span>
+                          )}
+                        </div>
+                      )
+                    })}
                   </div>
-                ))}
-              </>
+                </div>
+              )
+            })}
+
+            {examId === 'exam-4' && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm font-semibold text-slate-700">指定教师</h4>
+                  <span className="text-xs text-slate-500">已选 3 人</span>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {['张三', '李四', '王五'].map((name, i) => (
+                    <div key={i} className="flex items-center gap-2 p-2 rounded-md border bg-orange-50 border-orange-200 text-orange-800 text-sm">
+                      <UserCheck className="w-3.5 h-3.5 text-orange-500 shrink-0" />
+                      <span>{name}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
           </div>
         </DialogContent>

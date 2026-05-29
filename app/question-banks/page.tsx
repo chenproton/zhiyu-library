@@ -15,9 +15,17 @@ import {
   GitBranch,
   ArrowUpFromLine,
   CheckCircle2,
+  Send,
+  Undo2,
+  ArrowDownFromLine,
+  Copy,
+  Trash2,
+  Download,
+  FolderKanban,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   Select,
   SelectContent,
@@ -36,6 +44,15 @@ import {
 } from "@/components/ui/table"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
 import { StatusBadge } from "@/components/shared/status-badge"
 import { PageHeaderCard } from "@/components/shared/page-header-card"
 import { BankFormDialog } from "@/components/question-banks/bank-form-dialog"
@@ -46,6 +63,7 @@ import type { QuestionBank, QuestionBankFormData } from "@/lib/types"
 import { mockUsers, mockBatches } from "@/lib/mock-data"
 import { PrdAnnotation } from "@/components/prd-annotation"
 import { getAnnotation } from "@/lib/prd-annotations"
+import { cn } from "@/lib/utils"
 
 type OwnerTab = 'mine' | 'collaborate' | 'public'
 type ViewMode = 'list' | 'batch'
@@ -59,6 +77,8 @@ export default function QuestionBanksPage() {
     updateQuestionBank,
     deleteQuestionBank,
     updateQuestionBankStatus,
+    getQuestionsByBank,
+    createQuestion,
   } = useData()
 
   const [search, setSearch] = useState("")
@@ -69,6 +89,11 @@ export default function QuestionBanksPage() {
   const [viewMode, setViewMode] = useState<ViewMode>('list')
   const [inviteOpen, setInviteOpen] = useState(false)
   const [invitingBank, setInvitingBank] = useState<QuestionBank | null>(null)
+
+  const [selectedIds, setSelectedIds] = useState<string[]>([])
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false)
+  const [isBatchMoveDialogOpen, setIsBatchMoveDialogOpen] = useState(false)
+  const [batchMoveTarget, setBatchMoveTarget] = useState<string>("")
 
   const filteredBanks = useMemo(() => {
     return questionBanks
@@ -121,6 +146,31 @@ export default function QuestionBanksPage() {
     setInvitingBank(null)
   }
 
+  const handleCloneBank = (bank: QuestionBank) => {
+    const newBank = createQuestionBank({
+      name: `${bank.name}（克隆）`,
+      description: bank.description,
+      coverUrl: bank.coverUrl,
+      batchId: bank.batchId,
+      collaboratorIds: [],
+      collaboratorDeptIds: [],
+    })
+
+    const bankQuestions = getQuestionsByBank(bank.id)
+    bankQuestions.forEach((q) => {
+      createQuestion(newBank.id, {
+        type: q.type,
+        content: q.content,
+        options: q.options,
+        answer: q.answer,
+        analysis: q.analysis,
+        score: q.score,
+        difficulty: q.difficulty,
+        knowledgePoints: q.knowledgePoints,
+      })
+    })
+  }
+
   const handleDelete = (bank: QuestionBank) => {
     if (bank.isDraftPool) {
       alert('默认题库不可删除')
@@ -141,6 +191,78 @@ export default function QuestionBanksPage() {
 
   const getBatchName = (bank: QuestionBank) => {
     return mockBatches.find(b => b.id === bank.batchId)?.name || '-'
+  }
+
+  const selectableBanks = useMemo(() => filteredBanks.filter((b) => !b.isDraftPool), [filteredBanks])
+
+  const handleSelectId = (id: string, checked: boolean) => {
+    setSelectedIds((prev) => (checked ? [...prev, id] : prev.filter((sid) => sid !== id)))
+  }
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(selectableBanks.map((b) => b.id))
+    } else {
+      setSelectedIds([])
+    }
+  }
+
+  const selectedBanks = questionBanks.filter((b) => selectedIds.includes(b.id))
+  const hasSelected = selectedIds.length > 0
+
+  const canBatchSubmit = selectedBanks.some((b) => b.status === "draft" || b.status === "rejected" || b.status === "unsubmitted")
+  const canBatchWithdraw = selectedBanks.some((b) => b.status === "pending")
+  const canBatchPublish = selectedBanks.some((b) => b.status === "toPublish")
+  const canBatchUnpublish = selectedBanks.some((b) => b.status === "published")
+  const canBatchDelete = selectedBanks.some((b) => b.status === "draft" || b.status === "rejected" || b.status === "unsubmitted")
+
+  const handleBatchSubmitApproval = () => {
+    selectedIds.forEach((id) => updateQuestionBankStatus(id, "submit"))
+    setSelectedIds([])
+  }
+
+  const handleBatchWithdrawApproval = () => {
+    selectedIds.forEach((id) => updateQuestionBankStatus(id, "withdraw"))
+    setSelectedIds([])
+  }
+
+  const handleBatchPublish = () => {
+    selectedIds.forEach((id) => updateQuestionBankStatus(id, "publish"))
+    setSelectedIds([])
+  }
+
+  const handleBatchUnpublish = () => {
+    selectedIds.forEach((id) => updateQuestionBankStatus(id, "unpublish"))
+    setSelectedIds([])
+  }
+
+  const handleBatchDelete = () => {
+    if (confirm(`确定要删除选中的 ${selectedIds.length} 个题库吗？`)) {
+      selectedIds.forEach((id) => deleteQuestionBank(id))
+      setSelectedIds([])
+    }
+  }
+
+  const handleBatchClone = () => {
+    selectedBanks.forEach((bank) => handleCloneBank(bank))
+    setSelectedIds([])
+  }
+
+  const handleBatchMove = () => {
+    if (!batchMoveTarget) return
+    selectedIds.forEach((id) => {
+      const bank = questionBanks.find((b) => b.id === id)
+      if (bank) {
+        updateQuestionBank(id, { name: bank.name, description: bank.description, batchId: batchMoveTarget })
+      }
+    })
+    setBatchMoveTarget("")
+    setIsBatchMoveDialogOpen(false)
+    setSelectedIds([])
+  }
+
+  const handleBatchExport = () => {
+    setIsExportDialogOpen(true)
   }
 
   return (
@@ -263,6 +385,13 @@ export default function QuestionBanksPage() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-[40px] text-center">
+                  <Checkbox
+                    checked={selectableBanks.length > 0 && selectableBanks.every((b) => selectedIds.includes(b.id)) ? true : selectedBanks.some((b) => selectableBanks.map((sb) => sb.id).includes(b.id)) ? "indeterminate" : false}
+                    onCheckedChange={(checked) => handleSelectAll(checked === true)}
+                    aria-label="全选"
+                  />
+                </TableHead>
                 <TableHead className="w-[200px]">
                   <PrdAnnotation data={getAnnotation("qb-col-name")}>题库名称</PrdAnnotation>
                 </TableHead>
@@ -294,68 +423,119 @@ export default function QuestionBanksPage() {
             <TableBody>
               {filteredBanks.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={9} className="h-24 text-center text-muted-foreground">
+                  <TableCell colSpan={10} className="h-24 text-center text-muted-foreground">
                     暂无题库记录
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredBanks.map((bank) => (
-                  <TableRow
-                    key={bank.id}
-                    className="cursor-pointer hover:bg-muted/50"
-                    onClick={() => router.push(`/question-banks/${bank.id}`)}
-                  >
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        {bank.isDraftPool && (
-                          <span className="shrink-0 rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-700">
-                            草稿库
-                          </span>
+                filteredBanks.map((bank) => {
+                  const isSelected = selectedIds.includes(bank.id)
+                  return (
+                    <TableRow
+                      key={bank.id}
+                      className={cn("cursor-pointer hover:bg-muted/50", isSelected && "bg-primary/5")}
+                      onClick={() => router.push(`/question-banks/${bank.id}`)}
+                    >
+                      <TableCell className="text-center" onClick={(e) => e.stopPropagation()}>
+                        {!bank.isDraftPool && (
+                          <Checkbox
+                            checked={isSelected}
+                            onCheckedChange={(checked) => handleSelectId(bank.id, checked === true)}
+                            aria-label={`选择 ${bank.name}`}
+                          />
                         )}
-                        <span className="text-sm font-medium">{bank.name}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <span className="text-sm text-muted-foreground line-clamp-2">{bank.description || '-'}</span>
-                    </TableCell>
-                    <TableCell>
-                      <span className="text-sm">{bank.questionCount} 题</span>
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">{getBatchName(bank)}</TableCell>
-                    <TableCell>
-                      <span className="text-sm text-muted-foreground">张三</span>
-                    </TableCell>
-                    <TableCell>
-                      <span className="text-sm text-muted-foreground">{bank.isDraftPool ? '-' : (bank.collaboratorIds?.length ? bank.collaboratorIds.map(id => mockUsers.find(u => u.id === id)?.name).filter(Boolean).join('、') || '-' : '-')}</span>
-                    </TableCell>
-                    <TableCell>
-                      {bank.isDraftPool ? (
-                        <span className="text-sm text-muted-foreground">-</span>
-                      ) : (
-                        <StatusBadge status={bank.status} />
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <span className="text-sm text-muted-foreground">{formatDate(bank.createdAt)}</span>
-                    </TableCell>
-                    <TableCell>
-                      <span className="text-sm text-muted-foreground">{formatDate(bank.updatedAt)}</span>
-                    </TableCell>
-                    <TableCell className="sticky right-0 bg-white text-right">
-                      <BankStatusActions
-                        status={bank.status}
-                        onView={() => router.push(`/question-banks/${bank.id}`)}
-                        onEdit={bank.isDraftPool ? undefined : () => handleEdit(bank)}
-                        onDelete={bank.isDraftPool ? undefined : () => handleDelete(bank)}
-                        onStatusChange={bank.isDraftPool ? undefined : (action) => updateQuestionBankStatus(bank.id, action)}
-                        onInvite={bank.isDraftPool ? undefined : () => handleInvite(bank)}
-                      />
-                    </TableCell>
-                  </TableRow>
-                ))
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          {bank.isDraftPool && (
+                            <span className="shrink-0 rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-medium text-amber-700">
+                              草稿库
+                            </span>
+                          )}
+                          <span className="text-sm font-medium">{bank.name}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <span className="text-sm text-muted-foreground line-clamp-2">{bank.description || '-'}</span>
+                      </TableCell>
+                      <TableCell>
+                        <span className="text-sm">{bank.questionCount} 题</span>
+                      </TableCell>
+                      <TableCell className="text-sm text-muted-foreground">{getBatchName(bank)}</TableCell>
+                      <TableCell>
+                        <span className="text-sm text-muted-foreground">张三</span>
+                      </TableCell>
+                      <TableCell>
+                        <span className="text-sm text-muted-foreground">{bank.isDraftPool ? '-' : (bank.collaboratorIds?.length ? bank.collaboratorIds.map(id => mockUsers.find(u => u.id === id)?.name).filter(Boolean).join('、') || '-' : '-')}</span>
+                      </TableCell>
+                      <TableCell>
+                        {bank.isDraftPool ? (
+                          <span className="text-sm text-muted-foreground">-</span>
+                        ) : (
+                          <StatusBadge status={bank.status} />
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <span className="text-sm text-muted-foreground">{formatDate(bank.createdAt)}</span>
+                      </TableCell>
+                      <TableCell>
+                        <span className="text-sm text-muted-foreground">{formatDate(bank.updatedAt)}</span>
+                      </TableCell>
+                      <TableCell className="sticky right-0 bg-white text-right">
+                        <BankStatusActions
+                          status={bank.status}
+                          onView={() => router.push(`/question-banks/${bank.id}`)}
+                          onEdit={bank.isDraftPool ? undefined : () => handleEdit(bank)}
+                          onDelete={bank.isDraftPool ? undefined : () => handleDelete(bank)}
+                          onStatusChange={bank.isDraftPool ? undefined : (action) => updateQuestionBankStatus(bank.id, action)}
+                          onInvite={bank.isDraftPool ? undefined : () => handleInvite(bank)}
+                          onClone={bank.isDraftPool ? undefined : () => handleCloneBank(bank)}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  )
+                })
               )}
             </TableBody>
           </Table>
+        </div>
+        {/* 批量操作工具栏 */}
+        <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-slate-100 mt-3">
+          <span className={cn("text-xs mr-1", hasSelected ? "text-slate-700 font-medium" : "text-slate-400")}>
+            {hasSelected ? `已选择 ${selectedIds.length} 项：` : "请选择题库："}
+          </span>
+          <Button variant="outline" size="sm" className="h-8 text-xs" disabled={!hasSelected || !canBatchSubmit} onClick={handleBatchSubmitApproval}>
+            <Send className="mr-1 h-3 w-3" />
+            提交审批
+          </Button>
+          <Button variant="outline" size="sm" className="h-8 text-xs" disabled={!hasSelected || !canBatchWithdraw} onClick={handleBatchWithdrawApproval}>
+            <Undo2 className="mr-1 h-3 w-3" />
+            撤回审批
+          </Button>
+          <Button variant="outline" size="sm" className="h-8 text-xs" disabled={!hasSelected || !canBatchPublish} onClick={handleBatchPublish}>
+            <ArrowUpFromLine className="mr-1 h-3 w-3" />
+            发布
+          </Button>
+          <Button variant="outline" size="sm" className="h-8 text-xs" disabled={!hasSelected || !canBatchUnpublish} onClick={handleBatchUnpublish}>
+            <ArrowDownFromLine className="mr-1 h-3 w-3" />
+            取消发布
+          </Button>
+          <Button variant="outline" size="sm" className="h-8 text-xs" disabled={!hasSelected || !canBatchDelete} onClick={handleBatchDelete}>
+            <Trash2 className="mr-1 h-3 w-3" />
+            删除
+          </Button>
+          <Button variant="outline" size="sm" className="h-8 text-xs" disabled={!hasSelected} onClick={handleBatchClone}>
+            <Copy className="mr-1 h-3 w-3" />
+            克隆
+          </Button>
+          <Button variant="outline" size="sm" className="h-8 text-xs" disabled={!hasSelected} onClick={() => setIsBatchMoveDialogOpen(true)}>
+            <FolderKanban className="mr-1 h-3 w-3" />
+            调整批次分组
+          </Button>
+          <Button variant="outline" size="sm" className="h-8 text-xs" disabled={!hasSelected} onClick={handleBatchExport}>
+            <Download className="mr-1 h-3 w-3" />
+            导出
+          </Button>
         </div>
       </div>
 
@@ -375,6 +555,73 @@ export default function QuestionBanksPage() {
         description="邀请其他用户一起维护此题库"
         onInvite={handleInviteSubmit}
       />
+
+      {/* 批量导出弹窗 */}
+      <Dialog open={isExportDialogOpen} onOpenChange={setIsExportDialogOpen}>
+        <DialogContent className="sm:max-w-[450px]">
+          <DialogHeader>
+            <DialogTitle>批量导出题库</DialogTitle>
+            <DialogDescription>已选择 {selectedIds.length} 个题库，请选择导出格式</DialogDescription>
+          </DialogHeader>
+          <div className="py-4 space-y-3">
+            <div className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-slate-50">
+              <div className="h-10 w-10 rounded bg-green-50 flex items-center justify-center">
+                <span className="text-xs font-bold text-green-600">XLSX</span>
+              </div>
+              <div>
+                <p className="text-sm font-medium">导出为 Excel</p>
+                <p className="text-xs text-slate-400">包含题库基础信息和题目配置</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-slate-50">
+              <div className="h-10 w-10 rounded bg-blue-50 flex items-center justify-center">
+                <span className="text-xs font-bold text-blue-600">JSON</span>
+              </div>
+              <div>
+                <p className="text-sm font-medium">导出为 JSON</p>
+                <p className="text-xs text-slate-400">完整的题库数据结构，适用于备份和迁移</p>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsExportDialogOpen(false)}>取消</Button>
+            <Button onClick={() => setIsExportDialogOpen(false)}>确认导出</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* 调整批次分组弹窗 */}
+      <Dialog open={isBatchMoveDialogOpen} onOpenChange={setIsBatchMoveDialogOpen}>
+        <DialogContent className="sm:max-w-[450px]">
+          <DialogHeader>
+            <DialogTitle>调整批次分组</DialogTitle>
+            <DialogDescription>将已选择的 {selectedIds.length} 个题库移动到其他批次分组</DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="targetBatch">目标批次分组</Label>
+              <Select value={batchMoveTarget} onValueChange={setBatchMoveTarget}>
+                <SelectTrigger id="targetBatch">
+                  <SelectValue placeholder="请选择目标批次分组" />
+                </SelectTrigger>
+                <SelectContent>
+                  {mockBatches.map((batch) => (
+                    <SelectItem key={batch.id} value={batch.id}>
+                      <span className="flex items-center gap-2">
+                        {batch.name}
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsBatchMoveDialogOpen(false)}>取消</Button>
+            <Button onClick={handleBatchMove} disabled={!batchMoveTarget}>确认移动</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

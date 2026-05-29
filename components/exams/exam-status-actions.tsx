@@ -23,6 +23,7 @@ import {
   Eye,
   MonitorPlay,
   UserPlus,
+  Copy,
 } from "lucide-react"
 import type { Status, StatusAction } from "@/lib/types"
 import { canPerformAction } from "@/lib/types"
@@ -36,6 +37,7 @@ interface ExamStatusActionsProps {
   onPreview?: () => void
   onCompose?: () => void
   onInvite?: () => void
+  onClone?: () => void
 }
 
 type ConfirmType = 'delete' | 'submit' | 'withdraw' | 'approve' | 'reject' | 'publish' | 'unpublish' | null
@@ -86,6 +88,7 @@ export function ExamStatusActions({
   onView,
   onPreview,
   onInvite,
+  onClone,
 }: ExamStatusActionsProps) {
   const [confirmType, setConfirmType] = useState<ConfirmType>(null)
 
@@ -148,6 +151,12 @@ export function ExamStatusActions({
               <DropdownMenuItem onClick={onPreview}>
                 <MonitorPlay />
                 预览试卷
+              </DropdownMenuItem>
+            )}
+            {onClone && (
+              <DropdownMenuItem onClick={onClone}>
+                <Copy />
+                克隆
               </DropdownMenuItem>
             )}
             {canEdit && onEdit && (

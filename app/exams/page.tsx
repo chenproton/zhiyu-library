@@ -2,9 +2,10 @@
 
 import { useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
-import { Plus, Search, Settings, FolderTree, Upload, List, LayoutGrid, FileText, RotateCcw, GitBranch, ArrowUpFromLine, CheckCircle2 } from "lucide-react"
+import { Plus, Search, Settings, FolderTree, Upload, List, LayoutGrid, FileText, RotateCcw, GitBranch, ArrowUpFromLine, CheckCircle2, Send, Undo2, ArrowDownFromLine, Copy, Trash2, Download, FolderKanban } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   Select,
   SelectContent,
@@ -22,7 +23,15 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { StatusBadge } from "@/components/shared/status-badge"
 import { PageHeaderCard } from "@/components/shared/page-header-card"
@@ -35,6 +44,7 @@ import { STATUS_LABELS } from "@/lib/types"
 import { mockUsers, mockBatches } from "@/lib/mock-data"
 import { PrdAnnotation } from "@/components/prd-annotation"
 import { getAnnotation } from "@/lib/prd-annotations"
+import { cn } from "@/lib/utils"
 
 type OwnerTab = 'mine' | 'collaborate' | 'public'
 type ViewMode = 'list' | 'batch'
@@ -58,6 +68,11 @@ export default function ExamsPage() {
   const [invitingExam, setInvitingExam] = useState<Exam | null>(null)
   const [ownerTab, setOwnerTab] = useState<OwnerTab>('mine')
   const [viewMode, setViewMode] = useState<ViewMode>('list')
+
+  const [selectedIds, setSelectedIds] = useState<string[]>([])
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false)
+  const [isBatchMoveDialogOpen, setIsBatchMoveDialogOpen] = useState(false)
+  const [batchMoveTarget, setBatchMoveTarget] = useState<string>("")
 
   const filteredExams = useMemo(() => {
     return exams
@@ -113,6 +128,28 @@ export default function ExamsPage() {
     setInvitingExam(null)
   }
 
+  const handleCloneExam = (exam: Exam) => {
+    const newExam = createExam({
+      name: `${exam.name}（克隆）`,
+      description: exam.description,
+      duration: exam.duration,
+      coverUrl: exam.coverUrl,
+      batchId: exam.batchId,
+      collaboratorIds: [],
+      collaboratorDeptIds: [],
+    })
+
+    const clonedQuestions = exam.questions.map((q, index) => ({
+      ...q,
+      id: `eq-${Date.now()}-${index}-${Math.random().toString(36).slice(2, 6)}`,
+    }))
+
+    updateExam(newExam.id, {
+      questions: clonedQuestions,
+      totalScore: exam.totalScore,
+    })
+  }
+
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat("zh-CN", {
       year: "numeric",
@@ -134,6 +171,71 @@ export default function ExamsPage() {
 
   const getBatchName = (exam: Exam) => {
     return mockBatches.find(b => b.id === exam.batchId)?.name || '-'
+  }
+
+  const handleSelectId = (id: string, checked: boolean) => {
+    setSelectedIds((prev) => (checked ? [...prev, id] : prev.filter((sid) => sid !== id)))
+  }
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(filteredExams.map((e) => e.id))
+    } else {
+      setSelectedIds([])
+    }
+  }
+
+  const selectedExams = exams.filter((e) => selectedIds.includes(e.id))
+  const hasSelected = selectedIds.length > 0
+
+  const canBatchSubmit = selectedExams.some((e) => e.status === "draft" || e.status === "rejected" || e.status === "unsubmitted")
+  const canBatchWithdraw = selectedExams.some((e) => e.status === "pending")
+  const canBatchPublish = selectedExams.some((e) => e.status === "toPublish")
+  const canBatchUnpublish = selectedExams.some((e) => e.status === "published")
+  const canBatchDelete = selectedExams.some((e) => e.status === "draft" || e.status === "rejected" || e.status === "unsubmitted")
+
+  const handleBatchSubmitApproval = () => {
+    selectedIds.forEach((id) => updateExamStatus(id, "submit"))
+    setSelectedIds([])
+  }
+
+  const handleBatchWithdrawApproval = () => {
+    selectedIds.forEach((id) => updateExamStatus(id, "withdraw"))
+    setSelectedIds([])
+  }
+
+  const handleBatchPublish = () => {
+    selectedIds.forEach((id) => updateExamStatus(id, "publish"))
+    setSelectedIds([])
+  }
+
+  const handleBatchUnpublish = () => {
+    selectedIds.forEach((id) => updateExamStatus(id, "unpublish"))
+    setSelectedIds([])
+  }
+
+  const handleBatchDelete = () => {
+    if (confirm(`确定要删除选中的 ${selectedIds.length} 个试卷吗？`)) {
+      selectedIds.forEach((id) => deleteExam(id))
+      setSelectedIds([])
+    }
+  }
+
+  const handleBatchClone = () => {
+    selectedExams.forEach((exam) => handleCloneExam(exam))
+    setSelectedIds([])
+  }
+
+  const handleBatchMove = () => {
+    if (!batchMoveTarget) return
+    selectedIds.forEach((id) => updateExam(id, { batchId: batchMoveTarget }))
+    setBatchMoveTarget("")
+    setIsBatchMoveDialogOpen(false)
+    setSelectedIds([])
+  }
+
+  const handleBatchExport = () => {
+    setIsExportDialogOpen(true)
   }
 
   return (
@@ -243,6 +345,13 @@ export default function ExamsPage() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-[40px] text-center">
+                  <Checkbox
+                    checked={filteredExams.length > 0 && filteredExams.every((e) => selectedIds.includes(e.id)) ? true : selectedExams.some((e) => filteredExams.map((fe) => fe.id).includes(e.id)) ? "indeterminate" : false}
+                    onCheckedChange={(checked) => handleSelectAll(checked === true)}
+                    aria-label="全选"
+                  />
+                </TableHead>
                 <TableHead className="w-[180px]">
                   <PrdAnnotation data={getAnnotation("exam-col-name")}>试卷名称</PrdAnnotation>
                 </TableHead>
@@ -277,54 +386,103 @@ export default function ExamsPage() {
             <TableBody>
               {filteredExams.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={11} className="h-24 text-center text-muted-foreground">
+                  <TableCell colSpan={12} className="h-24 text-center text-muted-foreground">
                   {exams.length === 0 ? "暂无试卷，点击上方按钮创建" : "没有找到匹配的试卷"}
                 </TableCell>
               </TableRow>
             ) : (
-              filteredExams.map((exam) => (
-                <TableRow key={exam.id}>
-                  <TableCell>
-                    <span
-                      className="cursor-pointer font-medium hover:underline"
-                      onClick={() => router.push('/landingpage/resources/exams/exam-1?returnUrl=' + encodeURIComponent('/exams'))}
-                    >
-                      {exam.name}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    {exam.description ? (
-                      <p className="text-sm text-muted-foreground line-clamp-2">{exam.description}</p>
-                    ) : (
-                      <span className="text-sm text-muted-foreground">-</span>
-                    )}
-                  </TableCell>
-                  <TableCell>{exam.questions.length}</TableCell>
-                  <TableCell>{exam.totalScore} 分</TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{getBatchName(exam)}</TableCell>
-                  <TableCell>{getCreatorName(exam)}</TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{getCollaborators(exam)}</TableCell>
-                  <TableCell>
-                    <StatusBadge status={exam.status} />
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">{formatDate(exam.createdAt)}</TableCell>
-                  <TableCell className="text-muted-foreground">{formatDate(exam.updatedAt)}</TableCell>
-                  <TableCell className="sticky right-0 bg-white text-right">
-                    <ExamStatusActions
-                      status={exam.status}
-                      onEdit={() => handleEdit(exam)}
-                      onDelete={() => deleteExam(exam.id)}
-                      onStatusChange={(action) => updateExamStatus(exam.id, action)}
-                      onView={() => router.push(`/exams/${exam.id}`)}
-                      onPreview={() => router.push('/landingpage/resources/exams/exam-1?returnUrl=' + encodeURIComponent('/exams'))}
-                      onInvite={() => handleInvite(exam)}
-                    />
-                  </TableCell>
-                </TableRow>
-              ))
+              filteredExams.map((exam) => {
+                const isSelected = selectedIds.includes(exam.id)
+                return (
+                  <TableRow key={exam.id} className={cn(isSelected && "bg-primary/5")}>
+                    <TableCell className="text-center" onClick={(e) => e.stopPropagation()}>
+                      <Checkbox
+                        checked={isSelected}
+                        onCheckedChange={(checked) => handleSelectId(exam.id, checked === true)}
+                        aria-label={`选择 ${exam.name}`}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <span
+                        className="cursor-pointer font-medium hover:underline"
+                        onClick={() => router.push('/landingpage/resources/exams/exam-1?returnUrl=' + encodeURIComponent('/exams'))}
+                      >
+                        {exam.name}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      {exam.description ? (
+                        <p className="text-sm text-muted-foreground line-clamp-2">{exam.description}</p>
+                      ) : (
+                        <span className="text-sm text-muted-foreground">-</span>
+                      )}
+                    </TableCell>
+                    <TableCell>{exam.questions.length}</TableCell>
+                    <TableCell>{exam.totalScore} 分</TableCell>
+                    <TableCell className="text-sm text-muted-foreground">{getBatchName(exam)}</TableCell>
+                    <TableCell>{getCreatorName(exam)}</TableCell>
+                    <TableCell className="text-sm text-muted-foreground">{getCollaborators(exam)}</TableCell>
+                    <TableCell>
+                      <StatusBadge status={exam.status} />
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">{formatDate(exam.createdAt)}</TableCell>
+                    <TableCell className="text-muted-foreground">{formatDate(exam.updatedAt)}</TableCell>
+                    <TableCell className="sticky right-0 bg-white text-right">
+                      <ExamStatusActions
+                        status={exam.status}
+                        onEdit={() => handleEdit(exam)}
+                        onDelete={() => deleteExam(exam.id)}
+                        onStatusChange={(action) => updateExamStatus(exam.id, action)}
+                        onView={() => router.push(`/exams/${exam.id}`)}
+                        onPreview={() => router.push('/landingpage/resources/exams/exam-1?returnUrl=' + encodeURIComponent('/exams'))}
+                        onInvite={() => handleInvite(exam)}
+                        onClone={() => handleCloneExam(exam)}
+                      />
+                    </TableCell>
+                  </TableRow>
+                )
+              })
             )}
           </TableBody>
         </Table>
+        </div>
+        {/* 批量操作工具栏 */}
+        <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-slate-100 mt-3">
+          <span className={cn("text-xs mr-1", hasSelected ? "text-slate-700 font-medium" : "text-slate-400")}>
+            {hasSelected ? `已选择 ${selectedIds.length} 项：` : "请选择试卷："}
+          </span>
+          <Button variant="outline" size="sm" className="h-8 text-xs" disabled={!hasSelected || !canBatchSubmit} onClick={handleBatchSubmitApproval}>
+            <Send className="mr-1 h-3 w-3" />
+            提交审批
+          </Button>
+          <Button variant="outline" size="sm" className="h-8 text-xs" disabled={!hasSelected || !canBatchWithdraw} onClick={handleBatchWithdrawApproval}>
+            <Undo2 className="mr-1 h-3 w-3" />
+            撤回审批
+          </Button>
+          <Button variant="outline" size="sm" className="h-8 text-xs" disabled={!hasSelected || !canBatchPublish} onClick={handleBatchPublish}>
+            <ArrowUpFromLine className="mr-1 h-3 w-3" />
+            发布
+          </Button>
+          <Button variant="outline" size="sm" className="h-8 text-xs" disabled={!hasSelected || !canBatchUnpublish} onClick={handleBatchUnpublish}>
+            <ArrowDownFromLine className="mr-1 h-3 w-3" />
+            取消发布
+          </Button>
+          <Button variant="outline" size="sm" className="h-8 text-xs" disabled={!hasSelected || !canBatchDelete} onClick={handleBatchDelete}>
+            <Trash2 className="mr-1 h-3 w-3" />
+            删除
+          </Button>
+          <Button variant="outline" size="sm" className="h-8 text-xs" disabled={!hasSelected} onClick={handleBatchClone}>
+            <Copy className="mr-1 h-3 w-3" />
+            克隆
+          </Button>
+          <Button variant="outline" size="sm" className="h-8 text-xs" disabled={!hasSelected} onClick={() => setIsBatchMoveDialogOpen(true)}>
+            <FolderKanban className="mr-1 h-3 w-3" />
+            调整批次分组
+          </Button>
+          <Button variant="outline" size="sm" className="h-8 text-xs" disabled={!hasSelected} onClick={handleBatchExport}>
+            <Download className="mr-1 h-3 w-3" />
+            导出
+          </Button>
         </div>
       </div>
 
@@ -344,6 +502,73 @@ export default function ExamsPage() {
         description="邀请其他用户一起维护此试卷"
         onInvite={handleInviteSubmit}
       />
+
+      {/* 批量导出弹窗 */}
+      <Dialog open={isExportDialogOpen} onOpenChange={setIsExportDialogOpen}>
+        <DialogContent className="sm:max-w-[450px]">
+          <DialogHeader>
+            <DialogTitle>批量导出试卷</DialogTitle>
+            <DialogDescription>已选择 {selectedIds.length} 个试卷，请选择导出格式</DialogDescription>
+          </DialogHeader>
+          <div className="py-4 space-y-3">
+            <div className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-slate-50">
+              <div className="h-10 w-10 rounded bg-green-50 flex items-center justify-center">
+                <span className="text-xs font-bold text-green-600">XLSX</span>
+              </div>
+              <div>
+                <p className="text-sm font-medium">导出为 Excel</p>
+                <p className="text-xs text-slate-400">包含试卷基础信息和题目配置</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-slate-50">
+              <div className="h-10 w-10 rounded bg-blue-50 flex items-center justify-center">
+                <span className="text-xs font-bold text-blue-600">JSON</span>
+              </div>
+              <div>
+                <p className="text-sm font-medium">导出为 JSON</p>
+                <p className="text-xs text-slate-400">完整的试卷数据结构，适用于备份和迁移</p>
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsExportDialogOpen(false)}>取消</Button>
+            <Button onClick={() => setIsExportDialogOpen(false)}>确认导出</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* 调整批次分组弹窗 */}
+      <Dialog open={isBatchMoveDialogOpen} onOpenChange={setIsBatchMoveDialogOpen}>
+        <DialogContent className="sm:max-w-[450px]">
+          <DialogHeader>
+            <DialogTitle>调整批次分组</DialogTitle>
+            <DialogDescription>将已选择的 {selectedIds.length} 个试卷移动到其他批次分组</DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="targetBatch">目标批次分组</Label>
+              <Select value={batchMoveTarget} onValueChange={setBatchMoveTarget}>
+                <SelectTrigger id="targetBatch">
+                  <SelectValue placeholder="请选择目标批次分组" />
+                </SelectTrigger>
+                <SelectContent>
+                  {mockBatches.map((batch) => (
+                    <SelectItem key={batch.id} value={batch.id}>
+                      <span className="flex items-center gap-2">
+                        {batch.name}
+                      </span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsBatchMoveDialogOpen(false)}>取消</Button>
+            <Button onClick={handleBatchMove} disabled={!batchMoveTarget}>确认移动</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

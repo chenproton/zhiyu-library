@@ -3,7 +3,7 @@
 import { useState, useMemo, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { Plus, Search, BookOpen, Video, GraduationCap, PlayCircle, X, ChevronDown, MoreHorizontal, Eye, Pencil, Trash2, Clock, CheckCircle2, XCircle, Share2, ImageIcon, Users } from "lucide-react"
+import { Plus, Search, BookOpen, Video, GraduationCap, PlayCircle, X, ChevronDown, MoreHorizontal, Eye, Pencil, Trash2, Clock, CheckCircle2, XCircle, Share2, ImageIcon, Users, Undo2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -55,6 +55,7 @@ import {
 import { useData } from "@/components/providers/data-provider"
 import { PageHeaderCard } from "@/components/shared/page-header-card"
 import { CoBuilderDialog } from "@/components/shared/co-builder-dialog"
+import { ConfirmDialog } from "@/components/shared/confirm-dialog"
 import { mockUsers } from "@/lib/mock-data"
 import { PrdAnnotation } from "@/components/prd-annotation"
 import { getAnnotation } from "@/lib/prd-annotations"
@@ -380,29 +381,34 @@ export default function ExamUsagePage() {
   const [teacherDialogOpen, setTeacherDialogOpen] = useState(false)
   const [examSelectOpen, setExamSelectOpen] = useState(false)
 
+  // 使用记录状态（支持撤回审批等操作）
+  const [usages, setUsages] = useState<ExamUsage[]>(mockUsages)
+  const [confirmWithdrawOpen, setConfirmWithdrawOpen] = useState(false)
+  const [withdrawingUsageId, setWithdrawingUsageId] = useState<string | null>(null)
+
   const selectedExam = exams.find(e => e.id === selectedExamId)
 
   const filteredUsages = useMemo(() => {
-    return mockUsages.filter((usage) => {
+    return usages.filter((usage) => {
       const matchSearch = 
         usage.examName.toLowerCase().includes(search.toLowerCase()) ||
         usage.sceneName.toLowerCase().includes(search.toLowerCase())
-      const matchScene = sceneFilter === "all" || usage.sceneType === sceneFilter
+      const matchScene = sceneFilter === "all" || (sceneFilter === 'scene' && usage.displayType === '场景') || (sceneFilter === 'course' && usage.displayType === '课程')
       const matchUsage = usageFilter === "all" || usage.usageType === usageFilter
       return matchSearch && matchScene && matchUsage
     })
-  }, [search, sceneFilter, usageFilter])
+  }, [search, sceneFilter, usageFilter, usages])
 
   // 统计数据
   const stats = useMemo(() => {
-    const courseCount = mockUsages.filter((u) => u.displayType === '课程').length
-    const sceneCount = mockUsages.filter((u) => u.displayType === '场景').length
-    const onlineExamCount = mockUsages.filter((u) => u.displayType === '教学考试').length
-    const pendingCount = mockUsages.filter((u) => u.status === 'pending').length
-    const activeCount = mockUsages.filter((u) => u.status === 'active').length
-    const endedCount = mockUsages.filter((u) => u.status === 'ended').length
+    const courseCount = usages.filter((u) => u.displayType === '课程').length
+    const sceneCount = usages.filter((u) => u.displayType === '场景').length
+    const onlineExamCount = usages.filter((u) => u.displayType === '教学考试').length
+    const pendingCount = usages.filter((u) => u.status === 'pending').length
+    const activeCount = usages.filter((u) => u.status === 'active').length
+    const endedCount = usages.filter((u) => u.status === 'ended').length
     return { courseCount, sceneCount, onlineExamCount, pendingCount, activeCount, endedCount }
-  }, [])
+  }, [usages])
 
   const handleToggleClass = (classId: string) => {
     setSelectedClassIds(prev => 
@@ -440,6 +446,22 @@ export default function ExamUsagePage() {
     setSharingUsage(usage)
     setCopied(false)
     setShareDialogOpen(true)
+  }
+
+  const openWithdrawDialog = (usageId: string) => {
+    setWithdrawingUsageId(usageId)
+    setConfirmWithdrawOpen(true)
+  }
+
+  const handleWithdrawApproval = () => {
+    if (!withdrawingUsageId) return
+    setUsages(prev => prev.map(u =>
+      u.id === withdrawingUsageId
+        ? { ...u, approvalStatus: 'draft' as const }
+        : u
+    ))
+    setConfirmWithdrawOpen(false)
+    setWithdrawingUsageId(null)
   }
 
   const handleCopyLink = () => {
@@ -670,9 +692,6 @@ export default function ExamUsagePage() {
                   <PrdAnnotation data={getAnnotation("eu-col-scene")}>使用场景</PrdAnnotation>
                 </TableHead>
                 <TableHead className="w-[100px]">
-                  <PrdAnnotation data={getAnnotation("eu-col-approval-status")}>状态</PrdAnnotation>
-                </TableHead>
-                <TableHead className="w-[100px]">
                   <PrdAnnotation data={getAnnotation("eu-col-target")}>面向对象</PrdAnnotation>
                 </TableHead>
                 <TableHead className="w-[160px]">
@@ -689,6 +708,9 @@ export default function ExamUsagePage() {
                 </TableHead>
                 <TableHead className="w-[90px]">
                   <PrdAnnotation data={getAnnotation("eu-col-pass")}>及格人数</PrdAnnotation>
+                </TableHead>
+                <TableHead className="w-[100px]">
+                  <PrdAnnotation data={getAnnotation("eu-col-approval-status")}>状态</PrdAnnotation>
                 </TableHead>
                 <TableHead className="w-[90px]">
                   <PrdAnnotation data={getAnnotation("eu-col-status")}>考试状态</PrdAnnotation>
@@ -714,20 +736,6 @@ export default function ExamUsagePage() {
                         {getDisplayTypeIcon(usage.displayType)}
                         <span className="text-sm">{getDisplayTypeLabel(usage.displayType)}</span>
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      {usage.displayType === '教学考试' && usage.approvalStatus ? (
-                        <Badge variant="outline" className={cn(
-                          usage.approvalStatus === 'draft' && 'bg-gray-100 text-gray-600 border-gray-200',
-                          usage.approvalStatus === 'pending' && 'bg-blue-50 text-blue-600 border-blue-200',
-                          usage.approvalStatus === 'toPublish' && 'bg-amber-50 text-amber-600 border-amber-200',
-                          usage.approvalStatus === 'published' && 'bg-green-50 text-green-600 border-green-200',
-                        )}>
-                          {APPROVAL_STATUS_LABELS[usage.approvalStatus]}
-                        </Badge>
-                      ) : (
-                        <span className="text-sm text-muted-foreground">-</span>
-                      )}
                     </TableCell>
                     <TableCell>
                       <span className="text-sm">
@@ -761,6 +769,20 @@ export default function ExamUsagePage() {
                     <TableCell>
                       <span className="text-sm">{usage.passCount !== undefined ? `${usage.passCount} 人` : '-'}</span>
                     </TableCell>
+                    <TableCell>
+                      {usage.displayType === '教学考试' && usage.approvalStatus ? (
+                        <Badge variant="outline" className={cn(
+                          usage.approvalStatus === 'draft' && 'bg-gray-100 text-gray-600 border-gray-200',
+                          usage.approvalStatus === 'pending' && 'bg-blue-50 text-blue-600 border-blue-200',
+                          usage.approvalStatus === 'toPublish' && 'bg-amber-50 text-amber-600 border-amber-200',
+                          usage.approvalStatus === 'published' && 'bg-green-50 text-green-600 border-green-200',
+                        )}>
+                          {APPROVAL_STATUS_LABELS[usage.approvalStatus]}
+                        </Badge>
+                      ) : (
+                        <span className="text-sm text-muted-foreground">-</span>
+                      )}
+                    </TableCell>
                     <TableCell>{getStatusBadge(usage.status)}</TableCell>
                     <TableCell className="sticky right-0 bg-white text-right">
                       <DropdownMenu>
@@ -783,6 +805,12 @@ export default function ExamUsagePage() {
                           <DropdownMenuSeparator />
                           {usage.displayType === '教学考试' && (
                             <>
+                              {usage.approvalStatus === 'pending' && (
+                                <DropdownMenuItem onClick={() => openWithdrawDialog(usage.id)}>
+                                  <Undo2 className="size-4" />
+                                  撤回审批
+                                </DropdownMenuItem>
+                              )}
                               <DropdownMenuItem onClick={() => alert('此处参考 1.0 版本页面功能即可')}>
                                 <Pencil className="size-4" />
                                 编辑
@@ -1139,6 +1167,15 @@ export default function ExamUsagePage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* 撤回审批确认弹窗 */}
+      <ConfirmDialog
+        open={confirmWithdrawOpen}
+        onOpenChange={setConfirmWithdrawOpen}
+        title="撤回审批"
+        description="撤回后考试将回到草稿状态，可以继续编辑。确定要撤回吗？"
+        onConfirm={handleWithdrawApproval}
+      />
     </div>
   )
 }

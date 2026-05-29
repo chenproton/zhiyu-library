@@ -677,6 +677,64 @@ export const sceneTaskResultsAnnotations: Record<string, AnnotationItem> = {
     title: "学生提交列表",
     content: "展示当前任务下符合条件的学生提交记录。每条记录包含：学生头像（首字母）、姓名、学号、评分状态（待评分/已评分）、测评方式、提交时间、班级、年级。操作按钮：查看、评分/已评分。",
   },
+  "grading-title": {
+    id: "grading-title",
+    title: "场景评分管理",
+    content:
+      "教师查看已发布场景下的学生提交，按任务和测评形式维度进行评分管理。页面采用左右分栏布局。",
+  },
+  "grading-sidebar-search": {
+    id: "grading-sidebar-search",
+    title: "场景搜索",
+    content: "按场景名称/编码搜索左侧场景列表。",
+  },
+  "grading-sidebar-position": {
+    id: "grading-sidebar-position",
+    title: "岗位分组",
+    content:
+      "左侧场景列表按岗位分组折叠展示。岗位名 + 场景数量，点击展开/折叠。",
+  },
+  "grading-sidebar-scenario": {
+    id: "grading-sidebar-scenario",
+    title: "场景卡片",
+    content:
+      "每个场景卡片展示：场景名称 + 编码 + 统计（任务数、待评分、已评分、学生数）。点击选中后右侧展示该场景的任务分组。",
+  },
+  "grading-task-header": {
+    id: "grading-task-header",
+    title: "任务评分区",
+    content:
+      "右侧展示选中场景的任务列表，每个任务为一个折叠面板。头部：任务名 + 任务类型（训练/考核）+ 测评形式 + 待评分/已评分数量。",
+  },
+  "grading-task-expand": {
+    id: "grading-task-expand",
+    title: "任务展开",
+    content:
+      "展开后按测评形式分 Tab 展示学生提交列表。学生提交列表表格：学生姓名、学号、班级、入学年份、提交状态、操作（进入评分）。",
+  },
+  "grading-action-view": {
+    id: "grading-action-view",
+    title: "查看",
+    content: "查看学生提交的测评详情。",
+  },
+  "grading-action-grade": {
+    id: "grading-action-grade",
+    title: "评分",
+    content:
+      "跳转不同类型的评分详情页。试卷/题库：展示学生客观题答案与正误对比，主观题需教师人工评分。现场问答：记录教师现场抽题和学生回答情况，按评价点打分。现场评审：查看学生提交的材料，按评审量规的多维度评价点打分。",
+  },
+  "grading-task-form-tabs": {
+    id: "grading-task-form-tabs",
+    title: "测评形式切换",
+    content:
+      "展开任务后，若该任务配置了多种测评形式（如现场问答+现场评审），则以 Tab 形式切换展示不同测评形式下的学生提交列表。当前选中的测评形式以主色高亮显示。",
+  },
+  "dialog-approve-confirm": {
+    id: "dialog-approve-confirm",
+    title: "通过确认弹窗",
+    content:
+      "审批意见输入框（非必填，默认文案「审批通过。」）。操作：取消 / 确认通过。通过后场景状态变为已通过(approved)。",
+  },
 }
 
 // ==================== 岗位能力认定规则配置 (job-ability/config) ====================

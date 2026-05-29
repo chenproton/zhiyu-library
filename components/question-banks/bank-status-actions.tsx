@@ -21,7 +21,8 @@ import {
   XCircle,
   Rocket,
   Eye,
-  UserPlus
+  UserPlus,
+  Copy,
 } from "lucide-react"
 import type { Status, StatusAction } from "@/lib/types"
 import { canPerformAction } from "@/lib/types"
@@ -33,6 +34,7 @@ interface BankStatusActionsProps {
   onStatusChange: (action: StatusAction) => void
   onView?: () => void
   onInvite?: () => void
+  onClone?: () => void
 }
 
 type ConfirmType = 'delete' | 'submit' | 'withdraw' | 'approve' | 'reject' | 'publish' | null
@@ -77,6 +79,7 @@ export function BankStatusActions({
   onStatusChange,
   onView,
   onInvite,
+  onClone,
 }: BankStatusActionsProps) {
   const [confirmType, setConfirmType] = useState<ConfirmType>(null)
 
@@ -129,6 +132,12 @@ export function BankStatusActions({
               <DropdownMenuItem onClick={onView}>
                 <Eye />
                 查看详情
+              </DropdownMenuItem>
+            )}
+            {onClone && (
+              <DropdownMenuItem onClick={onClone}>
+                <Copy />
+                克隆
               </DropdownMenuItem>
             )}
             {canEdit && onEdit && (

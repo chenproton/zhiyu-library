@@ -1,0 +1,2255 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自动抽题配置 - 交互式原型</title>
+    <style>
+        :root {
+            --bg: #f0f4f8;
+            --card-bg: #ffffff;
+            --primary: #4A6CF7;
+            --primary-light: #EEF1FE;
+            --primary-dark: #3B54D4;
+            --text: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border: #e2e8f0;
+            --border-light: #f1f5f9;
+            --success: #10b981;
+            --success-light: #dcfce7;
+            --warning: #f59e0b;
+            --warning-light: #fef3c7;
+            --danger: #ef4444;
+            --danger-light: #fef2f2;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.04);
+            --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.1), 0 4px 8px rgba(0, 0, 0, 0.05);
+            --radius-sm: 8px;
+            --radius: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-spring: 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 24px 16px 60px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 960px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .app-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 4px 0;
+        }
+        .app-header .icon-wrapper {
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius);
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            color: #fff;
+            flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(74, 108, 247, 0.3);
+        }
+        .app-header h1 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: -0.3px;
+        }
+        .app-header .subtitle {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+            margin-top: -2px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            padding: 22px 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            transition: all var(--transition);
+        }
+        .card:hover { box-shadow: var(--shadow-md); }
+        .card-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .card-header .step-badge {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+        .card-header .card-title {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--text);
+            letter-spacing: -0.2px;
+        }
+        .card-header .card-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 400;
+            margin-top: 1px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            letter-spacing: -0.1px;
+        }
+        .form-row {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+        .form-group {
+            flex: 1;
+            min-width: 140px;
+        }
+
+        select, input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 0.9rem;
+            font-family: inherit;
+            color: var(--text);
+            background: #fafbfc;
+            transition: all var(--transition);
+            outline: none;
+            appearance: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+        select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 36px;
+        }
+        select:focus, input[type="text"]:focus, input[type="number"]:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.08);
+            background: #fff;
+        }
+        input[type="number"] {
+            cursor: text;
+            appearance: textfield;
+            -moz-appearance: textfield;
+            text-align: center;
+            font-weight: 600;
+        }
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            opacity: 1;
+            height: 30px;
+        }
+        input:read-only {
+            background: #f1f5f9;
+            color: var(--text-muted);
+            cursor: not-allowed;
+        }
+
+        .mode-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        @media (max-width: 700px) {
+            .mode-cards { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 420px) {
+            .mode-cards { grid-template-columns: 1fr; }
+        }
+        .mode-card {
+            position: relative;
+            padding: 16px 14px;
+            border-radius: var(--radius);
+            border: 2px solid var(--border);
+            cursor: pointer;
+            transition: all var(--transition-spring);
+            text-align: center;
+            background: #fafbfc;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .mode-card:hover {
+            border-color: #c7d2fe;
+            background: #f8faff;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        .mode-card:active { transform: scale(0.97); }
+        .mode-card.active {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            box-shadow: 0 0 0 4px rgba(74, 108, 247, 0.06);
+            transform: translateY(-1px);
+        }
+        .mode-card .mode-icon {
+            font-size: 28px;
+            margin-bottom: 6px;
+            display: block;
+            transition: transform var(--transition-spring);
+        }
+        .mode-card.active .mode-icon { transform: scale(1.15); }
+        .mode-card .mode-label {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--text);
+            letter-spacing: -0.2px;
+        }
+        .mode-card .mode-hint {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+        .mode-card .check-mark {
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #fff;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all var(--transition-spring);
+        }
+        .mode-card.active .check-mark { opacity: 1; transform: scale(1); }
+
+        .config-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .config-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            background: #fafbfc;
+            border-radius: var(--radius-sm);
+            border: 1.5px solid transparent;
+            transition: all var(--transition);
+            flex-wrap: wrap;
+        }
+        .config-item:hover {
+            border-color: #e2e8f0;
+            background: #fff;
+        }
+        .config-item.has-value {
+            border-color: #d9e2f8;
+            background: #fdfdff;
+        }
+        .config-item .item-tag {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: #f1f5f9;
+            color: #64748b;
+            letter-spacing: -0.1px;
+        }
+        .config-item.has-value .item-tag {
+            background: #eef1fe;
+            color: #4A6CF7;
+        }
+        .config-item input[type="number"] {
+            width: 80px;
+            flex-shrink: 0;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 8px 6px;
+        }
+        .config-item .percent-display {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--primary);
+            min-width: 40px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .config-item .qty-display {
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            min-width: 30px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .config-item .item-bar {
+            flex: 1;
+            min-width: 50px;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .config-item .item-bar-fill {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 3px;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .mode-toggle {
+            display: inline-flex;
+            background: #f1f5f9;
+            border-radius: 24px;
+            padding: 3px;
+            gap: 2px;
+        }
+        .mode-toggle button {
+            padding: 7px 16px;
+            border-radius: 22px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            font-family: inherit;
+            background: transparent;
+            color: var(--text-secondary);
+            transition: all var(--transition);
+            white-space: nowrap;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .mode-toggle button.active {
+            background: #fff;
+            color: var(--primary);
+            box-shadow: var(--shadow-sm);
+            font-weight: 700;
+        }
+        .mode-toggle button:hover:not(.active) { color: var(--text); }
+
+        .rule-card {
+            background: #fafbfc;
+            border-radius: var(--radius);
+            padding: 16px;
+            border: 1.5px solid var(--border);
+            position: relative;
+            transition: all var(--transition);
+        }
+        .rule-card:hover {
+            border-color: #d0d7e8;
+            box-shadow: var(--shadow-sm);
+        }
+        .rule-card .rule-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .rule-card .rule-number {
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: var(--primary);
+            background: var(--primary-light);
+            padding: 3px 10px;
+            border-radius: 14px;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            border-radius: 24px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            font-family: inherit;
+            border: none;
+            transition: all var(--transition);
+            letter-spacing: -0.1px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(74, 108, 247, 0.3);
+        }
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            box-shadow: 0 4px 14px rgba(74, 108, 247, 0.4);
+            transform: translateY(-1px);
+        }
+        .btn-outline {
+            background: #fff;
+            color: var(--primary);
+            border: 1.5px solid var(--primary);
+        }
+        .btn-outline:hover { background: var(--primary-light); }
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1.5px solid transparent;
+        }
+        .btn-ghost:hover {
+            background: #f1f5f9;
+            color: var(--text);
+        }
+        .btn-danger-ghost {
+            background: transparent;
+            color: #ef4444;
+            border: none;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 6px 10px;
+            border-radius: 6px;
+            transition: all var(--transition);
+            font-family: inherit;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .btn-danger-ghost:hover {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+        .btn-sm {
+            padding: 5px 12px;
+            font-size: 0.75rem;
+            border-radius: 18px;
+        }
+
+        .tag-chip {
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1.5px solid #e2e8f0;
+            background: #fafbfc;
+            color: #64748b;
+            transition: all var(--transition);
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            letter-spacing: -0.1px;
+        }
+        .tag-chip:hover {
+            border-color: #c7d2fe;
+            color: #4A6CF7;
+            background: #f8faff;
+        }
+        .tag-chip.selected {
+            background: #eef1fe;
+            border-color: #4A6CF7;
+            color: #4A6CF7;
+            box-shadow: 0 0 0 2px rgba(74, 108, 247, 0.08);
+        }
+
+        .knowledge-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            min-height: 36px;
+            align-items: flex-start;
+        }
+        .knowledge-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 12px;
+            border-radius: 18px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            background: #eef1fe;
+            color: #4A6CF7;
+            cursor: default;
+            transition: all var(--transition);
+        }
+        .knowledge-tag .remove-tag {
+            cursor: pointer;
+            font-size: 14px;
+            line-height: 1;
+            opacity: 0.6;
+            transition: opacity var(--transition);
+            margin-left: 2px;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .knowledge-tag .remove-tag:hover {
+            opacity: 1;
+            color: #ef4444;
+        }
+
+        .search-input-wrapper {
+            position: relative;
+            flex: 1;
+            min-width: 160px;
+        }
+        .search-input-wrapper input {
+            width: 100%;
+            padding: 10px 14px 10px 36px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            font-family: inherit;
+            background: #fafbfc;
+            transition: all var(--transition);
+            outline: none;
+            cursor: text;
+        }
+        .search-input-wrapper input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.08);
+            background: #fff;
+        }
+        .search-input-wrapper .search-icon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 16px;
+            pointer-events: none;
+        }
+
+        .suggestions-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #fff;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-lg);
+            z-index: 20;
+            max-height: 180px;
+            overflow-y: auto;
+            margin-top: 4px;
+            display: none;
+        }
+        .suggestions-dropdown.show { display: block; }
+        .suggestion-item {
+            padding: 10px 14px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background var(--transition);
+            border-bottom: 1px solid #f8fafc;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .suggestion-item:last-child { border-bottom: none; }
+        .suggestion-item:hover {
+            background: #f8faff;
+            color: #4A6CF7;
+        }
+        .suggestion-item.used {
+            color: #94a3b8;
+            pointer-events: none;
+            text-decoration: line-through;
+            opacity: 0.5;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: -0.1px;
+        }
+        .alert-info {
+            background: #eff6ff;
+            color: #3b82f6;
+            border: 1px solid #dbeafe;
+        }
+        .alert-warning {
+            background: #fffbeb;
+            color: #d97706;
+            border: 1px solid #fef3c7;
+        }
+        .alert-danger {
+            background: #fef2f2;
+            color: #ef4444;
+            border: 1px solid #fecaca;
+        }
+        .alert-success {
+            background: #f0fdf4;
+            color: #10b981;
+            border: 1px solid #d1fae5;
+        }
+
+        .summary-bar {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: center;
+            padding: 14px 18px;
+            background: #f8faff;
+            border-radius: var(--radius);
+            border: 1.5px dashed #d9e2f8;
+        }
+        .summary-stat {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+        .summary-stat .stat-value {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 1rem;
+        }
+        .summary-stat .stat-icon { font-size: 1.1rem; }
+
+        .action-bar {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 24px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .divider {
+            border: none;
+            border-top: 1px solid var(--border-light);
+            margin: 8px 0;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-in {
+            animation: fadeInUp 0.35s ease-out;
+        }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
+
+        /* ====== 组合抽题增强样式 ====== */
+        .global-relation-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: #f8faff;
+            border-radius: var(--radius);
+            border: 1.5px solid #d9e2f8;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+        .global-relation-label {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--text);
+        }
+        .global-relation-desc {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .logic-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 5px 12px;
+            border-radius: 14px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: 1.5px solid transparent;
+            transition: all var(--transition);
+            user-select: none;
+        }
+        .logic-badge.and {
+            background: #dbeafe;
+            color: #2563eb;
+            border-color: #93c5fd;
+        }
+        .logic-badge.or {
+            background: #dcfce7;
+            color: #16a34a;
+            border-color: #86efac;
+        }
+        .logic-badge.inactive {
+            background: #f1f5f9;
+            color: #94a3b8;
+            border-color: #e2e8f0;
+        }
+
+        .condition-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+        .condition-connector {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            min-width: 70px;
+        }
+        .connector-select {
+            padding: 6px 10px;
+            border-radius: var(--radius-sm);
+            font-size: 0.78rem;
+            font-weight: 700;
+            border: 1.5px solid var(--border);
+            background: #fff;
+            color: var(--text);
+            cursor: pointer;
+            min-width: 60px;
+        }
+        .connector-select option[value="AND"] { color: #2563eb; }
+        .connector-select option[value="OR"] { color: #16a34a; }
+
+        .condition-field-label {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            min-width: 60px;
+        }
+        .condition-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: 1.5px solid var(--border);
+            background: #fff;
+            color: var(--text-muted);
+            transition: all var(--transition);
+            user-select: none;
+        }
+        .condition-toggle.active {
+            background: var(--primary-light);
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+        .condition-toggle:hover { border-color: #c7d2fe; }
+
+        .match-stat {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            background: #f0fdf4;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+        }
+        .match-stat.warning {
+            background: #fffbeb;
+            color: #b45309;
+            border-color: #fde68a;
+        }
+        .match-stat.danger {
+            background: #fef2f2;
+            color: #b91c1c;
+            border-color: #fecaca;
+        }
+
+        .preview-panel {
+            background: #f8faff;
+            border-radius: var(--radius);
+            border: 1.5px solid #d9e2f8;
+            padding: 16px;
+            margin-top: 14px;
+        }
+        .preview-panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .preview-panel-title {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .preview-toggle {
+            font-size: 0.78rem;
+            color: var(--primary);
+            font-weight: 600;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-family: inherit;
+        }
+        .preview-toggle:hover { text-decoration: underline; }
+
+        .preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+        }
+        .preview-table th {
+            text-align: left;
+            padding: 8px 10px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            border-bottom: 1.5px solid var(--border);
+            white-space: nowrap;
+        }
+        .preview-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid var(--border-light);
+            vertical-align: top;
+        }
+        .preview-table tr:hover td { background: #fff; }
+        .preview-table .col-id { width: 50px; color: var(--text-muted); }
+        .preview-table .col-type { width: 80px; }
+        .preview-table .col-diff { width: 60px; }
+        .preview-table .col-kn { min-width: 140px; }
+        .preview-table .col-source { width: 90px; }
+        .preview-table .col-source span {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            background: #eef1fe;
+            color: #4A6CF7;
+        }
+
+        .tag-inline {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            background: #f1f5f9;
+            color: #64748b;
+            margin-right: 4px;
+            margin-bottom: 2px;
+        }
+
+        .dedup-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            background: #fffbeb;
+            border-radius: var(--radius-sm);
+            border: 1px solid #fef3c7;
+            font-size: 0.8rem;
+            color: #b45309;
+            margin-top: 10px;
+        }
+
+        .section-title {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--text);
+            margin: 16px 0 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .rule-relation-hint {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            background: #f8fafc;
+            border-radius: var(--radius-sm);
+            border-left: 3px solid var(--primary);
+        }
+
+        .expression-display {
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 0.82rem;
+            color: var(--primary);
+            background: var(--primary-light);
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 12px;
+            font-weight: 600;
+            word-break: break-all;
+        }
+
+        .total-readonly-hint {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .disabled-condition {
+            opacity: 0.45;
+            pointer-events: none;
+            filter: grayscale(40%);
+        }
+        .disabled-condition .condition-toggle {
+            opacity: 1;
+            pointer-events: auto;
+            filter: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="app-header">
+            <div class="icon-wrapper">📋</div>
+            <div>
+                <h1>自动抽题配置</h1>
+                <div class="subtitle">灵活配置抽题规则，精准控制题目分布</div>
+            </div>
+        </div>
+
+        <!-- 步骤1：选择题库来源 -->
+        <div class="card animate-in" style="animation-delay: 0.05s;">
+            <div class="card-header">
+                <div class="step-badge">1</div>
+                <div>
+                    <div class="card-title">选择题库来源</div>
+                    <div class="card-desc">选择要抽取题目的题库，不选则从全部已发布题库中抽取</div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="form-row">
+                    <div class="form-group" style="flex:2; min-width:200px;">
+                        <label for="bankSelect">题库</label>
+                        <select id="bankSelect" multiple size="1" style="height:auto; min-height:42px;">
+                            <option value="all" selected>全部已发布题库（默认）</option>
+                            <option value="bank1">📘 初级编程题库</option>
+                            <option value="bank2">📙 中级编程题库</option>
+                            <option value="bank3">📕 高级编程题库</option>
+                            <option value="bank4">📗 算法专项题库</option>
+                            <option value="bank5">📓 面试真题题库</option>
+                        </select>
+                        <div style="font-size:0.7rem;color:#94a3b8;margin-top:4px;">💡 可多选，按住Ctrl/Cmd选择多个</div>
+                    </div>
+                    <div class="form-group" style="flex:1; min-width:100px;">
+                        <label>已选题库</label>
+                        <div id="selectedBanksTags" style="display:flex;flex-wrap:wrap;gap:4px;min-height:28px;align-items:center;">
+                            <span class="tag-chip selected" style="font-size:0.7rem;padding:4px 10px;">全部题库</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 步骤2：选择抽题方式 -->
+        <div class="card animate-in" style="animation-delay: 0.1s;">
+            <div class="card-header">
+                <div class="step-badge">2</div>
+                <div>
+                    <div class="card-title">选择抽题方式</div>
+                    <div class="card-desc">选择一种维度作为权重分配依据，决定题目数量和占比的配置方式</div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="mode-cards" id="modeCards">
+                    <div class="mode-card active" data-mode="type" onclick="switchMode('type')">
+                        <span class="check-mark">✓</span>
+                        <span class="mode-icon">📝</span>
+                        <div class="mode-label">按题型抽题</div>
+                        <div class="mode-hint">单选/多选/判断等</div>
+                    </div>
+                    <div class="mode-card" data-mode="difficulty" onclick="switchMode('difficulty')">
+                        <span class="check-mark">✓</span>
+                        <span class="mode-icon">📊</span>
+                        <div class="mode-label">按难度抽题</div>
+                        <div class="mode-hint">简单/中等/困难</div>
+                    </div>
+                    <div class="mode-card" data-mode="knowledge" onclick="switchMode('knowledge')">
+                        <span class="check-mark">✓</span>
+                        <span class="mode-icon">🧠</span>
+                        <div class="mode-label">按知识点抽题</div>
+                        <div class="mode-hint">自由选择知识点</div>
+                    </div>
+                    <div class="mode-card" data-mode="combined" onclick="switchMode('combined')">
+                        <span class="check-mark">✓</span>
+                        <span class="mode-icon">🔀</span>
+                        <div class="mode-label">组合抽题</div>
+                        <div class="mode-hint">多维度组合规则</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 步骤3：详细配置 -->
+        <div class="card animate-in" style="animation-delay: 0.15s;" id="configCard">
+            <div class="card-header">
+                <div class="step-badge">3</div>
+                <div>
+                    <div class="card-title" id="configTitle">按题型配置</div>
+                    <div class="card-desc" id="configDesc">选择题型并设置每种题型的抽取数量或占比</div>
+                </div>
+                <div style="margin-left:auto;">
+                    <div class="mode-toggle" id="modeToggle">
+                        <button class="active" data-submode="quantity" onclick="switchSubMode('quantity')">按数量配置</button>
+                        <button data-submode="percent" onclick="switchSubMode('percent')">按占比配置</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body" id="configBody"></div>
+            <div id="configSummary" style="margin-top:12px;"></div>
+        </div>
+
+        <!-- 步骤4：总抽取数量 -->
+        <div class="card animate-in" id="totalCountCard" style="animation-delay: 0.2s;">
+            <div class="card-header">
+                <div class="step-badge">4</div>
+                <div>
+                    <div class="card-title">总抽取数量</div>
+                    <div class="card-desc" id="totalCountDesc">设定本次需要抽取的题目总数</div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="form-row" style="align-items:center;">
+                    <div class="form-group" style="flex:0 0 auto; min-width:120px;">
+                        <label for="totalCount">抽取数量</label>
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <input type="number" id="totalCount" value="5" min="1" max="200" style="width:90px;font-size:1.1rem;font-weight:700;text-align:center;" onchange="updateAllCalculations()" oninput="updateAllCalculations()">
+                            <span style="font-weight:600;color:#64748b;white-space:nowrap;">道题目</span>
+                        </div>
+                        <div class="total-readonly-hint" id="totalCountHint" style="display:none;">💡 组合模式下总数量由规则自动汇总</div>
+                    </div>
+                    <div id="totalStatus" style="flex:1;min-width:150px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 操作按钮 -->
+        <div class="action-bar animate-in" style="animation-delay: 0.25s;">
+            <button class="btn btn-ghost" onclick="resetAll()">🔄 重置配置</button>
+            <button class="btn btn-outline" onclick="previewConfig()">👁️ 预览配置</button>
+            <button class="btn btn-primary" onclick="confirmConfig()">✅ 确认并生成抽题方案</button>
+        </div>
+    </div>
+
+    <div id="toast" style="position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:999;pointer-events:none;display:flex;flex-direction:column;gap:8px;align-items:center;"></div>
+
+    <script>
+        // ==================== 模拟题库数据 ====================
+        const QUESTION_TYPES = ['单选题', '多选题', '判断题', '填空题', '简答题', '问答题'];
+        const DIFFICULTIES = ['简单', '中等', '困难'];
+        const KNOWLEDGE_POOL = [
+            '变量与数据类型', '控制流语句', '函数与作用域', '数组与对象',
+            'DOM操作', '事件处理', '异步编程', 'ES6新特性',
+            '面向对象编程', '错误处理', '模块化开发', '性能优化',
+            '数据结构基础', '算法设计', '正则表达式', '网络请求',
+            '状态管理', '组件化开发', '测试与调试', '安全基础',
+        ];
+        const BANK_NAMES = {
+            bank1: '初级编程题库', bank2: '中级编程题库', bank3: '高级编程题库',
+            bank4: '算法专项题库', bank5: '面试真题题库',
+        };
+
+        function generateMockBank() {
+            const bank = [];
+            let id = 1001;
+            const typeWeights = { '单选题': 35, '多选题': 20, '判断题': 15, '填空题': 10, '简答题': 12, '问答题': 8 };
+            const diffWeights = { '简单': 40, '中等': 40, '困难': 20 };
+            const bankWeights = { bank1: 25, bank2: 25, bank3: 20, bank4: 15, bank5: 15 };
+            function weightedPick(weights) {
+                const entries = Object.entries(weights);
+                const total = entries.reduce((s, [, w]) => s + w, 0);
+                let r = Math.random() * total;
+                for (const [k, w] of entries) {
+                    r -= w;
+                    if (r <= 0) return k;
+                }
+                return entries[entries.length - 1][0];
+            }
+            for (let i = 0; i < 150; i++) {
+                const type = weightedPick(typeWeights);
+                const diff = weightedPick(diffWeights);
+                const bankKey = weightedPick(bankWeights);
+                const knCount = 2 + Math.floor(Math.random() * 3);
+                const shuffled = [...KNOWLEDGE_POOL].sort(() => Math.random() - 0.5);
+                const knowledge = shuffled.slice(0, knCount);
+                bank.push({ id: id++, type, difficulty: diff, knowledge, bank: bankKey, title: `${type}第${i+1}题（${diff}）` });
+            }
+            return bank;
+        }
+        const mockBank = generateMockBank();
+
+        // ==================== 全局状态 ====================
+        const state = {
+            currentMode: 'type',
+            subMode: 'quantity',
+            totalCount: 5,
+
+            typeConfig: {
+                '单选题': { enabled: true, quantity: 2, percent: 40 },
+                '多选题': { enabled: true, quantity: 1, percent: 20 },
+                '判断题': { enabled: true, quantity: 1, percent: 20 },
+                '填空题': { enabled: false, quantity: 0, percent: 0 },
+                '简答题': { enabled: false, quantity: 0, percent: 0 },
+                '问答题': { enabled: true, quantity: 1, percent: 20 },
+            },
+            difficultyConfig: {
+                '简单': { enabled: true, quantity: 2, percent: 40 },
+                '中等': { enabled: true, quantity: 2, percent: 40 },
+                '困难': { enabled: true, quantity: 1, percent: 20 },
+            },
+            knowledgeConfig: {},
+            selectedKnowledge: [],
+
+            // === 组合抽题重构数据结构 ===
+            combinedRuleRelation: 'OR', // 'AND' | 'OR'  规则之间的关系
+            combinedRules: [
+                {
+                    id: 1,
+                    connector: 'AND',
+                    subRules: [
+                        { id: 1, category: 'type', value: '单选题', quantity: 2, percent: 40 },
+                        { id: 2, category: 'difficulty', value: '简单', quantity: 1, percent: 20 },
+                    ]
+                },
+                {
+                    id: 2,
+                    connector: 'OR',
+                    subRules: [
+                        { id: 1, category: 'type', value: '多选题', quantity: 1, percent: 20 },
+                        { id: 2, category: 'difficulty', value: '中等', quantity: 1, percent: 20 },
+                    ]
+                },
+            ],
+            combinedRuleIdCounter: 3,
+            subRuleIdCounter: 3,
+            combinedPreviewExpanded: false,
+        };
+
+        // ==================== 核心逻辑：筛选与抽题 ====================
+        function getSelectedBanks() {
+            const select = document.getElementById('bankSelect');
+            const selected = Array.from(select.selectedOptions).map(o => o.value);
+            if (selected.includes('all') || selected.length === 0) return Object.keys(BANK_NAMES);
+            return selected;
+        }
+
+        // 评估单条规则（规则内所有子规则共享一个 connector）
+        function evaluateRule(rule, question) {
+            const activeSubRules = rule.subRules.filter(sr => sr.value);
+            if (activeSubRules.length === 0) return true;
+            const results = activeSubRules.map(sr => evaluateSubRule(sr, question));
+            if (rule.connector === 'AND') return results.every(r => r);
+            return results.some(r => r);
+        }
+
+        function evaluateSubRule(subRule, question) {
+            if (!subRule.value) return true;
+            switch (subRule.category) {
+                case 'type': return question.type === subRule.value;
+                case 'difficulty': return question.difficulty === subRule.value;
+                case 'knowledge':
+                    const kws = subRule.value.trim().split(/[\s,，]+/).filter(Boolean);
+                    return kws.some(kw => question.knowledge.some(k => k.includes(kw)));
+                default: return true;
+            }
+        }
+
+        // 根据单条规则筛选题库
+        function filterByRule(rule) {
+            const selectedBanks = getSelectedBanks();
+            return mockBank.filter(q => {
+                if (!selectedBanks.includes(q.bank)) return false;
+                return evaluateRule(rule, q);
+            });
+        }
+
+        // 生成规则的可读表达式
+        function buildRuleExpression(rule) {
+            const active = rule.subRules.filter(sr => sr.value);
+            if (active.length === 0) return '（无筛选条件）';
+            const labelMap = { type: '题型', difficulty: '难度', knowledge: '知识点' };
+            const parts = active.map(sr => `${labelMap[sr.category] || sr.category}=${sr.value}`);
+            return parts.join(` ${rule.connector} `);
+        }
+
+        // 执行组合抽题
+        function executeCombinedDraw() {
+            const ruleResults = [];
+            const selectedBanks = getSelectedBanks();
+
+            // 各规则独立筛选与抽取
+            state.combinedRules.forEach((rule, idx) => {
+                const matched = filterByRule(rule);
+                const requested = getRuleQuantity(rule);
+                const shuffled = [...matched].sort(() => Math.random() - 0.5);
+                const picked = shuffled.slice(0, Math.min(requested, matched.length));
+
+                ruleResults.push({
+                    ruleId: rule.id,
+                    ruleIndex: idx + 1,
+                    matchedCount: matched.length,
+                    requested,
+                    pickedCount: picked.length,
+                    questions: picked,
+                    expression: buildRuleExpression(rule),
+                });
+            });
+
+            // 规则间关系处理
+            let deduped = [];
+            let intersectionEmpty = false;
+
+            if (state.combinedRuleRelation === 'OR') {
+                // OR 模式：并集去重
+                const seen = new Set();
+                ruleResults.forEach(rr => {
+                    rr.questions.forEach(q => {
+                        if (!seen.has(q.id)) {
+                            seen.add(q.id);
+                            deduped.push(q);
+                        }
+                    });
+                });
+            } else {
+                // AND 模式：取交集（只保留被所有规则同时匹配到的题目）
+                const allPickedSets = ruleResults.map(rr => new Set(rr.questions.map(q => q.id)));
+                if (allPickedSets.length === 0) {
+                    deduped = [];
+                } else {
+                    const intersection = new Set(allPickedSets[0]);
+                    for (let i = 1; i < allPickedSets.length; i++) {
+                        for (const id of intersection) {
+                            if (!allPickedSets[i].has(id)) intersection.delete(id);
+                        }
+                    }
+                    deduped = mockBank.filter(q => intersection.has(q.id));
+                    if (deduped.length === 0 && ruleResults.some(rr => rr.pickedCount > 0)) {
+                        intersectionEmpty = true;
+                    }
+                }
+            }
+
+            // 溢出检测
+            const overflowWarnings = [];
+            ruleResults.forEach(rr => {
+                if (rr.requested > rr.matchedCount) {
+                    overflowWarnings.push({
+                        ruleIndex: rr.ruleIndex,
+                        requested: rr.requested,
+                        available: rr.matchedCount,
+                        desc: `规则${rr.ruleIndex} [${rr.expression}] 需要${rr.requested}题，但仅匹配到${rr.matchedCount}题`
+                    });
+                }
+            });
+
+            return {
+                ruleResults,
+                deduped,
+                relation: state.combinedRuleRelation,
+                totalRequested: ruleResults.reduce((s, r) => s + r.requested, 0),
+                totalMatched: ruleResults.reduce((s, r) => s + r.matchedCount, 0),
+                finalCount: deduped.length,
+                overflowWarnings,
+                intersectionEmpty,
+            };
+        }
+
+        // ==================== 初始化 ====================
+        function init() {
+            updateBankTags();
+            renderConfigPanel();
+            updateAllCalculations();
+            document.getElementById('totalCount').value = state.totalCount;
+        }
+
+        // ==================== 题库相关 ====================
+        function updateBankTags() {
+            const select = document.getElementById('bankSelect');
+            const tagsContainer = document.getElementById('selectedBanksTags');
+            const selectedOptions = Array.from(select.selectedOptions);
+            if (selectedOptions.length === 0 || (selectedOptions.length === 1 && selectedOptions[0].value === 'all')) {
+                tagsContainer.innerHTML = '<span class="tag-chip selected" style="font-size:0.7rem;padding:4px 10px;">全部题库</span>';
+            } else {
+                tagsContainer.innerHTML = selectedOptions.map(opt =>
+                    `<span class="tag-chip selected" style="font-size:0.7rem;padding:4px 10px;">${opt.textContent.trim()}</span>`
+                ).join('');
+            }
+            if (state.currentMode === 'combined') renderCombinedPreview();
+        }
+        document.getElementById('bankSelect').addEventListener('change', updateBankTags);
+
+        // ==================== 模式切换 ====================
+        function switchMode(mode) {
+            state.currentMode = mode;
+            document.querySelectorAll('.mode-card').forEach(card => {
+                card.classList.toggle('active', card.dataset.mode === mode);
+            });
+            updateConfigPanelMeta();
+            renderConfigPanel();
+            updateAllCalculations();
+        }
+
+        function updateConfigPanelMeta() {
+            const titles = {
+                'type': '按题型配置', 'difficulty': '按难度配置',
+                'knowledge': '按知识点配置', 'combined': '组合抽题配置',
+            };
+            const descs = {
+                'type': '选择需要抽取的题型，并设置每种题型的数量或占比',
+                'difficulty': '选择难度等级，并设置每种难度的题目数量或占比',
+                'knowledge': '搜索并添加知识点，为每个知识点设置抽取数量或占比',
+                'combined': '添加多条抽题规则，每条规则内各条件可独立设置AND/OR关系，规则之间也可设置AND/OR关系',
+            };
+            document.getElementById('configTitle').textContent = titles[state.currentMode];
+            document.getElementById('configDesc').textContent = descs[state.currentMode];
+
+            const totalCard = document.getElementById('totalCountCard');
+            if (totalCard) {
+                totalCard.style.display = state.currentMode === 'combined' ? 'none' : 'block';
+            }
+        }
+
+        function switchSubMode(subMode) {
+            state.subMode = subMode;
+            document.querySelectorAll('#modeToggle button').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.submode === subMode);
+            });
+            renderConfigPanel();
+            updateAllCalculations();
+        }
+
+        // ==================== 渲染配置面板 ====================
+        function renderConfigPanel() {
+            const body = document.getElementById('configBody');
+            const mode = state.currentMode;
+            const subMode = state.subMode;
+            body.classList.remove('animate-in');
+            void body.offsetWidth;
+            body.classList.add('animate-in');
+
+            switch (mode) {
+                case 'type': body.innerHTML = renderTypeConfig(subMode); bindTypeEvents(); break;
+                case 'difficulty': body.innerHTML = renderDifficultyConfig(subMode); bindDifficultyEvents(); break;
+                case 'knowledge': body.innerHTML = renderKnowledgeConfig(subMode); bindKnowledgeEvents(); break;
+                case 'combined': body.innerHTML = renderCombinedConfig(subMode); bindCombinedEvents(); break;
+            }
+            updateSummary();
+        }
+
+        // ---- 按题型 ----
+        function renderTypeConfig(subMode) {
+            const types = ['单选题', '多选题', '判断题', '填空题', '简答题', '问答题'];
+            const config = state.typeConfig;
+            const isPercent = subMode === 'percent';
+            const totalQty = state.totalCount;
+            let html = '<div class="config-list">';
+            types.forEach(type => {
+                const cfg = config[type];
+                const hasVal = cfg.enabled && (isPercent ? cfg.percent > 0 : cfg.quantity > 0);
+                const displayVal = isPercent ? cfg.percent : cfg.quantity;
+                const barWidth = isPercent ? cfg.percent : (totalQty > 0 ? (cfg.quantity / totalQty * 100) : 0);
+                html += `
+                <div class="config-item ${hasVal ? 'has-value' : ''}" data-type="${type}">
+                    <span class="item-tag" style="cursor:pointer;" onclick="toggleTypeEnabled('${type}')">${cfg.enabled ? '✅' : '⬜'} ${type}</span>
+                    <input type="number" value="${displayVal}" min="0" max="${isPercent ? 100 : 200}" data-type="${type}" class="type-input"
+                        style="${!cfg.enabled ? 'opacity:0.4;pointer-events:none;' : ''}"
+                        onchange="updateTypeValue('${type}', this.value)" oninput="updateTypeValue('${type}', this.value)">
+                    <span style="font-weight:600;font-size:0.8rem;color:#94a3b8;">${isPercent ? '%' : '道'}</span>
+                    ${isPercent ? `<span class="qty-display">≈ ${Math.round(totalQty * cfg.percent / 100)} 道</span>` : `<span class="percent-display">${Math.round(barWidth)}%</span>`}
+                    <div class="item-bar"><div class="item-bar-fill" style="width:${Math.min(barWidth, 100)}%;"></div></div>
+                </div>`;
+            });
+            html += '</div>';
+            return html;
+        }
+        function bindTypeEvents() {}
+        function toggleTypeEnabled(type) {
+            state.typeConfig[type].enabled = !state.typeConfig[type].enabled;
+            if (!state.typeConfig[type].enabled) { state.typeConfig[type].quantity = 0; state.typeConfig[type].percent = 0; }
+            else { state.subMode === 'quantity' ? (state.typeConfig[type].quantity = 1) : (state.typeConfig[type].percent = Math.floor(100 / getEnabledTypeCount())); }
+            renderConfigPanel(); updateAllCalculations();
+        }
+        function getEnabledTypeCount() { return Object.values(state.typeConfig).filter(c => c.enabled).length || 1; }
+        function updateTypeValue(type, val) {
+            const numVal = parseInt(val) || 0;
+            if (state.subMode === 'quantity') { state.typeConfig[type].quantity = Math.max(0, numVal); state.typeConfig[type].enabled = numVal > 0; }
+            else { state.typeConfig[type].percent = Math.max(0, Math.min(100, numVal)); state.typeConfig[type].enabled = numVal > 0; }
+            updateAllCalculations(); refreshTypeDisplay();
+        }
+        function refreshTypeDisplay() {
+            const body = document.getElementById('configBody');
+            const subMode = state.subMode; const totalQty = state.totalCount;
+            ['单选题','多选题','判断题','填空题','简答题','问答题'].forEach(type => {
+                const cfg = state.typeConfig[type];
+                const displayVal = subMode === 'percent' ? cfg.percent : cfg.quantity;
+                const input = body.querySelector(`input[data-type="${type}"]`);
+                if (input) { input.value = displayVal; input.style.opacity = cfg.enabled ? '1' : '0.4'; input.style.pointerEvents = cfg.enabled ? 'auto' : 'none'; }
+                const item = body.querySelector(`.config-item[data-type="${type}"]`);
+                if (item) {
+                    item.classList.toggle('has-value', cfg.enabled && displayVal > 0);
+                    const tagEl = item.querySelector('.item-tag'); if (tagEl) tagEl.textContent = `${cfg.enabled ? '✅' : '⬜'} ${type}`;
+                    const barFill = item.querySelector('.item-bar-fill');
+                    if (barFill) { const barWidth = subMode === 'percent' ? cfg.percent : (totalQty > 0 ? (cfg.quantity / totalQty * 100) : 0); barFill.style.width = Math.min(barWidth, 100) + '%'; }
+                }
+            });
+            updateSummary();
+        }
+
+        // ---- 按难度 ----
+        function renderDifficultyConfig(subMode) {
+            const levels = ['简单', '中等', '困难'];
+            const config = state.difficultyConfig;
+            const isPercent = subMode === 'percent';
+            const totalQty = state.totalCount;
+            const colors = { '简单': '#10b981', '中等': '#f59e0b', '困难': '#ef4444' };
+            let html = '<div class="config-list">';
+            levels.forEach(level => {
+                const cfg = config[level];
+                const hasVal = cfg.enabled && (isPercent ? cfg.percent > 0 : cfg.quantity > 0);
+                const displayVal = isPercent ? cfg.percent : cfg.quantity;
+                const barWidth = isPercent ? cfg.percent : (totalQty > 0 ? (cfg.quantity / totalQty * 100) : 0);
+                html += `
+                <div class="config-item ${hasVal ? 'has-value' : ''}" data-level="${level}">
+                    <span class="item-tag" style="cursor:pointer;border-color:${colors[level]};color:${colors[level]};background:${colors[level]}15;" onclick="toggleDifficultyEnabled('${level}')">${cfg.enabled ? '✅' : '⬜'} ${level}</span>
+                    <input type="number" value="${displayVal}" min="0" max="${isPercent ? 100 : 200}" data-level="${level}" class="diff-input"
+                        style="${!cfg.enabled ? 'opacity:0.4;pointer-events:none;' : ''}"
+                        onchange="updateDifficultyValue('${level}', this.value)" oninput="updateDifficultyValue('${level}', this.value)">
+                    <span style="font-weight:600;font-size:0.8rem;color:#94a3b8;">${isPercent ? '%' : '道'}</span>
+                    ${isPercent ? `<span class="qty-display">≈ ${Math.round(totalQty * cfg.percent / 100)} 道</span>` : `<span class="percent-display">${Math.round(barWidth)}%</span>`}
+                    <div class="item-bar"><div class="item-bar-fill" style="width:${Math.min(barWidth, 100)}%;background:${colors[level]};"></div></div>
+                </div>`;
+            });
+            html += '</div>';
+            return html;
+        }
+        function bindDifficultyEvents() {}
+        function toggleDifficultyEnabled(level) {
+            state.difficultyConfig[level].enabled = !state.difficultyConfig[level].enabled;
+            if (!state.difficultyConfig[level].enabled) { state.difficultyConfig[level].quantity = 0; state.difficultyConfig[level].percent = 0; }
+            else { state.subMode === 'quantity' ? (state.difficultyConfig[level].quantity = 1) : (state.difficultyConfig[level].percent = Math.floor(100 / (Object.values(state.difficultyConfig).filter(c => c.enabled).length || 1))); }
+            renderConfigPanel(); updateAllCalculations();
+        }
+        function updateDifficultyValue(level, val) {
+            const numVal = parseInt(val) || 0;
+            if (state.subMode === 'quantity') { state.difficultyConfig[level].quantity = Math.max(0, numVal); state.difficultyConfig[level].enabled = numVal > 0; }
+            else { state.difficultyConfig[level].percent = Math.max(0, Math.min(100, numVal)); state.difficultyConfig[level].enabled = numVal > 0; }
+            updateAllCalculations(); refreshDifficultyDisplay();
+        }
+        function refreshDifficultyDisplay() {
+            const body = document.getElementById('configBody');
+            const subMode = state.subMode; const totalQty = state.totalCount;
+            ['简单','中等','困难'].forEach(level => {
+                const cfg = state.difficultyConfig[level];
+                const displayVal = subMode === 'percent' ? cfg.percent : cfg.quantity;
+                const input = body.querySelector(`input[data-level="${level}"]`);
+                if (input) { input.value = displayVal; input.style.opacity = cfg.enabled ? '1' : '0.4'; input.style.pointerEvents = cfg.enabled ? 'auto' : 'none'; }
+                const item = body.querySelector(`.config-item[data-level="${level}"]`);
+                if (item) {
+                    item.classList.toggle('has-value', cfg.enabled && displayVal > 0);
+                    const tagEl = item.querySelector('.item-tag'); if (tagEl) tagEl.textContent = `${cfg.enabled ? '✅' : '⬜'} ${level}`;
+                    const barFill = item.querySelector('.item-bar-fill');
+                    if (barFill) { const barWidth = subMode === 'percent' ? cfg.percent : (totalQty > 0 ? (cfg.quantity / totalQty * 100) : 0); barFill.style.width = Math.min(barWidth, 100) + '%'; }
+                }
+            });
+            updateSummary();
+        }
+
+        // ---- 按知识点 ----
+        function renderKnowledgeConfig(subMode) {
+            const isPercent = subMode === 'percent';
+            const totalQty = state.totalCount;
+            const selected = state.selectedKnowledge;
+            const config = state.knowledgeConfig;
+            let html = `
+            <div class="form-row" style="margin-bottom:12px;position:relative;">
+                <div class="search-input-wrapper">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="knowledgeSearch" placeholder="搜索知识点..." oninput="handleKnowledgeSearch(this.value)" onfocus="handleKnowledgeSearch(this.value)" autocomplete="off">
+                    <div class="suggestions-dropdown" id="knowledgeSuggestions"></div>
+                </div>
+                <button class="btn btn-outline btn-sm" onclick="addKnowledgeFromSearch()">+ 添加</button>
+            </div>`;
+            if (selected.length === 0) {
+                html += '<div class="empty-state">📭 尚未添加知识点，请在上方搜索并添加<br><span style="font-size:0.75rem;">不添加则从全部知识点中抽取</span></div>';
+            } else {
+                html += '<div class="config-list">';
+                selected.forEach(kname => {
+                    const cfg = config[kname] || { quantity: 0, percent: 0 };
+                    const hasVal = (isPercent ? cfg.percent > 0 : cfg.quantity > 0);
+                    const displayVal = isPercent ? cfg.percent : cfg.quantity;
+                    const barWidth = isPercent ? cfg.percent : (totalQty > 0 ? (cfg.quantity / totalQty * 100) : 0);
+                    html += `
+                    <div class="config-item ${hasVal ? 'has-value' : ''}" data-kname="${kname}">
+                        <span class="knowledge-tag" style="cursor:default;flex-shrink:0;">${kname}<span class="remove-tag" onclick="removeKnowledge('${kname}')" title="移除">×</span></span>
+                        <input type="number" value="${displayVal}" min="0" max="${isPercent ? 100 : 200}" data-kname="${kname}" class="kn-input"
+                            onchange="updateKnowledgeValue('${kname}', this.value)" oninput="updateKnowledgeValue('${kname}', this.value)">
+                        <span style="font-weight:600;font-size:0.8rem;color:#94a3b8;">${isPercent ? '%' : '道'}</span>
+                        ${isPercent ? `<span class="qty-display">≈ ${Math.round(totalQty * cfg.percent / 100)} 道</span>` : `<span class="percent-display">${Math.round(barWidth)}%</span>`}
+                        <div class="item-bar"><div class="item-bar-fill" style="width:${Math.min(barWidth, 100)}%;"></div></div>
+                    </div>`;
+                });
+                html += '</div>';
+            }
+            return html;
+        }
+        function bindKnowledgeEvents() {}
+        function handleKnowledgeSearch(query) {
+            const dropdown = document.getElementById('knowledgeSuggestions');
+            if (!dropdown) return;
+            if (!query || query.trim().length === 0) { dropdown.classList.remove('show'); dropdown.innerHTML = ''; return; }
+            const q = query.trim().toLowerCase();
+            const filtered = KNOWLEDGE_POOL.filter(k => k.toLowerCase().includes(q) && !state.selectedKnowledge.includes(k));
+            if (filtered.length === 0) dropdown.innerHTML = '<div class="suggestion-item" style="color:#94a3b8;cursor:default;">未找到匹配的知识点</div>';
+            else dropdown.innerHTML = filtered.map(k => `<div class="suggestion-item" onclick="addKnowledge('${k}')">📌 ${k}</div>`).join('');
+            dropdown.classList.add('show');
+        }
+        function addKnowledge(kname) {
+            if (!state.selectedKnowledge.includes(kname)) {
+                state.selectedKnowledge.push(kname);
+                if (!state.knowledgeConfig[kname]) state.knowledgeConfig[kname] = { quantity: 1, percent: Math.floor(100 / Math.max(1, state.selectedKnowledge.length)) };
+                autoDistributeKnowledge();
+                renderConfigPanel(); updateAllCalculations();
+            }
+            const dropdown = document.getElementById('knowledgeSuggestions');
+            if (dropdown) dropdown.classList.remove('show');
+            const searchInput = document.getElementById('knowledgeSearch');
+            if (searchInput) searchInput.value = '';
+        }
+        function addKnowledgeFromSearch() {
+            const searchInput = document.getElementById('knowledgeSearch');
+            if (!searchInput || !searchInput.value.trim()) { showToast('请先输入知识点名称', 'warning'); return; }
+            const query = searchInput.value.trim();
+            const matched = KNOWLEDGE_POOL.find(k => k.toLowerCase() === query.toLowerCase() && !state.selectedKnowledge.includes(k));
+            if (matched) { addKnowledge(matched); }
+            else if (!state.selectedKnowledge.includes(query)) {
+                state.selectedKnowledge.push(query);
+                state.knowledgeConfig[query] = { quantity: 1, percent: Math.floor(100 / Math.max(1, state.selectedKnowledge.length)) };
+                autoDistributeKnowledge();
+                renderConfigPanel(); updateAllCalculations();
+                searchInput.value = '';
+                const dropdown = document.getElementById('knowledgeSuggestions');
+                if (dropdown) dropdown.classList.remove('show');
+            } else { showToast('该知识点已添加', 'warning'); }
+        }
+        function removeKnowledge(kname) {
+            state.selectedKnowledge = state.selectedKnowledge.filter(k => k !== kname);
+            delete state.knowledgeConfig[kname];
+            autoDistributeKnowledge();
+            renderConfigPanel(); updateAllCalculations();
+        }
+        function updateKnowledgeValue(kname, val) {
+            const numVal = parseInt(val) || 0;
+            if (state.subMode === 'quantity') state.knowledgeConfig[kname].quantity = Math.max(0, numVal);
+            else state.knowledgeConfig[kname].percent = Math.max(0, Math.min(100, numVal));
+            updateAllCalculations(); refreshKnowledgeDisplay();
+        }
+        function autoDistributeKnowledge() {
+            const count = state.selectedKnowledge.length;
+            if (count === 0) return;
+            const perItem = Math.floor(100 / count);
+            const remainder = 100 - perItem * count;
+            state.selectedKnowledge.forEach((kname, i) => {
+                if (!state.knowledgeConfig[kname]) state.knowledgeConfig[kname] = { quantity: 1, percent: 0 };
+                state.knowledgeConfig[kname].percent = perItem + (i === 0 ? remainder : 0);
+                state.knowledgeConfig[kname].quantity = Math.max(1, Math.round(state.totalCount * state.knowledgeConfig[kname].percent / 100));
+            });
+        }
+        function refreshKnowledgeDisplay() {
+            const body = document.getElementById('configBody');
+            const subMode = state.subMode; const totalQty = state.totalCount;
+            state.selectedKnowledge.forEach(kname => {
+                const cfg = state.knowledgeConfig[kname] || { quantity: 0, percent: 0 };
+                const displayVal = subMode === 'percent' ? cfg.percent : cfg.quantity;
+                const input = body.querySelector(`input[data-kname="${kname}"]`);
+                if (input) input.value = displayVal;
+                const item = body.querySelector(`.config-item[data-kname="${kname}"]`);
+                if (item) {
+                    item.classList.toggle('has-value', displayVal > 0);
+                    const barFill = item.querySelector('.item-bar-fill');
+                    if (barFill) { const barWidth = subMode === 'percent' ? cfg.percent : (totalQty > 0 ? (cfg.quantity / totalQty * 100) : 0); barFill.style.width = Math.min(barWidth, 100) + '%'; }
+                }
+            });
+            updateSummary();
+        }
+
+        // ---- 组合抽题（新版：动态子规则 + 规则内单一 AND/OR） ----
+        function renderCombinedConfig(subMode) {
+            const rules = state.combinedRules;
+            const isPercent = subMode === 'percent';
+
+            let html = '';
+
+            // 规则间关系设置
+            html += `
+            <div class="global-relation-bar">
+                <span class="global-relation-label">规则间关系：</span>
+                <span class="logic-badge ${state.combinedRuleRelation === 'OR' ? 'or' : 'inactive'}"
+                      onclick="setGlobalRelation('OR')" title="各规则结果取并集（去重）">🔀 OR（并集）</span>
+                <span class="logic-badge ${state.combinedRuleRelation === 'AND' ? 'and' : 'inactive'}"
+                      onclick="setGlobalRelation('AND')" title="各规则结果取交集（仅保留同时满足所有规则的题目）">🔗 AND（交集）</span>
+                <span class="global-relation-desc">
+                    ${state.combinedRuleRelation === 'OR'
+                        ? '当前：各规则独立抽题，最终试卷为所有规则结果的合并（自动去重）'
+                        : '当前：仅保留被所有规则同时匹配到的题目（交集）'}
+                </span>
+            </div>`;
+
+            html += '<div style="display:flex;flex-direction:column;gap:10px;" id="combinedRulesList">';
+            rules.forEach((rule, index) => {
+                const expression = buildRuleExpression(rule);
+                const ruleQty = getRuleQuantity(rule);
+                html += `
+                <div class="rule-card" data-rule-id="${rule.id}">
+                    <div class="rule-header">
+                        <span class="rule-number">规则 ${index + 1}</span>
+                        <div style="display:flex;gap:6px;align-items:center;">
+                            ${rules.length > 1 ? `<button class="btn-danger-ghost" onclick="removeCombinedRule(${rule.id})">🗑 删除规则</button>` : ''}
+                        </div>
+                    </div>
+
+                    <!-- 规则内关系 -->
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;padding:8px 12px;background:#f8fafc;border-radius:var(--radius-sm);">
+                        <span style="font-size:0.78rem;font-weight:600;color:var(--text-secondary);">子规则关系：</span>
+                        <select class="connector-select" onchange="setRuleConnector(${rule.id}, this.value)" style="min-width:70px;">
+                            <option value="AND" ${rule.connector === 'AND' ? 'selected' : ''}>AND</option>
+                            <option value="OR" ${rule.connector === 'OR' ? 'selected' : ''}>OR</option>
+                        </select>
+                        <span style="font-size:0.72rem;color:var(--text-muted);">
+                            ${rule.connector === 'AND' ? '所有子规则条件必须同时满足' : '满足任一子规则条件即可'}
+                        </span>
+                    </div>
+
+                    <!-- 子规则列表 -->
+                    <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px;" id="subRulesList-${rule.id}">`;
+                
+                rule.subRules.forEach((subRule, srIndex) => {
+                    html += renderSubRuleRow(rule.id, subRule, srIndex, isPercent);
+                });
+                
+                html += `</div>
+
+                    <button class="btn btn-outline btn-sm" onclick="addSubRule(${rule.id})" style="margin-bottom:10px;">➕ 添加子规则</button>
+
+                    <!-- 数量配置（规则级别汇总，只读显示） -->
+                    <div style="display:flex;align-items:center;gap:10px;padding-top:10px;border-top:1px solid var(--border-light);">
+                        <span style="font-size:0.82rem;font-weight:600;color:var(--text-secondary);">规则${isPercent ? '占比' : '数量'}：</span>
+                        <span style="font-weight:700;font-size:1rem;color:var(--primary);">${ruleQty}</span>
+                        <span style="font-weight:600;font-size:0.78rem;color:#94a3b8;">${isPercent ? '%' : '道'}</span>
+                        <span style="font-size:0.72rem;color:var(--text-muted);margin-left:auto;">由子规则${isPercent ? '占比' : '数量'}自动汇总</span>
+                    </div>
+
+                    <!-- 实时匹配统计 -->
+                    <div id="ruleMatchStat-${rule.id}" style="margin-top:8px;"></div>
+                </div>`;
+            });
+            html += '</div>';
+            html += `<button class="btn btn-outline btn-sm" style="margin-top:10px;" onclick="addCombinedRule()">➕ 添加规则</button>`;
+
+            // 实时预览面板
+            html += `<div id="combinedPreviewContainer"></div>`;
+            return html;
+        }
+
+        function renderSubRuleRow(ruleId, subRule, index, isPercent) {
+            const categoryOptions = [
+                { value: 'type', label: '题型' },
+                { value: 'difficulty', label: '难度' },
+                { value: 'knowledge', label: '知识点' }
+            ];
+            const typeOptions = ['单选题', '多选题', '判断题', '填空题', '简答题', '问答题'];
+            const diffOptions = ['简单', '中等', '困难'];
+            
+            const isType = subRule.category === 'type';
+            const isDiff = subRule.category === 'difficulty';
+            
+            let valueSelectHtml = '';
+            if (isType) {
+                valueSelectHtml = `<select style="flex:1;min-width:100px;font-size:0.82rem;padding:8px 30px 8px 10px;" onchange="updateSubRuleValue(${ruleId}, ${subRule.id}, this.value)">
+                    <option value="">请选择题型</option>
+                    ${typeOptions.map(opt => `<option value="${opt}" ${subRule.value === opt ? 'selected' : ''}>${opt}</option>`).join('')}
+                </select>`;
+            } else if (isDiff) {
+                valueSelectHtml = `<select style="flex:1;min-width:100px;font-size:0.82rem;padding:8px 30px 8px 10px;" onchange="updateSubRuleValue(${ruleId}, ${subRule.id}, this.value)">
+                    <option value="">请选择难度</option>
+                    ${diffOptions.map(opt => `<option value="${opt}" ${subRule.value === opt ? 'selected' : ''}>${opt}</option>`).join('')}
+                </select>`;
+            } else {
+                valueSelectHtml = `<input type="text" placeholder="输入知识点关键词（支持多关键词用空格/逗号分隔）" value="${subRule.value || ''}"
+                    onchange="updateSubRuleValue(${ruleId}, ${subRule.id}, this.value)"
+                    style="flex:1;min-width:140px;font-size:0.82rem;padding:8px 10px;">`;
+            }
+            
+            return `
+            <div class="condition-row" data-subrule-id="${subRule.id}" style="background:#fff;padding:8px 10px;border-radius:var(--radius-sm);border:1px solid var(--border);">
+                <span style="font-size:0.75rem;font-weight:700;color:var(--text-muted);min-width:24px;">${index + 1}.</span>
+                <select style="width:90px;min-width:90px;font-size:0.82rem;padding:8px 30px 8px 10px;" onchange="updateSubRuleCategory(${ruleId}, ${subRule.id}, this.value)">
+                    ${categoryOptions.map(opt => `<option value="${opt.value}" ${subRule.category === opt.value ? 'selected' : ''}>${opt.label}</option>`).join('')}
+                </select>
+                ${valueSelectHtml}
+                <input type="number" value="${isPercent ? subRule.percent : subRule.quantity}" min="0" max="${isPercent ? 100 : 200}" step="1"
+                    onchange="updateSubRuleQty(${ruleId}, ${subRule.id}, this.value)"
+                    oninput="updateSubRuleQty(${ruleId}, ${subRule.id}, this.value)"
+                    style="width:70px;text-align:center;font-weight:600;padding:8px 6px;flex-shrink:0;">
+                <span style="font-weight:600;font-size:0.78rem;color:#94a3b8;flex-shrink:0;">${isPercent ? '%' : '道'}</span>
+                ${index > 0 ? `<button class="btn-danger-ghost" style="padding:4px 8px;font-size:0.75rem;" onclick="removeSubRule(${ruleId}, ${subRule.id})" title="删除子规则">✕</button>` : ''}
+            </div>`;
+        }
+
+        function bindCombinedEvents() {
+            refreshCombinedDisplay();
+        }
+
+        function setGlobalRelation(relation) {
+            state.combinedRuleRelation = relation;
+            renderConfigPanel();
+            updateAllCalculations();
+            showToast(`规则间关系已切换为 ${relation}`, 'info');
+        }
+
+        function setRuleConnector(ruleId, connector) {
+            const rule = state.combinedRules.find(r => r.id === ruleId);
+            if (rule) rule.connector = connector;
+            updateAllCalculations();
+            refreshCombinedDisplay();
+        }
+
+        function addSubRule(ruleId) {
+            const rule = state.combinedRules.find(r => r.id === ruleId);
+            if (!rule) return;
+            const newId = state.subRuleIdCounter++;
+            rule.subRules.push({ id: newId, category: 'type', value: '', quantity: 1, percent: 10 });
+            renderConfigPanel();
+            updateAllCalculations();
+            showToast('已添加子规则', 'success');
+        }
+
+        function removeSubRule(ruleId, subRuleId) {
+            const rule = state.combinedRules.find(r => r.id === ruleId);
+            if (!rule) return;
+            if (rule.subRules.length <= 1) { showToast('至少保留一条子规则', 'warning'); return; }
+            rule.subRules = rule.subRules.filter(sr => sr.id !== subRuleId);
+            renderConfigPanel();
+            updateAllCalculations();
+            showToast('子规则已删除', 'info');
+        }
+
+        function updateSubRuleCategory(ruleId, subRuleId, category) {
+            const rule = state.combinedRules.find(r => r.id === ruleId);
+            const subRule = rule.subRules.find(sr => sr.id === subRuleId);
+            if (subRule) {
+                subRule.category = category;
+                subRule.value = '';
+            }
+            renderConfigPanel();
+            updateAllCalculations();
+        }
+
+        function updateSubRuleValue(ruleId, subRuleId, value) {
+            const rule = state.combinedRules.find(r => r.id === ruleId);
+            const subRule = rule.subRules.find(sr => sr.id === subRuleId);
+            if (subRule) subRule.value = value;
+            updateAllCalculations();
+            refreshCombinedDisplay();
+        }
+
+        function updateSubRuleQty(ruleId, subRuleId, val) {
+            const rule = state.combinedRules.find(r => r.id === ruleId);
+            const subRule = rule.subRules.find(sr => sr.id === subRuleId);
+            const num = Math.max(0, parseInt(val) || 0);
+            if (subRule) {
+                if (state.subMode === 'quantity') subRule.quantity = num;
+                else subRule.percent = Math.min(100, num);
+            }
+            updateAllCalculations();
+            refreshCombinedDisplay();
+        }
+
+        function getRuleQuantity(rule) {
+            if (state.subMode === 'quantity') {
+                return rule.subRules.reduce((s, sr) => s + (sr.quantity || 0), 0);
+            }
+            return rule.subRules.reduce((s, sr) => s + (sr.percent || 0), 0);
+        }
+
+        function addCombinedRule() {
+            const newId = state.combinedRuleIdCounter++;
+            state.combinedRules.push({
+                id: newId,
+                connector: 'AND',
+                subRules: [
+                    { id: state.subRuleIdCounter++, category: 'type', value: '', quantity: 1, percent: 50 },
+                ]
+            });
+            renderConfigPanel();
+            updateAllCalculations();
+            showToast('已添加新规则', 'success');
+        }
+
+        function removeCombinedRule(ruleId) {
+            if (state.combinedRules.length <= 1) { showToast('至少保留一条规则', 'warning'); return; }
+            state.combinedRules = state.combinedRules.filter(r => r.id !== ruleId);
+            renderConfigPanel();
+            updateAllCalculations();
+            showToast('规则已删除', 'info');
+        }
+
+        function refreshCombinedDisplay() {
+            const body = document.getElementById('configBody');
+            const isPercent = state.subMode === 'percent';
+            // 更新每条规则的表达式和匹配统计
+            state.combinedRules.forEach(rule => {
+                // 更新规则数量显示
+                const card = body.querySelector(`.rule-card[data-rule-id="${rule.id}"]`);
+                if (card) {
+                    const qtySpan = card.querySelector('span[style*="color:var(--primary)"]');
+                    if (qtySpan) qtySpan.textContent = getRuleQuantity(rule);
+                }
+
+                // 更新匹配统计
+                const matched = filterByRule(rule);
+                const statEl = document.getElementById(`ruleMatchStat-${rule.id}`);
+                if (statEl) {
+                    const requested = getRuleQuantity(rule);
+                    const available = matched.length;
+                    const isOverflow = requested > available;
+                    statEl.innerHTML = `
+                        <span class="match-stat ${isOverflow ? 'danger' : (available < requested * 1.5 ? 'warning' : '')}">
+                            📊 匹配到 <strong>${available}</strong> 题 / 需抽取 <strong>${requested}</strong> ${isPercent ? '%' : '题'}
+                            ${isOverflow ? `<span style="margin-left:4px;">⚠️ 题库不足！</span>` : ''}
+                        </span>
+                    `;
+                }
+            });
+            renderCombinedPreview();
+            updateSummary();
+        }
+
+        // 渲染组合抽题实时预览
+        function renderCombinedPreview() {
+            const container = document.getElementById('combinedPreviewContainer');
+            if (!container) return;
+
+            const result = executeCombinedDraw();
+
+            let html = `<div class="preview-panel">
+                <div class="preview-panel-header">
+                    <div class="preview-panel-title">🔮 实时抽题预览（规则间关系：${result.relation}）</div>
+                    <button class="preview-toggle" onclick="toggleCombinedPreview()">
+                        ${state.combinedPreviewExpanded ? '收起详情 ▲' : '展开详情 ▼'}
+                    </button>
+                </div>
+
+            `;
+
+            if (result.overflowWarnings.length > 0) {
+                html += `<div class="alert alert-danger" style="margin-bottom:10px;">
+                    <div style="display:flex;flex-direction:column;gap:4px;">
+                        ${result.overflowWarnings.map(w => `<div>⚠️ ${w.desc}</div>`).join('')}
+                    </div>
+                </div>`;
+            }
+
+            if (result.intersectionEmpty) {
+                html += `<div class="alert alert-danger" style="margin-bottom:10px;">
+                    ❌ 规则间关系为 AND（交集），但各规则结果没有重叠题目，最终试卷为空！请放宽条件或切换为 OR 模式。
+                </div>`;
+            }
+
+            if (result.relation === 'OR' && result.totalRequested > result.finalCount) {
+                const dedupCount = result.totalRequested - result.finalCount;
+                if (dedupCount > 0) {
+                    html += `<div class="dedup-info">
+                        🔄 多条规则存在重叠匹配，已自动去重 ${dedupCount} 道，最终试卷共 ${result.finalCount} 道
+                    </div>`;
+                }
+            }
+
+            if (state.combinedPreviewExpanded) {
+                html += `<div style="margin-top:10px;">
+                    <div class="section-title">📋 各规则抽取详情</div>
+                    <table class="preview-table">
+                        <thead><tr>
+                            <th class="col-source">来源规则</th>
+                            <th class="col-id">题号</th>
+                            <th class="col-type">题型</th>
+                            <th class="col-diff">难度</th>
+                            <th class="col-kn">知识点</th>
+                        </tr></thead>
+                        <tbody>`;
+
+                result.ruleResults.forEach(rr => {
+                    if (rr.questions.length === 0) {
+                        html += `<tr><td colspan="5" style="color:#94a3b8;text-align:center;padding:12px;">规则${rr.ruleIndex} [${rr.expression}] 未匹配到题目</td></tr>`;
+                    } else {
+                        rr.questions.forEach(q => {
+                            const isRemovedByAnd = result.relation === 'AND' && !result.deduped.some(d => d.id === q.id);
+                            html += `<tr style="${isRemovedByAnd ? 'opacity:0.4;background:#f8fafc;text-decoration:line-through;' : ''}">
+                                <td class="col-source"><span>规则${rr.ruleIndex}</span></td>
+                                <td class="col-id">#${q.id}</td>
+                                <td class="col-type">${q.type}</td>
+                                <td class="col-diff">${q.difficulty}</td>
+                                <td class="col-kn">${q.knowledge.map(k => `<span class="tag-inline">${k}</span>`).join('')}</td>
+                            </tr>`;
+                        });
+                    }
+                });
+                html += `</tbody></table>`;
+
+                // 最终去重后/交集后列表
+                const title = result.relation === 'OR' ? '✅ 最终去重后试卷' : '✅ 最终交集试卷';
+                html += `<div class="section-title">${title}（共 ${result.finalCount} 道）</div>`;
+                if (result.deduped.length === 0) {
+                    html += `<div class="empty-state">暂无题目</div>`;
+                } else {
+                    html += `<table class="preview-table">
+                        <thead><tr>
+                            <th class="col-id">题号</th>
+                            <th class="col-type">题型</th>
+                            <th class="col-diff">难度</th>
+                            <th class="col-kn">知识点</th>
+                            <th class="col-source">来源规则</th>
+                        </tr></thead>
+                        <tbody>`;
+                    result.deduped.forEach(q => {
+                        const sourceRule = result.ruleResults.find(r => r.questions.some(rq => rq.id === q.id));
+                        html += `<tr>
+                            <td class="col-id">#${q.id}</td>
+                            <td class="col-type">${q.type}</td>
+                            <td class="col-diff">${q.difficulty}</td>
+                            <td class="col-kn">${q.knowledge.map(k => `<span class="tag-inline">${k}</span>`).join('')}</td>
+                            <td class="col-source"><span>规则${sourceRule ? sourceRule.ruleIndex : '-'}</span></td>
+                        </tr>`;
+                    });
+                    html += `</tbody></table>`;
+                }
+                html += `</div>`;
+            }
+
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        function toggleCombinedPreview() {
+            state.combinedPreviewExpanded = !state.combinedPreviewExpanded;
+            renderCombinedPreview();
+        }
+
+        // ==================== 计算与验证 ====================
+        function updateAllCalculations() {
+            const totalInput = document.getElementById('totalCount');
+            if (state.currentMode === 'combined') {
+                const sum = state.combinedRules.reduce((s, r) => s + getRuleQuantity(r), 0);
+                state.totalCount = sum;
+                totalInput.value = sum;
+            } else {
+                state.totalCount = parseInt(totalInput.value) || 0;
+                if (state.totalCount < 1) state.totalCount = 1;
+            }
+
+            const subMode = state.subMode;
+            const mode = state.currentMode;
+
+            if (mode === 'type') syncConfigBidirectional(state.typeConfig, subMode);
+            else if (mode === 'difficulty') syncConfigBidirectional(state.difficultyConfig, subMode);
+            else if (mode === 'knowledge') syncConfigBidirectional(state.knowledgeConfig, subMode);
+
+            updateSummary();
+            refreshCurrentDisplay();
+        }
+
+        function syncConfigBidirectional(configObj, subMode) {
+            const totalQty = state.totalCount;
+            Object.keys(configObj).forEach(key => {
+                const cfg = configObj[key];
+                if (subMode === 'quantity') cfg.percent = totalQty > 0 ? Math.round(cfg.quantity / totalQty * 100) : 0;
+                else cfg.quantity = Math.round(totalQty * cfg.percent / 100);
+            });
+        }
+
+        function refreshCurrentDisplay() {
+            const mode = state.currentMode;
+            if (mode === 'type') refreshTypeDisplay();
+            else if (mode === 'difficulty') refreshDifficultyDisplay();
+            else if (mode === 'knowledge') refreshKnowledgeDisplay();
+            else if (mode === 'combined') refreshCombinedDisplay();
+        }
+
+        function updateSummary() {
+            const summaryEl = document.getElementById('configSummary');
+            const mode = state.currentMode;
+            const subMode = state.subMode;
+            const totalQty = state.totalCount;
+
+            if (mode === 'combined') {
+                summaryEl.innerHTML = '';
+                const totalStatusEl = document.getElementById('totalStatus');
+                if (totalStatusEl) totalStatusEl.innerHTML = '';
+                return;
+            }
+
+            let totalConfigured = 0, totalPercent = 0, items = [];
+            if (mode === 'type') {
+                items = Object.entries(state.typeConfig).filter(([, cfg]) => cfg.enabled);
+                totalConfigured = items.reduce((sum, [, cfg]) => sum + (subMode === 'quantity' ? cfg.quantity : Math.round(totalQty * cfg.percent / 100)), 0);
+                totalPercent = items.reduce((sum, [, cfg]) => sum + cfg.percent, 0);
+            } else if (mode === 'difficulty') {
+                items = Object.entries(state.difficultyConfig).filter(([, cfg]) => cfg.enabled);
+                totalConfigured = items.reduce((sum, [, cfg]) => sum + (subMode === 'quantity' ? cfg.quantity : Math.round(totalQty * cfg.percent / 100)), 0);
+                totalPercent = items.reduce((sum, [, cfg]) => sum + cfg.percent, 0);
+            } else if (mode === 'knowledge') {
+                items = state.selectedKnowledge.map(k => [k, state.knowledgeConfig[k] || { quantity: 0, percent: 0 }]);
+                totalConfigured = items.reduce((sum, [, cfg]) => sum + (subMode === 'quantity' ? cfg.quantity : Math.round(totalQty * cfg.percent / 100)), 0);
+                totalPercent = items.reduce((sum, [, cfg]) => sum + (cfg.percent || 0), 0);
+            }
+
+            const diff = totalQty - totalConfigured;
+            const percentDiff = 100 - totalPercent;
+
+            let summaryHTML = '<div class="summary-bar">';
+            summaryHTML += `<div class="summary-stat"><span class="stat-icon">📦</span> 总抽取：<span class="stat-value">${totalQty} 道</span></div>`;
+            summaryHTML += `<div class="summary-stat"><span class="stat-icon">📋</span> 已配置：<span class="stat-value">${totalConfigured} 道</span></div>`;
+
+            if (subMode === 'percent') {
+                summaryHTML += `<div class="summary-stat"><span class="stat-icon">📊</span> 占比合计：<span class="stat-value" style="color:${percentDiff === 0 ? '#10b981' : '#ef4444'}">${totalPercent}%</span></div>`;
+                if (percentDiff !== 0) summaryHTML += `<span style="color:#ef4444;font-weight:600;font-size:0.78rem;">⚠ 占比${percentDiff > 0 ? '尚缺' : '超出'}${Math.abs(percentDiff)}%（需恰好100%）</span>`;
+                else summaryHTML += `<span style="color:#10b981;font-weight:600;font-size:0.78rem;">✅ 占比完美</span>`;
+            } else {
+                if (diff > 0) summaryHTML += `<span style="color:#f59e0b;font-weight:600;font-size:0.78rem;">⚠ 尚缺 ${diff} 道题目待分配</span>`;
+                else if (diff < 0) summaryHTML += `<span style="color:#ef4444;font-weight:600;font-size:0.78rem;">⚠ 超出 ${Math.abs(diff)} 道（需恰好等于总抽取数量）</span>`;
+                else summaryHTML += `<span style="color:#10b981;font-weight:600;font-size:0.78rem;">✅ 数量匹配完美</span>`;
+            }
+            summaryHTML += '</div>';
+            summaryEl.innerHTML = summaryHTML;
+
+            const totalStatusEl = document.getElementById('totalStatus');
+            if (totalStatusEl) {
+                if (subMode === 'percent') {
+                    totalStatusEl.innerHTML = `<span style="font-size:0.8rem;color:${percentDiff === 0 ? '#10b981' : '#ef4444'};font-weight:600;">${percentDiff === 0 ? '✅ 占比配置正确' : '⚠ 占比需调整至100%'}</span>`;
+                } else {
+                    totalStatusEl.innerHTML = `<span style="font-size:0.8rem;color:${diff === 0 ? '#10b981' : '#ef4444'};font-weight:600;">${diff === 0 ? '✅ 数量配置正确' : `⚠ ${diff > 0 ? '还需分配' + diff + '道' : '超出' + Math.abs(diff) + '道'}`}</span>`;
+                }
+            }
+        }
+
+        // ==================== 全局操作 ====================
+        function resetAll() {
+            if (confirm('确定要重置所有配置吗？此操作不可撤销。')) {
+                state.currentMode = 'type';
+                state.subMode = 'quantity';
+                state.totalCount = 5;
+                state.typeConfig = { '单选题': { enabled: true, quantity: 2, percent: 40 }, '多选题': { enabled: true, quantity: 1, percent: 20 }, '判断题': { enabled: true, quantity: 1, percent: 20 }, '填空题': { enabled: false, quantity: 0, percent: 0 }, '简答题': { enabled: false, quantity: 0, percent: 0 }, '问答题': { enabled: true, quantity: 1, percent: 20 } };
+                state.difficultyConfig = { '简单': { enabled: true, quantity: 2, percent: 40 }, '中等': { enabled: true, quantity: 2, percent: 40 }, '困难': { enabled: true, quantity: 1, percent: 20 } };
+                state.knowledgeConfig = {};
+                state.selectedKnowledge = [];
+                state.combinedRuleRelation = 'OR';
+                state.combinedRules = [
+                    { id: 1, connector: 'AND', subRules: [{ id: 1, category: 'type', value: '单选题', quantity: 2, percent: 40 }, { id: 2, category: 'difficulty', value: '简单', quantity: 1, percent: 20 }] },
+                    { id: 2, connector: 'OR', subRules: [{ id: 1, category: 'type', value: '多选题', quantity: 1, percent: 20 }, { id: 2, category: 'difficulty', value: '中等', quantity: 1, percent: 20 }] },
+                ];
+                state.combinedRuleIdCounter = 3;
+                state.subRuleIdCounter = 3;
+                state.combinedPreviewExpanded = false;
+                document.getElementById('totalCount').value = 5;
+                document.getElementById('bankSelect').value = 'all';
+                updateBankTags();
+                document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('active'));
+                document.querySelector('.mode-card[data-mode="type"]').classList.add('active');
+                document.querySelectorAll('#modeToggle button').forEach(b => b.classList.remove('active'));
+                document.querySelector('#modeToggle button[data-submode="quantity"]').classList.add('active');
+                updateConfigPanelMeta();
+                renderConfigPanel();
+                updateAllCalculations();
+                showToast('配置已重置', 'info');
+            }
+        }
+
+        function previewConfig() {
+            const mode = state.currentMode;
+            const subMode = state.subMode;
+            const totalQty = state.totalCount;
+            let previewText = `📋 抽题方案预览\n\n`;
+            previewText += `📦 题库来源：${document.getElementById('bankSelect').value === 'all' ? '全部题库' : '已选特定题库'}\n`;
+            previewText += `🎯 抽题方式：${document.getElementById('configTitle').textContent}\n`;
+            previewText += `📐 配置模式：${subMode === 'quantity' ? '按数量' : '按占比'}\n`;
+            previewText += `📊 总抽取数量：${totalQty} 道\n\n`;
+            previewText += `--- 详细分配 ---\n`;
+
+            if (mode === 'type') {
+                Object.entries(state.typeConfig).filter(([, c]) => c.enabled).forEach(([type, cfg]) => {
+                    const qty = subMode === 'quantity' ? cfg.quantity : Math.round(totalQty * cfg.percent / 100);
+                    previewText += `  • ${type}：${qty} 道 (${cfg.percent}%)\n`;
+                });
+            } else if (mode === 'difficulty') {
+                Object.entries(state.difficultyConfig).filter(([, c]) => c.enabled).forEach(([level, cfg]) => {
+                    const qty = subMode === 'quantity' ? cfg.quantity : Math.round(totalQty * cfg.percent / 100);
+                    previewText += `  • ${level}：${qty} 道 (${cfg.percent}%)\n`;
+                });
+            } else if (mode === 'knowledge') {
+                state.selectedKnowledge.forEach(kname => {
+                    const cfg = state.knowledgeConfig[kname] || { quantity: 0, percent: 0 };
+                    const qty = subMode === 'quantity' ? cfg.quantity : Math.round(totalQty * cfg.percent / 100);
+                    previewText += `  • ${kname}：${qty} 道 (${cfg.percent}%)\n`;
+                });
+            } else if (mode === 'combined') {
+                const result = executeCombinedDraw();
+                previewText += `【组合抽题结果】\n`;
+                previewText += `  规则间关系：${result.relation}\n`;
+                previewText += `  规则请求总数：${result.totalRequested} 道\n`;
+                previewText += `  题库可匹配：${result.totalMatched} 道\n`;
+                previewText += `  最终结果：${result.finalCount} 道\n\n`;
+                result.ruleResults.forEach(rr => {
+                    previewText += `  规则${rr.ruleIndex} [${rr.expression}]：请求${rr.requested}${state.subMode === 'percent' ? '%' : '道'}，匹配${rr.matchedCount}道，实际抽取${rr.pickedCount}道\n`;
+                });
+                if (result.overflowWarnings.length > 0) {
+                    previewText += `\n⚠️ 警告：\n`;
+                    result.overflowWarnings.forEach(w => { previewText += `  ${w.desc}\n`; });
+                }
+                if (result.intersectionEmpty) {
+                    previewText += `\n❌ AND 模式下交集为空，最终试卷无题目！\n`;
+                }
+            }
+            alert(previewText);
+        }
+
+        function confirmConfig() {
+            const subMode = state.subMode;
+            const totalQty = state.totalCount;
+            const mode = state.currentMode;
+
+            if (mode === 'combined') {
+                const result = executeCombinedDraw();
+                if (result.overflowWarnings.length > 0) {
+                    showToast(`存在 ${result.overflowWarnings.length} 条规则题库不足，请调整`, 'danger');
+                    return;
+                }
+                if (result.intersectionEmpty) {
+                    showToast('AND 模式下各规则结果无交集，最终试卷为空，请调整条件', 'danger');
+                    return;
+                }
+                showToast(`✅ 组合抽题方案已确认！共抽取 ${result.finalCount} 道（规则间${result.relation}）。`, 'success');
+                console.log('组合抽题方案确认:', {
+                    relation: state.combinedRuleRelation,
+                    subMode: state.subMode,
+                    rules: state.combinedRules,
+                    finalCount: result.finalCount,
+                    result: result.deduped.map(q => q.id),
+                });
+                return;
+            }
+
+            let totalConfigured = 0, totalPercent = 0;
+            if (mode === 'type') {
+                const items = Object.entries(state.typeConfig).filter(([, c]) => c.enabled);
+                totalConfigured = items.reduce((s, [, c]) => s + (subMode === 'quantity' ? c.quantity : Math.round(totalQty * c.percent / 100)), 0);
+                totalPercent = items.reduce((s, [, c]) => s + c.percent, 0);
+            } else if (mode === 'difficulty') {
+                const items = Object.entries(state.difficultyConfig).filter(([, c]) => c.enabled);
+                totalConfigured = items.reduce((s, [, c]) => s + (subMode === 'quantity' ? c.quantity : Math.round(totalQty * c.percent / 100)), 0);
+                totalPercent = items.reduce((s, [, c]) => s + c.percent, 0);
+            } else if (mode === 'knowledge') {
+                const items = state.selectedKnowledge.map(k => [k, state.knowledgeConfig[k] || { quantity: 0, percent: 0 }]);
+                totalConfigured = items.reduce((s, [, c]) => s + (subMode === 'quantity' ? c.quantity : Math.round(totalQty * (c.percent || 0) / 100)), 0);
+                totalPercent = items.reduce((s, [, c]) => s + (c.percent || 0), 0);
+            }
+
+            if (subMode === 'percent' && totalPercent !== 100) { showToast(`占比合计为 ${totalPercent}%，需要恰好为 100% 才能确认`, 'danger'); return; }
+            if (subMode === 'quantity' && totalConfigured !== totalQty) { showToast(`已配置 ${totalConfigured} 道，需要恰好 ${totalQty} 道才能确认`, 'danger'); return; }
+
+            showToast('✅ 抽题方案已确认！配置成功。', 'success');
+            console.log('抽题方案确认:', { mode: state.currentMode, subMode: state.subMode, totalCount: state.totalCount, config: getCurrentConfigSnapshot() });
+        }
+
+        function getCurrentConfigSnapshot() {
+            const mode = state.currentMode;
+            if (mode === 'type') return state.typeConfig;
+            if (mode === 'difficulty') return state.difficultyConfig;
+            if (mode === 'knowledge') return state.knowledgeConfig;
+            if (mode === 'combined') return { relation: state.combinedRuleRelation, subMode: state.subMode, rules: state.combinedRules };
+            return {};
+        }
+
+        // ==================== Toast 提示 ====================
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast');
+            const toast = document.createElement('div');
+            const colors = {
+                'info': { bg: '#eff6ff', border: '#dbeafe', text: '#3b82f6', icon: 'ℹ️' },
+                'success': { bg: '#f0fdf4', border: '#d1fae5', text: '#10b981', icon: '✅' },
+                'warning': { bg: '#fffbeb', border: '#fef3c7', text: '#d97706', icon: '⚠️' },
+                'danger': { bg: '#fef2f2', border: '#fecaca', text: '#ef4444', icon: '❌' },
+            };
+            const c = colors[type] || colors['info'];
+            toast.style.cssText = `padding:12px 20px;border-radius:24px;font-weight:600;font-size:0.85rem;background:${c.bg};color:${c.text};border:1.5px solid ${c.border};box-shadow:0 8px 24px rgba(0,0,0,0.12);animation: fadeInUp 0.3s ease-out;pointer-events:auto;cursor:default;display:flex;align-items:center;gap:8px;white-space:nowrap;`;
+            toast.textContent = `${c.icon} ${message}`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0'; toast.style.transform = 'translateY(-8px)'; toast.style.transition = 'all 0.3s ease-in';
+                setTimeout(() => toast.remove(), 300);
+            }, 2500);
+        }
+
+        document.addEventListener('click', function(e) {
+            const dropdown = document.getElementById('knowledgeSuggestions');
+            if (dropdown && !e.target.closest('.search-input-wrapper')) dropdown.classList.remove('show');
+        });
+
+        init();
+        updateConfigPanelMeta();
+        console.log('✅ 自动抽题配置原型已就绪（增强版 v2）');
+        console.log('🔀 组合抽题增强：规则间AND/OR | 规则内条件级AND/OR | 实时预览 | 自动去重/交集');
+    </script>
+</body>
+</html>

@@ -97,7 +97,7 @@ export default function PortraitDetailPage() {
             { icon: <Layers style={{ width: 18, height: 18 }} />, label: "已完成场景", value: `${portrait.completedScenes} 个` },
             { icon: <Star style={{ width: 18, height: 18 }} />, label: "总学分", value: `${portrait.totalCredits}` },
             { icon: <Award style={{ width: 18, height: 18 }} />, label: "档案数", value: `${portrait.archiveCount}` },
-            { icon: <TrendingUp style={{ width: 18, height: 18 }} />, label: "出勤率", value: `${Math.round(portrait.attendanceRate * 100)}%` },
+            { icon: <TrendingUp style={{ width: 18, height: 18 }} />, label: "出勤率", value: `${Math.round(portrait.attendanceRate)}%` },
           ].map((item, i) => (
             <div key={i} style={{ textAlign: "center", padding: "16px 0", background: "#f5f6f7", borderRadius: 8 }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, color: "#3370ff", marginBottom: 6 }}>

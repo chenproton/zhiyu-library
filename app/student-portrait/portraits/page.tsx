@@ -33,7 +33,7 @@ import {
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+// import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useData } from "@/components/providers/data-provider"
 import { useToast } from "@/hooks/use-toast"
 import { StudentPortraitModal } from "@/components/shared/student-portrait-modal"
@@ -85,7 +85,11 @@ export default function StudentAbilityPortraitsPage() {
 
   const stats = useMemo(() => {
     const total = studentAbilityPortraits.length
-    const avgScore = total > 0 ? Math.round(studentAbilityPortraits.reduce((sum, p) => { const avg = p.domainScores.reduce((s, d) => s + d.score, 0) / p.domainScores.length; return sum + avg }, 0) / total) : 0
+    const avgScore = total > 0 ? Math.round(studentAbilityPortraits.reduce((sum, p) => {
+      const domainLen = p.domainScores.length
+      const avg = domainLen > 0 ? p.domainScores.reduce((s, d) => s + d.score, 0) / domainLen : 0
+      return sum + avg
+    }, 0) / total) : 0
     return { total, gradeA: studentAbilityPortraits.filter((p) => p.overallGrade === 'A').length, gradeB: studentAbilityPortraits.filter((p) => p.overallGrade === 'B').length, gradeC: studentAbilityPortraits.filter((p) => p.overallGrade === 'C').length, gradeD: studentAbilityPortraits.filter((p) => p.overallGrade === 'D').length, avgScore }
   }, [studentAbilityPortraits])
 

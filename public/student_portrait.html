@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <title>学生画像 - 赵江威</title>
-<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
@@ -799,8 +798,12 @@ body {
     </div>
 </div>
 
+<script src="/echarts.min.js"></script>
 <script>
-const radarChart = echarts.init(document.getElementById('radarChart'));
+let radarChart = null;
+if (typeof echarts !== 'undefined' && document.getElementById('radarChart')) {
+    radarChart = echarts.init(document.getElementById('radarChart'));
+}
 
 const dataMap = {
     '前端开发工程师': [70, 86, 85, 78, 82],
@@ -1352,6 +1355,7 @@ const abilityMap = {
 };
 
 function renderRadar(data) {
+    if (!radarChart) return;
     radarChart.setOption({
         tooltip: { trigger: 'item' },
         radar: {
@@ -1391,8 +1395,10 @@ function renderRadar(data) {
         }]
     });
 }
-renderRadar(dataMap['前端开发工程师']);
-window.addEventListener('resize', () => radarChart.resize());
+if (radarChart) {
+    renderRadar(dataMap['前端开发工程师']);
+    window.addEventListener('resize', () => radarChart && radarChart.resize());
+}
 
 function switchTab(el, key) {
     document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));

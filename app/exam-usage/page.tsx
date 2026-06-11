@@ -385,6 +385,8 @@ export default function ExamUsagePage() {
   const [usages, setUsages] = useState<ExamUsage[]>(mockUsages)
   const [confirmWithdrawOpen, setConfirmWithdrawOpen] = useState(false)
   const [withdrawingUsageId, setWithdrawingUsageId] = useState<string | null>(null)
+  const [confirmEndOpen, setConfirmEndOpen] = useState(false)
+  const [endingUsageId, setEndingUsageId] = useState<string | null>(null)
 
   const selectedExam = exams.find(e => e.id === selectedExamId)
 
@@ -462,6 +464,22 @@ export default function ExamUsagePage() {
     ))
     setConfirmWithdrawOpen(false)
     setWithdrawingUsageId(null)
+  }
+
+  const openEndDialog = (usageId: string) => {
+    setEndingUsageId(usageId)
+    setConfirmEndOpen(true)
+  }
+
+  const handleEndExam = () => {
+    if (!endingUsageId) return
+    setUsages(prev => prev.map(u =>
+      u.id === endingUsageId
+        ? { ...u, status: 'ended' as const }
+        : u
+    ))
+    setConfirmEndOpen(false)
+    setEndingUsageId(null)
   }
 
   const handleCopyLink = () => {
@@ -800,6 +818,12 @@ export default function ExamUsagePage() {
                             <DropdownMenuItem onClick={() => router.push(`/exam-usage/results?usageId=${usage.id}`)}>
                               <Eye className="size-4" />
                               查看考试结果
+                            </DropdownMenuItem>
+                          )}
+                          {usage.status === 'active' && (
+                            <DropdownMenuItem onClick={() => openEndDialog(usage.id)}>
+                              <XCircle className="size-4" />
+                              结束考试
                             </DropdownMenuItem>
                           )}
                           <DropdownMenuSeparator />
@@ -1175,6 +1199,15 @@ export default function ExamUsagePage() {
         title="撤回审批"
         description="撤回后考试将回到草稿状态，可以继续编辑。确定要撤回吗？"
         onConfirm={handleWithdrawApproval}
+      />
+
+      {/* 结束考试确认弹窗 */}
+      <ConfirmDialog
+        open={confirmEndOpen}
+        onOpenChange={setConfirmEndOpen}
+        title="结束考试"
+        description="结束考试后，学生将无法继续答题，且状态将变为已结束。确定要结束吗？"
+        onConfirm={handleEndExam}
       />
     </div>
   )

@@ -25,6 +25,9 @@ PUBLIC_DIR="$SCRIPT_DIR/public"
 SERVER_DIR="$SCRIPT_DIR/.next/server"
 SSH_PORT="${SSH_PORT:-22}"
 
+# 本地构建产物备份目录（放在 /tmp 下，避免污染源码）
+LOCAL_BUILD_BACKUP_DIR="/tmp/${SITE_NAME}-local-build-backup"
+
 # 安全提示
 if [ -z "${DEMO_PASS:-}" ]; then
   echo "❌ 错误：未设置 DEMO_PASS 环境变量且脚本默认密码为空"
@@ -91,8 +94,30 @@ restore_ip() {
   done
 }
 
-# 确保脚本退出时还原源码
-trap 'restore_ip' EXIT
+backup_local_build() {
+  if [ -d "$SCRIPT_DIR/.next" ]; then
+    echo ">>> 备份本地构建产物到 $LOCAL_BUILD_BACKUP_DIR ..."
+    rm -rf "$LOCAL_BUILD_BACKUP_DIR"
+    cp -a "$SCRIPT_DIR/.next" "$LOCAL_BUILD_BACKUP_DIR"
+  fi
+}
+
+restore_local_build() {
+  if [ -n "${LOCAL_BUILD_BACKUP_DIR:-}" ] && [ -d "$LOCAL_BUILD_BACKUP_DIR" ]; then
+    echo ""
+    echo ">>> 还原本地构建产物..."
+    rm -rf "$SCRIPT_DIR/.next"
+    cp -a "$LOCAL_BUILD_BACKUP_DIR" "$SCRIPT_DIR/.next"
+    rm -rf "$LOCAL_BUILD_BACKUP_DIR"
+    # 重启本地 PM2 服务
+    if command -v pm2 &>/dev/null; then
+      pm2 restart "$SITE_NAME" --update-env >/dev/null 2>&1 || true
+    fi
+  fi
+}
+
+# 脚本退出时还原源码 IP 和本地构建产物
+trap 'restore_ip; restore_local_build' EXIT
 
 # 清理上次残留的备份文件
 find . -maxdepth 3 -name '*.demo-bak' -type f -delete 2>/dev/null || true
@@ -104,6 +129,10 @@ echo ""
 
 echo "[1/5] 替换源码中的旧 IP ($OLD_IP -> $DEMO_HOST)..."
 replace_ip "$OLD_IP" "$DEMO_HOST"
+
+echo ""
+echo "[1.5/5] 备份本地构建产物..."
+backup_local_build
 
 echo ""
 echo "[2/5] 清理旧构建..."

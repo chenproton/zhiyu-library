@@ -417,10 +417,90 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
       </Dialog>
 
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
           <DialogHeader><DialogTitle>编辑资源</DialogTitle></DialogHeader>
           <div className="space-y-3">
             <div><Label>资源标题</Label><Input value={formTitle} onChange={(e) => setFormTitle(e.target.value)} maxLength={50} /></div>
+
+            {type === "knowledge-point" && (
+              <>
+                <div className="grid grid-cols-2 gap-3">
+                  <div><Label>编码</Label><Input value={formKnowledgeCode} onChange={(e) => setFormKnowledgeCode(e.target.value)} placeholder="例如：KP-001" className="mt-1.5" /></div>
+                  <div>
+                    <Label>分类</Label>
+                    <Select value={formKnowledgeCategory} onValueChange={setFormKnowledgeCategory}>
+                      <SelectTrigger className="mt-1.5"><SelectValue placeholder="选择分类" /></SelectTrigger>
+                      <SelectContent>
+                        {KNOWLEDGE_CATEGORIES.map((cat) => (
+                          <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div><Label>关联颗粒课</Label><Input value={formKnowledgeCourses} onChange={(e) => setFormKnowledgeCourses(e.target.value)} placeholder="逗号分隔" className="mt-1.5" /></div>
+                <div><Label>关联资源</Label><Input value={formKnowledgeRelatedResources} onChange={(e) => setFormKnowledgeRelatedResources(e.target.value)} placeholder="逗号分隔" className="mt-1.5" /></div>
+              </>
+            )}
+
+            {type === "ability-point" && (
+              <>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label>所属能力领域</Label>
+                    <Select value={formAbilityDomain} onValueChange={setFormAbilityDomain}>
+                      <SelectTrigger className="mt-1.5"><SelectValue placeholder="选择能力领域" /></SelectTrigger>
+                      <SelectContent>
+                        {ABILITY_DOMAINS.map((d) => (
+                          <SelectItem key={d} value={d}>{d}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label>分类</Label>
+                    <Select value={formAbilityCategory} onValueChange={setFormAbilityCategory}>
+                      <SelectTrigger className="mt-1.5"><SelectValue placeholder="选择分类" /></SelectTrigger>
+                      <SelectContent>
+                        {ABILITY_CATEGORIES.map((cat) => (
+                          <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div><Label>编码</Label><Input value={formAbilityCode} onChange={(e) => setFormAbilityCode(e.target.value)} placeholder="例如：SD-001" className="mt-1.5" /></div>
+                  <div>
+                    <Label>能力属性</Label>
+                    <Select value={formAbilityAttribute} onValueChange={(v) => setFormAbilityAttribute(v as AbilityAttribute)}>
+                      <SelectTrigger className="mt-1.5"><SelectValue placeholder="请选择" /></SelectTrigger>
+                      <SelectContent>
+                        {ALL_ABILITY_ATTRIBUTES.map((attr) => (
+                          <SelectItem key={attr} value={attr}>{attr}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div>
+                  <Label>掌握程度</Label>
+                  <Select value={formAbilityMastery} onValueChange={(v) => setFormAbilityMastery(v as AbilityMastery)}>
+                    <SelectTrigger className="mt-1.5"><SelectValue placeholder="请选择" /></SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(ABILITY_MASTERY_LABELS).map(([value, label]) => (
+                        <SelectItem key={value} value={value}>{label} - {ABILITY_MASTERY_DESCRIPTIONS[value as AbilityMastery]}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>胜任标准描述</Label>
+                  <Textarea value={formAbilityStandard} onChange={(e) => setFormAbilityStandard(e.target.value)} placeholder="描述该能力点对应的胜任标准..." className="mt-1.5" rows={3} maxLength={500} />
+                </div>
+              </>
+            )}
+
             <div><Label>描述</Label><Textarea value={formDesc} onChange={(e) => setFormDesc(e.target.value)} maxLength={500} rows={3} /></div>
             <div><Label>标签（逗号分隔）</Label><Input value={formTags} onChange={(e) => setFormTags(e.target.value)} /></div>
           </div>

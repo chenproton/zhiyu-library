@@ -24,21 +24,39 @@ export const RESOURCE_STATUS_LABELS: Record<ResourceStatus, string> = {
   rejected: '已驳回',
 }
 
-export type AbilityAttribute = 'knowledge' | 'literacy' | 'skill'
-export type AbilityMastery = 'understand' | 'comprehend' | 'master' | 'proficient' | 'static'
+export type AbilityAttribute = '知识' | '素养' | '技能'
+export type AbilityMastery = 'understand' | 'comprehend' | 'master' | 'proficient' | 'expert'
 
-export const ABILITY_ATTRIBUTE_LABELS: Record<AbilityAttribute, string> = {
-  knowledge: '知识',
-  literacy: '素养',
-  skill: '技能',
-}
+export const ALL_ABILITY_ATTRIBUTES: AbilityAttribute[] = ['知识', '素养', '技能']
 
 export const ABILITY_MASTERY_LABELS: Record<AbilityMastery, string> = {
   understand: '了解',
   comprehend: '理解',
   master: '掌握',
   proficient: '熟练',
-  static: '静态',
+  expert: '精通',
+}
+
+export const ABILITY_MASTERY_DESCRIPTIONS: Record<AbilityMastery, string> = {
+  understand: '了解基本概念，能在指导下完成简单任务',
+  comprehend: '理解原理和方法，能独立完成基本任务',
+  master: '能独立完成常规任务，处理一般问题',
+  proficient: '能处理复杂任务，指导他人，优化流程',
+  expert: '行业专家水平，能创新和引领发展方向',
+}
+
+export const KNOWLEDGE_CATEGORIES = ['前端开发', '后端开发', '安全', '工具', '电子商务', '数据分析', '财务管理', '通用']
+
+export const ABILITY_CATEGORIES = ['专业技能', '通用能力', '软技能', '工具应用', '行业知识']
+
+export const ABILITY_DOMAINS = ['业务洞察', '专业工具', '通用素质', '团队协作', '创新思维']
+
+export const ABILITY_DOMAIN_DESCRIPTIONS: Record<string, string> = {
+  '业务洞察': '对业务场景、用户需求的理解与洞察能力',
+  '专业工具': '专业领域内的工具使用与技术应用能力',
+  '通用素质': '通用职业素养与基础素质能力',
+  '团队协作': '团队沟通、协作与领导能力',
+  '创新思维': '创新意识、问题解决与学习能力',
 }
 
 export type UserRole = 'teacher' | 'admin'
@@ -88,8 +106,11 @@ export interface Resource {
   linkSource?: string
   fileUrl?: string
   knowledgeCode?: string
+  knowledgeCategory?: string
   knowledgeCourses?: string
+  knowledgeRelatedResources?: string
   abilityDomain?: string
+  abilityCategory?: string
   abilityCode?: string
   abilityAttribute?: AbilityAttribute
   abilityMastery?: AbilityMastery
@@ -126,8 +147,11 @@ export interface ResourceFormData {
   linkSource?: string
   fileUrl?: string
   knowledgeCode?: string
+  knowledgeCategory?: string
   knowledgeCourses?: string
+  knowledgeRelatedResources?: string
   abilityDomain?: string
+  abilityCategory?: string
   abilityCode?: string
   abilityAttribute?: AbilityAttribute
   abilityMastery?: AbilityMastery

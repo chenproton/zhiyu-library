@@ -6,7 +6,7 @@ import ShellWrapper from './shell-wrapper'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: '教学资源共享平台',
+  title: '教学资源共享服务平台',
   description: '教学资源共享服务平台，提供视频、文档、软件、仿真等多种教学资源的共享与管理',
 }
 

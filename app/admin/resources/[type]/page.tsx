@@ -16,8 +16,10 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogD
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { useData } from "@/components/providers/data-provider"
+import { MultiSelectSearch } from "@/components/ui/multi-select-search"
 import { RESOURCE_TYPE_LABELS, RESOURCE_STATUS_LABELS, COLLEGES, ALL_ABILITY_ATTRIBUTES, ABILITY_MASTERY_LABELS, ABILITY_MASTERY_DESCRIPTIONS, ABILITY_DOMAINS } from "@/lib/types"
 import type { ResourceType, ResourceStatus, Resource, AbilityAttribute, AbilityMastery } from "@/lib/types"
+import { mockGranularLessons } from "@/lib/mock-data"
 
 const STATUS_COLORS: Record<ResourceStatus, string> = {
   pending: "bg-amber-50 text-amber-600 border-amber-200",
@@ -52,8 +54,7 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
   const [formDesc, setFormDesc] = useState("")
   const [formTags, setFormTags] = useState("")
   const [formKnowledgeCode, setFormKnowledgeCode] = useState("")
-  const [formKnowledgeCourses, setFormKnowledgeCourses] = useState("")
-  const [formKnowledgeRelatedResources, setFormKnowledgeRelatedResources] = useState("")
+  const [formKnowledgeCourses, setFormKnowledgeCourses] = useState<string[]>([])
   const [formAbilityDomain, setFormAbilityDomain] = useState("")
   const [formAbilityCode, setFormAbilityCode] = useState("")
   const [formAbilityAttribute, setFormAbilityAttribute] = useState<AbilityAttribute | "">("")
@@ -82,7 +83,7 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
         r.tags.some((t) => t.toLowerCase().includes(q)) ||
         r.uploaderName.toLowerCase().includes(q) ||
         (r.knowledgeCode && r.knowledgeCode.toLowerCase().includes(q)) ||
-        (r.knowledgeCourses && r.knowledgeCourses.toLowerCase().includes(q)) ||
+        (r.knowledgeCourses && r.knowledgeCourses.includes(q)) ||
         (r.abilityDomain && r.abilityDomain.toLowerCase().includes(q)) ||
         (r.abilityCode && r.abilityCode.toLowerCase().includes(q)) ||
         (r.abilityStandard && r.abilityStandard.toLowerCase().includes(q))
@@ -96,7 +97,7 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
 
   const openAdd = () => {
     setFormTitle(""); setFormContent(""); setFormDesc(""); setFormTags("");
-    setFormKnowledgeCode(""); setFormKnowledgeCourses(""); setFormKnowledgeRelatedResources("");
+    setFormKnowledgeCode(""); setFormKnowledgeCourses([]);
     setFormAbilityDomain(""); setFormAbilityCode(""); setFormAbilityAttribute(""); setFormAbilityMastery(""); setFormAbilityStandard("");
     setAddOpen(true)
   }
@@ -108,8 +109,7 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
     setFormDesc(resource.description)
     setFormTags(resource.tags.join("，"))
     setFormKnowledgeCode(resource.knowledgeCode || "")
-    setFormKnowledgeCourses(resource.knowledgeCourses || "")
-    setFormKnowledgeRelatedResources(resource.knowledgeRelatedResources || "")
+    setFormKnowledgeCourses(resource.knowledgeCourses?.split(',').filter(Boolean) || [])
     setFormAbilityDomain(resource.abilityDomain || "")
     setFormAbilityCode(resource.abilityCode || "")
     setFormAbilityAttribute(resource.abilityAttribute || "")
@@ -125,8 +125,7 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
       description: formDesc.trim(),
       tags: formTags.split(/[,，]/).map((t) => t.trim()).filter((t) => t.length > 0).slice(0, 5),
       knowledgeCode: formKnowledgeCode.trim() || undefined,
-      knowledgeCourses: formKnowledgeCourses.trim() || undefined,
-      knowledgeRelatedResources: formKnowledgeRelatedResources.trim() || undefined,
+      knowledgeCourses: formKnowledgeCourses.join(',') || undefined,
       abilityDomain: formAbilityDomain || undefined,
       abilityCode: formAbilityCode.trim() || undefined,
       abilityAttribute: formAbilityAttribute || undefined,
@@ -142,8 +141,7 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
         title: formTitle.trim(), description: formDesc.trim(),
         tags: formTags.split(/[,，]/).map((t) => t.trim()).filter((t) => t.length > 0).slice(0, 5),
         knowledgeCode: formKnowledgeCode.trim() || undefined,
-        knowledgeCourses: formKnowledgeCourses.trim() || undefined,
-        knowledgeRelatedResources: formKnowledgeRelatedResources.trim() || undefined,
+        knowledgeCourses: formKnowledgeCourses.join(',') || undefined,
         abilityDomain: formAbilityDomain || undefined,
         abilityCode: formAbilityCode.trim() || undefined,
         abilityAttribute: formAbilityAttribute || undefined,
@@ -308,9 +306,17 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
                 <div><Label>知识点名称 <span className="text-red-500">*</span></Label><Input value={formContent} onChange={(e) => setFormContent(e.target.value)} placeholder="输入知识点名称" className="mt-1.5" /></div>
                 <div className="grid grid-cols-2 gap-3">
                   <div><Label>编码</Label><Input value={formKnowledgeCode} onChange={(e) => setFormKnowledgeCode(e.target.value)} placeholder="例如：KP-001" className="mt-1.5" /></div>
-                  <div><Label>关联颗粒课</Label><Input value={formKnowledgeCourses} onChange={(e) => setFormKnowledgeCourses(e.target.value)} placeholder="逗号分隔" className="mt-1.5" /></div>
+                  <div>
+                    <Label>关联颗粒课</Label>
+                    <MultiSelectSearch
+                      options={mockGranularLessons.map((l) => ({ label: l.name, value: l.id, subtitle: l.code }))}
+                      selected={formKnowledgeCourses}
+                      onChange={setFormKnowledgeCourses}
+                      placeholder="选择关联颗粒课"
+                      searchPlaceholder="搜索颗粒课..."
+                    />
+                  </div>
                 </div>
-                <div><Label>关联资源</Label><Input value={formKnowledgeRelatedResources} onChange={(e) => setFormKnowledgeRelatedResources(e.target.value)} placeholder="逗号分隔" className="mt-1.5" /></div>
               </>
             )}
 
@@ -408,9 +414,17 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
               <>
                 <div className="grid grid-cols-2 gap-3">
                   <div><Label>编码</Label><Input value={formKnowledgeCode} onChange={(e) => setFormKnowledgeCode(e.target.value)} placeholder="例如：KP-001" className="mt-1.5" /></div>
-                  <div><Label>关联颗粒课</Label><Input value={formKnowledgeCourses} onChange={(e) => setFormKnowledgeCourses(e.target.value)} placeholder="逗号分隔" className="mt-1.5" /></div>
+                  <div>
+                    <Label>关联颗粒课</Label>
+                    <MultiSelectSearch
+                      options={mockGranularLessons.map((l) => ({ label: l.name, value: l.id, subtitle: l.code }))}
+                      selected={formKnowledgeCourses}
+                      onChange={setFormKnowledgeCourses}
+                      placeholder="选择关联颗粒课"
+                      searchPlaceholder="搜索颗粒课..."
+                    />
+                  </div>
                 </div>
-                <div><Label>关联资源</Label><Input value={formKnowledgeRelatedResources} onChange={(e) => setFormKnowledgeRelatedResources(e.target.value)} placeholder="逗号分隔" className="mt-1.5" /></div>
               </>
             )}
 
@@ -507,8 +521,7 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
                 {detailResource.type === "knowledge-point" && (
                   <div className="bg-blue-50 rounded-lg p-3 space-y-1">
                     {detailResource.knowledgeCode && <p className="text-xs font-medium text-blue-700">编码：{detailResource.knowledgeCode}</p>}
-                    {detailResource.knowledgeCourses && <p className="text-xs text-blue-600">关联颗粒课：{detailResource.knowledgeCourses}</p>}
-                    {detailResource.knowledgeRelatedResources && <p className="text-xs text-blue-600">关联资源：{detailResource.knowledgeRelatedResources}</p>}
+                    {detailResource.knowledgeCourses && <p className="text-xs text-blue-600">关联颗粒课：{detailResource.knowledgeCourses.split(',').map(id => mockGranularLessons.find(l => l.id === id)?.name || id).filter(Boolean).join('、')}</p>}
                   </div>
                 )}
                 {detailResource.type === "ability-point" && (

@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/dialog"
 import { useData } from "@/components/providers/data-provider"
 import { RESOURCE_TYPE_LABELS, COLLEGES, MAJORS, ABILITY_MASTERY_LABELS } from "@/lib/types"
-import { getResourceTypeStats } from "@/lib/mock-data"
+import { getResourceTypeStats, mockGranularLessons } from "@/lib/mock-data"
 import type { ResourceType, Resource } from "@/lib/types"
 
 function SectionHeader({ title, subtitle }: { title: string; subtitle?: string }) {
@@ -481,8 +481,7 @@ export default function HomePage() {
                   <div style={{ background: "#f0f9ff", borderRadius: 10, padding: 16, display: "flex", flexDirection: "column", gap: 8 }}>
                     <div style={{ fontSize: 13, fontWeight: 600, color: "#0369a1", marginBottom: 4 }}>知识点信息</div>
                     {detailResource.knowledgeCode && <DetailRow label="编码" value={detailResource.knowledgeCode} />}
-                    {detailResource.knowledgeCourses && <DetailRow label="关联颗粒课" value={detailResource.knowledgeCourses} />}
-                    {detailResource.knowledgeRelatedResources && <DetailRow label="关联资源" value={detailResource.knowledgeRelatedResources} />}
+                    {detailResource.knowledgeCourses && <DetailRow label="关联颗粒课" value={detailResource.knowledgeCourses.split(',').map(id => mockGranularLessons.find(l => l.id === id)?.name || id).filter(Boolean).join('、')} />}
                   </div>
                 )}
                 {detailResource.type === "ability-point" && (

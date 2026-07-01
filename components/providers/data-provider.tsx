@@ -94,7 +94,6 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       fileUrl: data.fileUrl,
       knowledgeCode: data.knowledgeCode,
       knowledgeCourses: data.knowledgeCourses,
-      knowledgeRelatedResources: data.knowledgeRelatedResources,
       abilityDomain: data.abilityDomain,
       abilityCode: data.abilityCode,
       abilityAttribute: data.abilityAttribute,

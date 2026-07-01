@@ -103,7 +103,6 @@ export interface Resource {
   fileUrl?: string
   knowledgeCode?: string
   knowledgeCourses?: string
-  knowledgeRelatedResources?: string
   abilityDomain?: string
   abilityCode?: string
   abilityAttribute?: AbilityAttribute
@@ -142,7 +141,6 @@ export interface ResourceFormData {
   fileUrl?: string
   knowledgeCode?: string
   knowledgeCourses?: string
-  knowledgeRelatedResources?: string
   abilityDomain?: string
   abilityCode?: string
   abilityAttribute?: AbilityAttribute

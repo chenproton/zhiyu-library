@@ -230,7 +230,7 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
             <DialogTitle>上传{typeLabel}资源到公共库</DialogTitle>
             <DialogDescription>补充本地资源，上传后将进入待审核状态</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 py-2">
+          <div className="space-y-5 py-2">
             <div>
               <Label>资源名称 <span className="text-red-500">*</span></Label>
               <Input value={formTitle} onChange={(e) => setFormTitle(e.target.value)} placeholder="输入资源名称" className="mt-1.5" maxLength={50} />
@@ -284,31 +284,41 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
             )}
 
             {type === "knowledge-point" && (
-              <>
-                <div><Label>知识点名称 <span className="text-red-500">*</span></Label><Input value={formContent} onChange={(e) => setFormContent(e.target.value)} placeholder="输入知识点名称" className="mt-1.5" /></div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div><Label>编码</Label><Input value={formKnowledgeCode} onChange={(e) => setFormKnowledgeCode(e.target.value)} placeholder="例如：KP-001" className="mt-1.5" /></div>
-                  <div>
-                    <Label>关联颗粒课</Label>
-                    <MultiSelectSearch
-                      options={mockGranularLessons.map((l) => ({ label: l.name, value: l.id, subtitle: l.code }))}
-                      selected={formKnowledgeCourses}
-                      onChange={setFormKnowledgeCourses}
-                      placeholder="选择关联颗粒课"
-                      searchPlaceholder="搜索颗粒课..."
-                    />
-                  </div>
+              <div className="space-y-1.5">
+                <Label className="text-sm text-gray-700">知识点名称 <span className="text-red-500">*</span></Label>
+                <Input value={formContent} onChange={(e) => setFormContent(e.target.value)} placeholder="输入知识点名称" />
+              </div>
+            )}
+
+            {type === "knowledge-point" && (
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label className="text-sm text-gray-700">编码</Label>
+                  <Input value={formKnowledgeCode} onChange={(e) => setFormKnowledgeCode(e.target.value)} placeholder="例如：KP-001" />
                 </div>
-              </>
+                <div className="space-y-1.5">
+                  <Label className="text-sm text-gray-700">关联颗粒课</Label>
+                  <MultiSelectSearch
+                    options={mockGranularLessons.map((l) => ({ label: l.name, value: l.id, subtitle: l.code }))}
+                    selected={formKnowledgeCourses}
+                    onChange={setFormKnowledgeCourses}
+                    placeholder="选择关联颗粒课"
+                    searchPlaceholder="搜索颗粒课..."
+                  />
+                </div>
+              </div>
             )}
 
             {type === "ability-point" && (
               <>
-                <div><Label>能力点名称 <span className="text-red-500">*</span></Label><Input value={formContent} onChange={(e) => setFormContent(e.target.value)} placeholder="输入能力点名称" className="mt-1.5" /></div>
-                <div>
-                  <Label>能力属性</Label>
+                <div className="space-y-1.5">
+                  <Label className="text-sm text-gray-700">能力点名称 <span className="text-red-500">*</span></Label>
+                  <Input value={formContent} onChange={(e) => setFormContent(e.target.value)} placeholder="输入能力点名称" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-sm text-gray-700">能力属性</Label>
                   <Select value={formAbilityAttribute} onValueChange={(v) => setFormAbilityAttribute(v as AbilityAttribute)}>
-                    <SelectTrigger className="mt-1.5"><SelectValue placeholder="请选择" /></SelectTrigger>
+                    <SelectTrigger><SelectValue placeholder="请选择" /></SelectTrigger>
                     <SelectContent>
                       {ALL_ABILITY_ATTRIBUTES.map((attr) => (
                         <SelectItem key={attr} value={attr}>{attr}</SelectItem>
@@ -320,9 +330,9 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
             )}
 
             {["document", "spreadsheet", "image", "audio", "video", "other"].includes(type) && (
-              <div>
-                <Label>资源文件 <span className="text-red-500">*</span></Label>
-                <div className="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center space-y-3 mt-1.5 hover:border-primary/50 transition-colors cursor-pointer">
+              <div className="space-y-1.5">
+                <Label className="text-sm text-gray-700">资源文件 <span className="text-red-500">*</span></Label>
+                <div className="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center space-y-3 hover:border-primary/50 transition-colors cursor-pointer">
                   <div className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mx-auto">
                     <Upload className="h-6 w-6 text-gray-400" />
                   </div>
@@ -334,18 +344,18 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
               </div>
             )}
 
-            <div>
-              <Label>资源描述</Label>
-              <Textarea placeholder="输入资源简介、用途说明等" className="mt-1.5" rows={2} onChange={(e) => setFormDesc(e.target.value)} value={formDesc} maxLength={500} />
+            <div className="space-y-1.5">
+              <Label className="text-sm text-gray-700">资源描述</Label>
+              <Textarea placeholder="输入资源简介、用途说明等" rows={2} onChange={(e) => setFormDesc(e.target.value)} value={formDesc} maxLength={500} />
             </div>
             {!["knowledge-point", "ability-point"].includes(type) && (
-              <div>
-                <Label>关键词标签（逗号分隔，≤5个）</Label>
-                <Input value={formTags} onChange={(e) => setFormTags(e.target.value)} placeholder="标签1，标签2" className="mt-1.5" />
+              <div className="space-y-1.5">
+                <Label className="text-sm text-gray-700">关键词标签（逗号分隔，≤5个）</Label>
+                <Input value={formTags} onChange={(e) => setFormTags(e.target.value)} placeholder="标签1，标签2" />
               </div>
             )}
           </div>
-          <DialogFooter>
+          <DialogFooter className="mt-6">
             <Button variant="outline" onClick={() => setAddOpen(false)}>取消</Button>
              <Button onClick={handleAdd} disabled={!formTitle.trim() || (!formContent.trim() && !["venue", "equipment", "software", "simulation", "knowledge-point", "ability-point"].includes(type))}>
               上传并提交审核
@@ -357,49 +367,57 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
           <DialogHeader><DialogTitle>编辑资源</DialogTitle></DialogHeader>
-          <div className="space-y-3">
-            <div><Label>资源标题</Label><Input value={formTitle} onChange={(e) => setFormTitle(e.target.value)} maxLength={50} /></div>
+          <div className="space-y-5">
+            <div className="space-y-1.5">
+              <Label className="text-sm text-gray-700">{typeLabel}名称</Label>
+              <Input value={formTitle} onChange={(e) => setFormTitle(e.target.value)} maxLength={50} />
+            </div>
 
             {type === "knowledge-point" && (
-              <>
-                <div className="grid grid-cols-2 gap-3">
-                  <div><Label>编码</Label><Input value={formKnowledgeCode} onChange={(e) => setFormKnowledgeCode(e.target.value)} placeholder="例如：KP-001" className="mt-1.5" /></div>
-                  <div>
-                    <Label>关联颗粒课</Label>
-                    <MultiSelectSearch
-                      options={mockGranularLessons.map((l) => ({ label: l.name, value: l.id, subtitle: l.code }))}
-                      selected={formKnowledgeCourses}
-                      onChange={setFormKnowledgeCourses}
-                      placeholder="选择关联颗粒课"
-                      searchPlaceholder="搜索颗粒课..."
-                    />
-                  </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label className="text-sm text-gray-700">编码</Label>
+                  <Input value={formKnowledgeCode} onChange={(e) => setFormKnowledgeCode(e.target.value)} placeholder="例如：KP-001" />
                 </div>
-              </>
+                <div className="space-y-1.5">
+                  <Label className="text-sm text-gray-700">关联颗粒课</Label>
+                  <MultiSelectSearch
+                    options={mockGranularLessons.map((l) => ({ label: l.name, value: l.id, subtitle: l.code }))}
+                    selected={formKnowledgeCourses}
+                    onChange={setFormKnowledgeCourses}
+                    placeholder="选择关联颗粒课"
+                    searchPlaceholder="搜索颗粒课..."
+                  />
+                </div>
+              </div>
             )}
 
             {type === "ability-point" && (
-              <>
-                <div>
-                  <Label>能力属性</Label>
-                  <Select value={formAbilityAttribute} onValueChange={(v) => setFormAbilityAttribute(v as AbilityAttribute)}>
-                    <SelectTrigger className="mt-1.5"><SelectValue placeholder="请选择" /></SelectTrigger>
-                    <SelectContent>
-                      {ALL_ABILITY_ATTRIBUTES.map((attr) => (
-                        <SelectItem key={attr} value={attr}>{attr}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </>
+              <div className="space-y-1.5">
+                <Label className="text-sm text-gray-700">能力属性</Label>
+                <Select value={formAbilityAttribute} onValueChange={(v) => setFormAbilityAttribute(v as AbilityAttribute)}>
+                  <SelectTrigger><SelectValue placeholder="请选择" /></SelectTrigger>
+                  <SelectContent>
+                    {ALL_ABILITY_ATTRIBUTES.map((attr) => (
+                      <SelectItem key={attr} value={attr}>{attr}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             )}
 
-            <div><Label>描述</Label><Textarea value={formDesc} onChange={(e) => setFormDesc(e.target.value)} maxLength={500} rows={3} /></div>
+            <div className="space-y-1.5">
+              <Label className="text-sm text-gray-700">描述</Label>
+              <Textarea value={formDesc} onChange={(e) => setFormDesc(e.target.value)} maxLength={500} rows={3} />
+            </div>
             {!["knowledge-point", "ability-point"].includes(type) && (
-              <div><Label>标签（逗号分隔）</Label><Input value={formTags} onChange={(e) => setFormTags(e.target.value)} /></div>
+              <div className="space-y-1.5">
+                <Label className="text-sm text-gray-700">标签（逗号分隔）</Label>
+                <Input value={formTags} onChange={(e) => setFormTags(e.target.value)} />
+              </div>
             )}
           </div>
-          <DialogFooter>
+          <DialogFooter className="mt-6">
             <Button variant="outline" onClick={() => setEditOpen(false)}>取消</Button>
             <Button onClick={handleEdit}>保存修改</Button>
           </DialogFooter>

@@ -6,7 +6,7 @@ import {
   Video, FileText, Table, Image, LinkIcon, Music, MapPin, Cpu,
   Monitor, FlaskConical, Ellipsis, Heart, Eye, User, Building2,
   Search, Clock, Sparkles, TrendingUp, RotateCcw, Download,
-  Flame, ArrowRight, Filter,
+  Flame, ArrowRight, Filter, BookOpen, Target,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -17,7 +17,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { useData } from "@/components/providers/data-provider"
-import { RESOURCE_TYPE_LABELS, COLLEGES } from "@/lib/types"
+import { RESOURCE_TYPE_LABELS, COLLEGES, MAJORS, ABILITY_ATTRIBUTE_LABELS, ABILITY_MASTERY_LABELS } from "@/lib/types"
 import { getResourceTypeStats } from "@/lib/mock-data"
 import type { ResourceType, Resource } from "@/lib/types"
 
@@ -46,6 +46,7 @@ const TYPE_EMOJI: Record<ResourceType, string> = {
   video: "🎬", document: "📄", spreadsheet: "📊", image: "🖼️",
   link: "🔗", audio: "🎵", venue: "📍", equipment: "🔧",
   software: "💻", simulation: "🧪", other: "📦",
+  "knowledge-point": "📚", "ability-point": "🎯",
 }
 
 const TYPE_GRADIENTS: Record<ResourceType, string> = {
@@ -60,6 +61,8 @@ const TYPE_GRADIENTS: Record<ResourceType, string> = {
   software: "linear-gradient(135deg, #e0e7ff, #c7d2fe)",
   simulation: "linear-gradient(135deg, #ccfbf1, #99f6e4)",
   other: "linear-gradient(135deg, #e7e5e4, #d6d3d1)",
+  "knowledge-point": "linear-gradient(135deg, #e0f2fe, #bae6fd)",
+  "ability-point": "linear-gradient(135deg, #ede9fe, #ddd6fe)",
 }
 
 const TYPE_COLORS: Record<ResourceType, string> = {
@@ -74,6 +77,8 @@ const TYPE_COLORS: Record<ResourceType, string> = {
   software: "#6366f1",
   simulation: "#14b8a6",
   other: "#78716c",
+  "knowledge-point": "#0284c7",
+  "ability-point": "#7c3aed",
 }
 
 const TYPE_ICONS: Record<ResourceType, React.ReactNode> = {
@@ -88,9 +93,11 @@ const TYPE_ICONS: Record<ResourceType, React.ReactNode> = {
   software: <Monitor className="size-5" />,
   simulation: <FlaskConical className="size-5" />,
   other: <Ellipsis className="size-5" />,
+  "knowledge-point": <BookOpen className="size-5" />,
+  "ability-point": <Target className="size-5" />,
 }
 
-const ALL_TYPES: ResourceType[] = ["video", "document", "spreadsheet", "image", "link", "audio", "venue", "equipment", "software", "simulation", "other"]
+const ALL_TYPES: ResourceType[] = ["video", "document", "spreadsheet", "image", "link", "audio", "venue", "equipment", "software", "simulation", "other", "knowledge-point", "ability-point"]
 const ALL_COLLEGES = ["全部", ...COLLEGES]
 
 const TIME_RANGES = [
@@ -109,8 +116,10 @@ export default function HomePage() {
   const [search, setSearch] = useState("")
   const [typeFilter, setTypeFilter] = useState<ResourceType | "全部">("全部")
   const [collegeFilter, setCollegeFilter] = useState("全部")
+  const [majorFilter, setMajorFilter] = useState("全部")
   const [timeFilter, setTimeFilter] = useState("all")
-  const [hotTab, setHotTab] = useState<"hot" | "new">("hot")
+  const [sortBy, setSortBy] = useState<"newest" | "popular">("newest")
+  const [titleSearch, setTitleSearch] = useState("")
   const [detailOpen, setDetailOpen] = useState(false)
   const [detailResource, setDetailResource] = useState<Resource | null>(null)
 
@@ -119,27 +128,32 @@ export default function HomePage() {
   const favorites = useMemo(() => getFavorites(), [getFavorites])
   const totalUsage = useMemo(() => approvedResources.reduce((s, r) => s + r.usageCount, 0), [approvedResources])
 
-  const sortedByUsage  = useMemo(() => [...approvedResources].sort((a, b) => b.usageCount - a.usageCount).slice(0, 4), [approvedResources])
-  const sortedByNewest = useMemo(() => [...approvedResources].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()).slice(0, 4), [approvedResources])
-  const hotNewResources = hotTab === "hot" ? sortedByUsage : sortedByNewest
-
   const filteredResources = useMemo(() => {
     let list = approvedResources
     if (typeFilter !== "全部") list = list.filter((r) => r.type === typeFilter)
     if (collegeFilter !== "全部") list = list.filter((r) => r.department === collegeFilter)
+    if (majorFilter !== "全部") list = list.filter((r) => r.major === majorFilter)
     if (timeFilter !== "all") {
       const now = Date.now()
       const ms = timeFilter === "week" ? 7 * 86400000 : timeFilter === "month" ? 30 * 86400000 : 365 * 86400000
       list = list.filter((r) => now - r.createdAt.getTime() < ms)
     }
+    if (titleSearch.trim()) {
+      list = list.filter((r) => r.title.toLowerCase().includes(titleSearch.toLowerCase()))
+    }
     if (search.trim()) {
       const q = search.toLowerCase()
       list = list.filter((r) => r.title.toLowerCase().includes(q) || r.description.toLowerCase().includes(q) || r.tags.some((t) => t.toLowerCase().includes(q)) || r.uploaderName.toLowerCase().includes(q))
     }
+    if (sortBy === "popular") {
+      list = [...list].sort((a, b) => b.usageCount - a.usageCount)
+    } else {
+      list = [...list].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+    }
     return list
-  }, [approvedResources, typeFilter, collegeFilter, timeFilter, search])
+  }, [approvedResources, typeFilter, collegeFilter, majorFilter, timeFilter, search, titleSearch, sortBy])
 
-  const filterCount = (typeFilter !== "全部" ? 1 : 0) + (collegeFilter !== "全部" ? 1 : 0) + (timeFilter !== "all" ? 1 : 0)
+  const filterCount = (typeFilter !== "全部" ? 1 : 0) + (collegeFilter !== "全部" ? 1 : 0) + (majorFilter !== "全部" ? 1 : 0) + (timeFilter !== "all" ? 1 : 0)
 
   const handleCardClick = (resource: Resource) => {
     setDetailResource(resource)
@@ -159,9 +173,9 @@ export default function HomePage() {
         <div style={{ position: "absolute", bottom: -60, left: "5%", width: 200, height: 200, background: "rgba(255,255,255,0.04)", borderRadius: "50%" }} />
         <div style={{ position: "absolute", top: "30%", right: "15%", width: 100, height: 100, background: "rgba(255,255,255,0.03)", borderRadius: "50%" }} />
         <div style={{ maxWidth: 720, margin: "0 auto", position: "relative", zIndex: 1 }}>
-          <h1 style={{ fontSize: 40, fontWeight: "bold", marginBottom: 12, letterSpacing: 1 }}>教学资源共享平台</h1>
+           <h1 style={{ fontSize: 40, fontWeight: "bold", marginBottom: 12, letterSpacing: 1 }}>教学资源共享服务平台</h1>
           <p style={{ fontSize: 15, opacity: 0.85, marginBottom: 28 }}>
-            汇聚视频、文档、软件、仿真等 11 类教学资源，为教师提供一站式资源共享服务
+            汇聚视频、文档、软件、仿真等 13 类教学资源，为教师提供一站式资源共享服务
           </p>
           <div style={{
             background: "#fff", borderRadius: 50, padding: "5px 5px 5px 24px",
@@ -247,51 +261,6 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ── 热门/最新 资源 ── */}
-        <section style={{ marginBottom: 50 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-            <h2 style={{ fontSize: 20, fontWeight: "bold", color: "#1e293b", position: "relative", paddingLeft: 12 }}>
-              <span style={{ position: "absolute", left: 0, top: "50%", transform: "translateY(-50%)", width: 4, height: 20, background: "linear-gradient(180deg, #2563eb, #3b82f6)", borderRadius: 2 }} />
-              {hotTab === "hot" ? "热门资源" : "最新资源"}
-            </h2>
-            <div style={{ display: "flex", gap: 4 }}>
-              <button onClick={() => setHotTab("hot")} style={{ padding: "6px 16px", borderRadius: 20, fontSize: 13, cursor: "pointer", border: "none", fontWeight: 500, background: hotTab === "hot" ? "#2563eb" : "#f1f5f9", color: hotTab === "hot" ? "#fff" : "#64748b", transition: "all 0.2s" }}>
-                <Flame style={{ width: 14, height: 14, display: "inline", marginRight: 4, verticalAlign: "middle" }} />热门
-              </button>
-              <button onClick={() => setHotTab("new")} style={{ padding: "6px 16px", borderRadius: 20, fontSize: 13, cursor: "pointer", border: "none", fontWeight: 500, background: hotTab === "new" ? "#2563eb" : "#f1f5f9", color: hotTab === "new" ? "#fff" : "#64748b", transition: "all 0.2s" }}>
-                <Sparkles style={{ width: 14, height: 14, display: "inline", marginRight: 4, verticalAlign: "middle" }} />最新
-              </button>
-            </div>
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 20 }}>
-            {hotNewResources.map((resource) => (
-              <button key={resource.id} onClick={() => handleCardClick(resource)}
-                style={{ background: "#fff", borderRadius: 10, overflow: "hidden", boxShadow: "0 1px 3px rgba(0,0,0,0.06)", transition: "all 0.25s", cursor: "pointer", border: "none", textAlign: "left" as const, width: "100%", display: "block" }}
-                onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 8px 16px rgba(0,0,0,0.08)" }}
-                onMouseLeave={(e) => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.06)" }}
-              >
-                <div style={{ height: 90, background: TYPE_GRADIENTS[resource.type], display: "flex", alignItems: "center", justifyContent: "center", fontSize: 32, position: "relative" }}>
-                  {TYPE_EMOJI[resource.type]}
-                  {hotTab === "hot" && resource.usageCount > 2000 && (
-                    <span style={{ position: "absolute", top: 8, right: 8, background: "#ef4444", color: "#fff", fontSize: 10, padding: "2px 8px", borderRadius: 10, fontWeight: 600 }}>HOT</span>
-                  )}
-                </div>
-                <div style={{ padding: 14 }}>
-                  <h3 style={{ fontSize: 14, marginBottom: 8, lineHeight: 1.4, color: "#1e293b", fontWeight: 600 }}>{resource.title}</h3>
-                  <div style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 12, color: "#64748b" }}>
-                    <span style={{ display: "flex", alignItems: "center", gap: 3 }}><Eye style={{ width: 12, height: 12 }} /> {resource.usageCount}</span>
-                    <span style={{ display: "flex", alignItems: "center", gap: 3 }}><Heart style={{ width: 12, height: 12 }} /> {resource.favoriteCount}</span>
-                    <span style={{ marginLeft: "auto", color: TYPE_COLORS[resource.type], fontWeight: 500 }}>{RESOURCE_TYPE_LABELS[resource.type]}</span>
-                  </div>
-                </div>
-              </button>
-            ))}
-            {hotNewResources.length === 0 && (
-              <div style={{ gridColumn: "span 4", textAlign: "center", padding: 40, color: "#94a3b8", background: "#fff", borderRadius: 10 }}>暂无资源</div>
-            )}
-          </div>
-        </section>
-
         {/* ── 筛选条件 ── */}
         <section style={{ marginBottom: 50 }}>
           <SectionHeader title="筛选条件" />
@@ -305,6 +274,18 @@ export default function HomePage() {
                     {college}
                   </span>
                 ))}
+              </div>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", padding: "8px 0", borderBottom: "1px dashed #f1f5f9", fontSize: 13 }}>
+              <span style={{ color: "#94a3b8", width: 80, flexShrink: 0 }}>专业筛选：</span>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                {["全部", ...(collegeFilter === "全部" ? [] : MAJORS[collegeFilter] || [])].map((major) => (
+                  <span key={major} onClick={() => setMajorFilter(major)}
+                    style={{ padding: "4px 12px", borderRadius: 4, cursor: collegeFilter === "全部" ? "not-allowed" : "pointer", color: majorFilter === major ? "#2563eb" : "#64748b", background: majorFilter === major ? "#eff6ff" : "transparent", fontWeight: majorFilter === major ? 500 : 400, opacity: collegeFilter === "全部" ? 0.4 : 1, transition: "all 0.3s" }}>
+                    {major}
+                  </span>
+                ))}
+                {collegeFilter === "全部" && <span style={{ color: "#94a3b8", fontSize: 12, fontStyle: "italic" }}>请先选择院系</span>}
               </div>
             </div>
             <div style={{ display: "flex", alignItems: "center", padding: "8px 0", fontSize: 13 }}>
@@ -321,7 +302,7 @@ export default function HomePage() {
             {filterCount > 0 && (
               <div style={{ marginTop: 12, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <span style={{ fontSize: 13, color: "#64748b" }}>已筛选到 <strong style={{ color: "#2563eb" }}>{filteredResources.length}</strong> 个资源</span>
-                <button onClick={() => { setSearch(""); setTypeFilter("全部"); setCollegeFilter("全部"); setTimeFilter("all") }}
+                <button onClick={() => { setSearch(""); setTitleSearch(""); setTypeFilter("全部"); setCollegeFilter("全部"); setMajorFilter("全部"); setTimeFilter("all") }}
                   style={{ padding: "6px 16px", borderRadius: 6, fontSize: 13, cursor: "pointer", border: "1px solid #e2e8f0", background: "#fff", color: "#64748b", display: "inline-flex", alignItems: "center", gap: 6, transition: "all 0.2s" }}
                   onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#cbd5e1"; e.currentTarget.style.color = "#334155" }}
                   onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#e2e8f0"; e.currentTarget.style.color = "#64748b" }}
@@ -340,7 +321,25 @@ export default function HomePage() {
               <span style={{ position: "absolute", left: 0, top: "50%", transform: "translateY(-50%)", width: 4, height: 20, background: "linear-gradient(180deg, #2563eb, #3b82f6)", borderRadius: 2 }} />
               公共资源库
             </h2>
-            <span style={{ color: "#94a3b8", fontSize: 13 }}>共 {filteredResources.length} 个资源</span>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <div style={{ position: "relative" }}>
+                <Search style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", width: 14, height: 14, color: "#94a3b8" }} />
+                <input type="text" placeholder="搜索资源名称..." value={titleSearch}
+                  onChange={(e) => setTitleSearch(e.target.value)}
+                  style={{ width: 180, padding: "6px 12px 6px 32px", borderRadius: 20, fontSize: 12, border: "1px solid #e2e8f0", outline: "none", color: "#334155", background: "#f8fafc", transition: "all 0.2s" }}
+                  onFocus={(e) => { e.currentTarget.style.borderColor = "#2563eb"; e.currentTarget.style.background = "#fff" }}
+                  onBlur={(e) => { e.currentTarget.style.borderColor = "#e2e8f0"; e.currentTarget.style.background = "#f8fafc" }} />
+              </div>
+              <div style={{ display: "flex", gap: 4 }}>
+                <button onClick={() => setSortBy("newest")} style={{ padding: "6px 14px", borderRadius: 20, fontSize: 12, cursor: "pointer", border: "none", fontWeight: 500, background: sortBy === "newest" ? "#2563eb" : "#f1f5f9", color: sortBy === "newest" ? "#fff" : "#64748b", transition: "all 0.2s", display: "inline-flex", alignItems: "center", gap: 4 }}>
+                  <Sparkles style={{ width: 13, height: 13 }} />最新
+                </button>
+                <button onClick={() => setSortBy("popular")} style={{ padding: "6px 14px", borderRadius: 20, fontSize: 12, cursor: "pointer", border: "none", fontWeight: 500, background: sortBy === "popular" ? "#2563eb" : "#f1f5f9", color: sortBy === "popular" ? "#fff" : "#64748b", transition: "all 0.2s", display: "inline-flex", alignItems: "center", gap: 4 }}>
+                  <Flame style={{ width: 13, height: 13 }} />热门
+                </button>
+              </div>
+              <span style={{ color: "#94a3b8", fontSize: 13 }}>共 {filteredResources.length} 个资源</span>
+            </div>
           </div>
           <div style={{ background: "#fff", borderRadius: 12, boxShadow: "0 1px 3px rgba(0,0,0,0.06)", padding: "12px 16px", marginBottom: 20, display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
             <span style={{ fontSize: 13, color: "#94a3b8", marginRight: 4 }}>分类：</span>
@@ -476,6 +475,23 @@ export default function HomePage() {
                     <div style={{ fontSize: 13, fontWeight: 600, color: "#475569", marginBottom: 4 }}>链接信息</div>
                     <DetailRow label="URL" value={detailResource.linkUrl || "-"} />
                     <DetailRow label="来源网站" value={detailResource.linkSource || "-"} />
+                  </div>
+                )}
+                {detailResource.type === "knowledge-point" && (
+                  <div style={{ background: "#f0f9ff", borderRadius: 10, padding: 16, display: "flex", flexDirection: "column", gap: 8 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: "#0369a1", marginBottom: 4 }}>知识点信息</div>
+                    <DetailRow label="编码" value={detailResource.knowledgeCode || "-"} />
+                    <DetailRow label="关联颗粒课" value={detailResource.knowledgeCourses || "-"} />
+                  </div>
+                )}
+                {detailResource.type === "ability-point" && (
+                  <div style={{ background: "#f5f3ff", borderRadius: 10, padding: 16, display: "flex", flexDirection: "column", gap: 8 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: "#6d28d9", marginBottom: 4 }}>能力点信息</div>
+                    {detailResource.abilityDomain && <DetailRow label="所属能力领域" value={detailResource.abilityDomain} />}
+                    {detailResource.abilityCode && <DetailRow label="编码" value={detailResource.abilityCode} />}
+                    {detailResource.abilityAttribute && <DetailRow label="能力属性" value={ABILITY_ATTRIBUTE_LABELS[detailResource.abilityAttribute]} />}
+                    {detailResource.abilityMastery && <DetailRow label="掌握程度" value={ABILITY_MASTERY_LABELS[detailResource.abilityMastery]} />}
+                    {detailResource.abilityStandard && <DetailRow label="胜任标准" value={detailResource.abilityStandard} />}
                   </div>
                 )}
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 12, borderTop: "1px solid #e2e8f0", fontSize: 13, color: "#94a3b8" }}>

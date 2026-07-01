@@ -1,4 +1,4 @@
-export type ResourceType = 'video' | 'document' | 'spreadsheet' | 'image' | 'link' | 'audio' | 'venue' | 'equipment' | 'software' | 'simulation' | 'other'
+export type ResourceType = 'video' | 'document' | 'spreadsheet' | 'image' | 'link' | 'audio' | 'venue' | 'equipment' | 'software' | 'simulation' | 'other' | 'knowledge-point' | 'ability-point'
 
 export const RESOURCE_TYPE_LABELS: Record<ResourceType, string> = {
   video: '视频',
@@ -12,6 +12,8 @@ export const RESOURCE_TYPE_LABELS: Record<ResourceType, string> = {
   software: '软件',
   simulation: '仿真',
   other: '其他',
+  'knowledge-point': '知识点',
+  'ability-point': '能力点',
 }
 
 export type ResourceStatus = 'pending' | 'approved' | 'rejected'
@@ -20,6 +22,23 @@ export const RESOURCE_STATUS_LABELS: Record<ResourceStatus, string> = {
   pending: '待审核',
   approved: '已通过',
   rejected: '已驳回',
+}
+
+export type AbilityAttribute = 'knowledge' | 'literacy' | 'skill'
+export type AbilityMastery = 'understand' | 'comprehend' | 'master' | 'proficient' | 'static'
+
+export const ABILITY_ATTRIBUTE_LABELS: Record<AbilityAttribute, string> = {
+  knowledge: '知识',
+  literacy: '素养',
+  skill: '技能',
+}
+
+export const ABILITY_MASTERY_LABELS: Record<AbilityMastery, string> = {
+  understand: '了解',
+  comprehend: '理解',
+  master: '掌握',
+  proficient: '熟练',
+  static: '静态',
 }
 
 export type UserRole = 'teacher' | 'admin'
@@ -46,6 +65,7 @@ export interface Resource {
   uploaderName: string
   uploaderDepartment: string
   department: string
+  major?: string
   rejectReason?: string
   venueCapacity?: number
   venueLocation?: string
@@ -67,6 +87,13 @@ export interface Resource {
   linkUrl?: string
   linkSource?: string
   fileUrl?: string
+  knowledgeCode?: string
+  knowledgeCourses?: string
+  abilityDomain?: string
+  abilityCode?: string
+  abilityAttribute?: AbilityAttribute
+  abilityMastery?: AbilityMastery
+  abilityStandard?: string
   createdAt: Date
   updatedAt: Date
 }
@@ -77,6 +104,7 @@ export interface ResourceFormData {
   content: string
   description: string
   tags: string[]
+  major?: string
   venueCapacity?: number
   venueLocation?: string
   venueFacilities?: string
@@ -97,6 +125,13 @@ export interface ResourceFormData {
   linkUrl?: string
   linkSource?: string
   fileUrl?: string
+  knowledgeCode?: string
+  knowledgeCourses?: string
+  abilityDomain?: string
+  abilityCode?: string
+  abilityAttribute?: AbilityAttribute
+  abilityMastery?: AbilityMastery
+  abilityStandard?: string
 }
 
 export const COLLEGES = [
@@ -108,4 +143,19 @@ export const COLLEGES = [
   '外国语学院',
   '理学院',
   '艺术学院',
-]
+ ]
+
+export const MAJORS: Record<string, string[]> = {
+  '计算机科学与技术学院': ['计算机科学与技术', '软件工程', '人工智能', '网络工程'],
+  '电子信息工程学院': ['电子信息工程', '通信工程', '微电子科学与工程'],
+  '机械工程学院': ['机械设计制造及其自动化', '车辆工程'],
+  '土木工程学院': ['土木工程', '建筑学', '给排水科学与工程'],
+  '经济管理学院': ['工商管理', '会计学', '金融学'],
+  '外国语学院': ['英语', '日语'],
+  '理学院': ['数学与应用数学', '物理学', '应用化学'],
+  '艺术学院': ['视觉传达设计', '环境设计'],
+}
+
+export function getAllMajors(): string[] {
+  return Object.values(MAJORS).flat()
+}

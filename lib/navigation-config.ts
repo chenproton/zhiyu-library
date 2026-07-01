@@ -2,9 +2,9 @@ import type { PlatformNavigationConfig } from "@/components/platform-shell"
 import { COLLEGES } from "@/lib/types"
 
 const baseConfig: Omit<PlatformNavigationConfig, 'sideNavItems' | 'hideSideNav'> = {
-  brandTitle: "教学资源共享平台",
+  brandTitle: "教学资源共享服务平台",
   currentPlatformId: "resource-platform",
-  currentPlatformLabel: "教学资源共享平台",
+  currentPlatformLabel: "教学资源共享服务平台",
   brandHref: "/home",
   brandIcon: "library",
   platformIcon: "library",
@@ -37,15 +37,8 @@ export const backendNavigationConfig: PlatformNavigationConfig = {
   collegeOptions: COLLEGES,
   sideNavItems: [
     {
-      id: "audit-center",
-      label: "审核中心",
-      icon: "badgeCheck",
-      href: "/admin/audit",
-      matchers: ["/admin/audit"],
-    },
-    {
-      id: "digital-resources",
-      label: "数字资源",
+      id: "resource-management",
+      label: "公共资源库",
       icon: "folderKanban",
       children: [
         { id: "admin-video", label: "视频", href: "/admin/resources/video", matchers: ["/admin/resources/video"] },
@@ -53,34 +46,22 @@ export const backendNavigationConfig: PlatformNavigationConfig = {
         { id: "admin-spreadsheet", label: "表格", href: "/admin/resources/spreadsheet", matchers: ["/admin/resources/spreadsheet"] },
         { id: "admin-image", label: "图片", href: "/admin/resources/image", matchers: ["/admin/resources/image"] },
         { id: "admin-link", label: "链接", href: "/admin/resources/link", matchers: ["/admin/resources/link"] },
-      ],
-    },
-    {
-      id: "physical-resources",
-      label: "实体资源",
-      icon: "mapPin",
-      children: [
         { id: "admin-venue", label: "场地", href: "/admin/resources/venue", matchers: ["/admin/resources/venue"] },
         { id: "admin-equipment", label: "仪器设备", href: "/admin/resources/equipment", matchers: ["/admin/resources/equipment"] },
         { id: "admin-software", label: "软件", href: "/admin/resources/software", matchers: ["/admin/resources/software"] },
-      ],
-    },
-    {
-      id: "professional-resources",
-      label: "专业资源",
-      icon: "flaskConical",
-      children: [
         { id: "admin-simulation", label: "仿真", href: "/admin/resources/simulation", matchers: ["/admin/resources/simulation"] },
         { id: "admin-audio", label: "音频", href: "/admin/resources/audio", matchers: ["/admin/resources/audio"] },
         { id: "admin-other", label: "其他", href: "/admin/resources/other", matchers: ["/admin/resources/other"] },
+        { id: "admin-knowledge-point", label: "知识点", href: "/admin/resources/knowledge-point", matchers: ["/admin/resources/knowledge-point"] },
+        { id: "admin-ability-point", label: "能力点", href: "/admin/resources/ability-point", matchers: ["/admin/resources/ability-point"] },
       ],
     },
     {
-      id: "admin-upload",
-      label: "资源上传",
-      icon: "upload",
-      href: "/admin/upload",
-      matchers: ["/admin/upload"],
+      id: "audit-center",
+      label: "资源审核管理",
+      icon: "badgeCheck",
+      href: "/admin/audit",
+      matchers: ["/admin/audit"],
     },
     {
       id: "admin-my-resources",

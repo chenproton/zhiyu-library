@@ -34,12 +34,15 @@ const TYPE_GRADIENTS: Record<ResourceType, string> = {
   software: "linear-gradient(135deg, #a1c4fd, #c2e9fb)",
   simulation: "linear-gradient(135deg, #d4a5a5, #7c8fd4)",
   other: "linear-gradient(135deg, #a8c0ff, #3f2b96)",
+  "knowledge-point": "linear-gradient(135deg, #e0f2fe, #bae6fd)",
+  "ability-point": "linear-gradient(135deg, #ede9fe, #ddd6fe)",
 }
 
 const TYPE_EMOJI: Record<ResourceType, string> = {
   video: "🎬", document: "📄", spreadsheet: "📊", image: "🖼️",
   link: "🔗", audio: "🎵", venue: "📍", equipment: "🔧",
   software: "💻", simulation: "🧪", other: "📦",
+  "knowledge-point": "📚", "ability-point": "🎯",
 }
 
 const TYPE_COLORS: Record<ResourceType, string> = {
@@ -54,6 +57,8 @@ const TYPE_COLORS: Record<ResourceType, string> = {
   software: "#6366f1",
   simulation: "#14b8a6",
   other: "#78716c",
+  "knowledge-point": "#0284c7",
+  "ability-point": "#7c3aed",
 }
 
 const FAVORITE_TABS: { value: ResourceType | "all"; label: string }[] = [
@@ -69,6 +74,8 @@ const FAVORITE_TABS: { value: ResourceType | "all"; label: string }[] = [
   { value: "software", label: "软件" },
   { value: "simulation", label: "仿真" },
   { value: "other", label: "其他" },
+  { value: "knowledge-point", label: "知识点" },
+  { value: "ability-point", label: "能力点" },
 ]
 
 export default function MyPage() {
@@ -141,7 +148,7 @@ export default function MyPage() {
             {
               icon: "📤", iconBg: "linear-gradient(135deg, #4facfe, #00f2fe)",
               title: "上传资源", subtitle: "分享教学资源",
-              onClick: () => router.push("/admin/upload"),
+              onClick: () => router.push("/admin/resources/video"),
             },
           ].map((item, i) => {
             const inner = (

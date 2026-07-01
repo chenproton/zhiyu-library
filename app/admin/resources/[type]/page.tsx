@@ -16,8 +16,8 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogD
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { useData } from "@/components/providers/data-provider"
-import { RESOURCE_TYPE_LABELS, RESOURCE_STATUS_LABELS, COLLEGES } from "@/lib/types"
-import type { ResourceType, ResourceStatus, Resource } from "@/lib/types"
+import { RESOURCE_TYPE_LABELS, RESOURCE_STATUS_LABELS, COLLEGES, ABILITY_ATTRIBUTE_LABELS, ABILITY_MASTERY_LABELS } from "@/lib/types"
+import type { ResourceType, ResourceStatus, Resource, AbilityAttribute, AbilityMastery } from "@/lib/types"
 
 const STATUS_COLORS: Record<ResourceStatus, string> = {
   pending: "bg-amber-50 text-amber-600 border-amber-200",
@@ -51,6 +51,13 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
   const [formContent, setFormContent] = useState("")
   const [formDesc, setFormDesc] = useState("")
   const [formTags, setFormTags] = useState("")
+  const [formKnowledgeCode, setFormKnowledgeCode] = useState("")
+  const [formKnowledgeCourses, setFormKnowledgeCourses] = useState("")
+  const [formAbilityDomain, setFormAbilityDomain] = useState("")
+  const [formAbilityCode, setFormAbilityCode] = useState("")
+  const [formAbilityAttribute, setFormAbilityAttribute] = useState<AbilityAttribute | "">("")
+  const [formAbilityMastery, setFormAbilityMastery] = useState<AbilityMastery | "">("")
+  const [formAbilityStandard, setFormAbilityStandard] = useState("")
   const [batchUploadOpen, setBatchUploadOpen] = useState(false)
 
   const [detailOpen, setDetailOpen] = useState(false)
@@ -78,7 +85,10 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
   const toggleSelectAll = () => { if (selectedIds.length === filtered.length) setSelectedIds([]); else setSelectedIds(filtered.map((r) => r.id)) }
 
   const openAdd = () => {
-    setFormTitle(""); setFormContent(""); setFormDesc(""); setFormTags(""); setAddOpen(true)
+    setFormTitle(""); setFormContent(""); setFormDesc(""); setFormTags("");
+    setFormKnowledgeCode(""); setFormKnowledgeCourses("");
+    setFormAbilityDomain(""); setFormAbilityCode(""); setFormAbilityAttribute(""); setFormAbilityMastery(""); setFormAbilityStandard("");
+    setAddOpen(true)
   }
 
   const openEdit = (resource: Resource) => {
@@ -87,18 +97,46 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
     setFormContent(resource.content)
     setFormDesc(resource.description)
     setFormTags(resource.tags.join("，"))
+    setFormKnowledgeCode(resource.knowledgeCode || "")
+    setFormKnowledgeCourses(resource.knowledgeCourses || "")
+    setFormAbilityDomain(resource.abilityDomain || "")
+    setFormAbilityCode(resource.abilityCode || "")
+    setFormAbilityAttribute(resource.abilityAttribute || "")
+    setFormAbilityMastery(resource.abilityMastery || "")
+    setFormAbilityStandard(resource.abilityStandard || "")
     setEditOpen(true)
   }
 
   const handleAdd = () => {
     if (!formTitle.trim() || !formContent.trim()) return
-    createResource({ title: formTitle.trim(), type: type as ResourceType, content: formContent.trim(), description: formDesc.trim(), tags: formTags.split(/[,，]/).map((t) => t.trim()).filter((t) => t.length > 0).slice(0, 5) })
+    createResource({
+      title: formTitle.trim(), type: type as ResourceType, content: formContent.trim(),
+      description: formDesc.trim(),
+      tags: formTags.split(/[,，]/).map((t) => t.trim()).filter((t) => t.length > 0).slice(0, 5),
+      knowledgeCode: formKnowledgeCode.trim() || undefined,
+      knowledgeCourses: formKnowledgeCourses.trim() || undefined,
+      abilityDomain: formAbilityDomain.trim() || undefined,
+      abilityCode: formAbilityCode.trim() || undefined,
+      abilityAttribute: formAbilityAttribute || undefined,
+      abilityMastery: formAbilityMastery || undefined,
+      abilityStandard: formAbilityStandard.trim() || undefined,
+    })
     setAddOpen(false)
   }
 
   const handleEdit = () => {
     if (editResource && formTitle.trim()) {
-      updateResource(editResource.id, { title: formTitle.trim(), description: formDesc.trim(), tags: formTags.split(/[,，]/).map((t) => t.trim()).filter((t) => t.length > 0).slice(0, 5) })
+      updateResource(editResource.id, {
+        title: formTitle.trim(), description: formDesc.trim(),
+        tags: formTags.split(/[,，]/).map((t) => t.trim()).filter((t) => t.length > 0).slice(0, 5),
+        knowledgeCode: formKnowledgeCode.trim() || undefined,
+        knowledgeCourses: formKnowledgeCourses.trim() || undefined,
+        abilityDomain: formAbilityDomain.trim() || undefined,
+        abilityCode: formAbilityCode.trim() || undefined,
+        abilityAttribute: formAbilityAttribute || undefined,
+        abilityMastery: formAbilityMastery || undefined,
+        abilityStandard: formAbilityStandard.trim() || undefined,
+      })
       setEditOpen(false); setEditResource(null)
     }
   }
@@ -252,6 +290,54 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
               </>
             )}
 
+            {type === "knowledge-point" && (
+              <>
+                <div><Label>知识点名称 <span className="text-red-500">*</span></Label><Input value={formContent} onChange={(e) => setFormContent(e.target.value)} placeholder="输入知识点名称" className="mt-1.5" /></div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div><Label>编码</Label><Input value={formKnowledgeCode} onChange={(e) => setFormKnowledgeCode(e.target.value)} placeholder="例如：MATH-101-001" className="mt-1.5" /></div>
+                  <div><Label>关联颗粒课</Label><Input value={formKnowledgeCourses} onChange={(e) => setFormKnowledgeCourses(e.target.value)} placeholder="输入关联颗粒课，逗号分隔" className="mt-1.5" /></div>
+                </div>
+              </>
+            )}
+
+            {type === "ability-point" && (
+              <>
+                <div><Label>能力点名称 <span className="text-red-500">*</span></Label><Input value={formContent} onChange={(e) => setFormContent(e.target.value)} placeholder="输入能力点名称" className="mt-1.5" /></div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div><Label>所属能力领域</Label><Input value={formAbilityDomain} onChange={(e) => setFormAbilityDomain(e.target.value)} placeholder="例如：软件开发能力域" className="mt-1.5" /></div>
+                  <div><Label>编码</Label><Input value={formAbilityCode} onChange={(e) => setFormAbilityCode(e.target.value)} placeholder="例如：SD-001" className="mt-1.5" /></div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label>能力属性</Label>
+                    <Select value={formAbilityAttribute} onValueChange={(v) => setFormAbilityAttribute(v as AbilityAttribute)}>
+                      <SelectTrigger className="mt-1.5"><SelectValue placeholder="请选择" /></SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(ABILITY_ATTRIBUTE_LABELS).map(([value, label]) => (
+                          <SelectItem key={value} value={value}>{label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label>掌握程度</Label>
+                    <Select value={formAbilityMastery} onValueChange={(v) => setFormAbilityMastery(v as AbilityMastery)}>
+                      <SelectTrigger className="mt-1.5"><SelectValue placeholder="请选择" /></SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(ABILITY_MASTERY_LABELS).map(([value, label]) => (
+                          <SelectItem key={value} value={value}>{label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div>
+                  <Label>胜任标准描述</Label>
+                  <Textarea value={formAbilityStandard} onChange={(e) => setFormAbilityStandard(e.target.value)} placeholder="描述该能力点对应的胜任标准..." className="mt-1.5" rows={3} maxLength={500} />
+                </div>
+              </>
+            )}
+
             {["document", "spreadsheet", "image", "audio", "video", "other"].includes(type) && (
               <div>
                 <Label>资源文件 <span className="text-red-500">*</span></Label>
@@ -278,7 +364,7 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setAddOpen(false)}>取消</Button>
-            <Button onClick={handleAdd} disabled={!formTitle.trim() || (!formContent.trim() && !["venue", "equipment", "software", "simulation"].includes(type))}>
+             <Button onClick={handleAdd} disabled={!formTitle.trim() || (!formContent.trim() && !["venue", "equipment", "software", "simulation", "knowledge-point", "ability-point"].includes(type))}>
               上传并提交审核
             </Button>
           </DialogFooter>
@@ -328,6 +414,21 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
                 <div className="flex items-center gap-2"><Badge variant="secondary">{RESOURCE_TYPE_LABELS[detailResource.type]}</Badge><Badge className={STATUS_COLORS[detailResource.status]}>{RESOURCE_STATUS_LABELS[detailResource.status]}</Badge></div>
                 <div><Label className="text-gray-500">描述</Label><p className="text-sm">{detailResource.description}</p></div>
                 <div className="flex flex-wrap gap-1">{detailResource.tags.map((tag) => (<Badge key={tag} variant="secondary">{tag}</Badge>))}</div>
+                {detailResource.type === "knowledge-point" && detailResource.knowledgeCode && (
+                  <div className="bg-blue-50 rounded-lg p-3 space-y-1">
+                    <p className="text-xs font-medium text-blue-700">编码：{detailResource.knowledgeCode}</p>
+                    {detailResource.knowledgeCourses && <p className="text-xs text-blue-600">关联颗粒课：{detailResource.knowledgeCourses}</p>}
+                  </div>
+                )}
+                {detailResource.type === "ability-point" && (
+                  <div className="bg-purple-50 rounded-lg p-3 space-y-1">
+                    {detailResource.abilityDomain && <p className="text-xs font-medium text-purple-700">所属能力领域：{detailResource.abilityDomain}</p>}
+                    {detailResource.abilityCode && <p className="text-xs text-purple-600">编码：{detailResource.abilityCode}</p>}
+                    {detailResource.abilityAttribute && <p className="text-xs text-purple-600">能力属性：{ABILITY_ATTRIBUTE_LABELS[detailResource.abilityAttribute]}</p>}
+                    {detailResource.abilityMastery && <p className="text-xs text-purple-600">掌握程度：{ABILITY_MASTERY_LABELS[detailResource.abilityMastery]}</p>}
+                    {detailResource.abilityStandard && <p className="text-xs text-purple-600">胜任标准：{detailResource.abilityStandard}</p>}
+                  </div>
+                )}
                 <div><Label className="text-gray-500">上传人</Label><p className="text-sm">{detailResource.uploaderName} · {detailResource.uploaderDepartment}</p></div>
                 {detailResource.rejectReason && <p className="text-sm text-red-600">驳回原因：{detailResource.rejectReason}</p>}
               </div>

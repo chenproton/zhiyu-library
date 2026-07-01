@@ -42,6 +42,8 @@ const TYPE_GRADIENTS: Record<ResourceType, string> = {
   software: "linear-gradient(135deg, #e0e7ff, #c7d2fe)",
   simulation: "linear-gradient(135deg, #ccfbf1, #99f6e4)",
   other: "linear-gradient(135deg, #e7e5e4, #d6d3d1)",
+  "knowledge-point": "linear-gradient(135deg, #e0f2fe, #bae6fd)",
+  "ability-point": "linear-gradient(135deg, #ede9fe, #ddd6fe)",
 }
 
 const TYPE_COLORS: Record<ResourceType, string> = {
@@ -49,12 +51,14 @@ const TYPE_COLORS: Record<ResourceType, string> = {
   image: "#a855f7", link: "#06b6d4", audio: "#ec4899",
   venue: "#ef4444", equipment: "#64748b", software: "#6366f1",
   simulation: "#14b8a6", other: "#78716c",
+  "knowledge-point": "#0284c7", "ability-point": "#7c3aed",
 }
 
 const TYPE_EMOJI: Record<ResourceType, string> = {
   video: "🎬", document: "📄", spreadsheet: "📊", image: "🖼️",
   link: "🔗", audio: "🎵", venue: "📍", equipment: "🔧",
   software: "💻", simulation: "🧪", other: "📦",
+  "knowledge-point": "📚", "ability-point": "🎯",
 }
 
 export default function MyResourcesPage() {

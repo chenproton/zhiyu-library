@@ -45,10 +45,6 @@ export const ABILITY_MASTERY_DESCRIPTIONS: Record<AbilityMastery, string> = {
   expert: '行业专家水平，能创新和引领发展方向',
 }
 
-export const KNOWLEDGE_CATEGORIES = ['前端开发', '后端开发', '安全', '工具', '电子商务', '数据分析', '财务管理', '通用']
-
-export const ABILITY_CATEGORIES = ['专业技能', '通用能力', '软技能', '工具应用', '行业知识']
-
 export const ABILITY_DOMAINS = ['业务洞察', '专业工具', '通用素质', '团队协作', '创新思维']
 
 export const ABILITY_DOMAIN_DESCRIPTIONS: Record<string, string> = {
@@ -106,11 +102,9 @@ export interface Resource {
   linkSource?: string
   fileUrl?: string
   knowledgeCode?: string
-  knowledgeCategory?: string
   knowledgeCourses?: string
   knowledgeRelatedResources?: string
   abilityDomain?: string
-  abilityCategory?: string
   abilityCode?: string
   abilityAttribute?: AbilityAttribute
   abilityMastery?: AbilityMastery
@@ -147,11 +141,9 @@ export interface ResourceFormData {
   linkSource?: string
   fileUrl?: string
   knowledgeCode?: string
-  knowledgeCategory?: string
   knowledgeCourses?: string
   knowledgeRelatedResources?: string
   abilityDomain?: string
-  abilityCategory?: string
   abilityCode?: string
   abilityAttribute?: AbilityAttribute
   abilityMastery?: AbilityMastery

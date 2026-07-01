@@ -481,7 +481,6 @@ export default function HomePage() {
                   <div style={{ background: "#f0f9ff", borderRadius: 10, padding: 16, display: "flex", flexDirection: "column", gap: 8 }}>
                     <div style={{ fontSize: 13, fontWeight: 600, color: "#0369a1", marginBottom: 4 }}>知识点信息</div>
                     {detailResource.knowledgeCode && <DetailRow label="编码" value={detailResource.knowledgeCode} />}
-                    {detailResource.knowledgeCategory && <DetailRow label="分类" value={detailResource.knowledgeCategory} />}
                     {detailResource.knowledgeCourses && <DetailRow label="关联颗粒课" value={detailResource.knowledgeCourses} />}
                     {detailResource.knowledgeRelatedResources && <DetailRow label="关联资源" value={detailResource.knowledgeRelatedResources} />}
                   </div>

@@ -16,7 +16,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogD
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { useData } from "@/components/providers/data-provider"
-import { RESOURCE_TYPE_LABELS, RESOURCE_STATUS_LABELS, COLLEGES, ALL_ABILITY_ATTRIBUTES, ABILITY_MASTERY_LABELS, ABILITY_MASTERY_DESCRIPTIONS, KNOWLEDGE_CATEGORIES, ABILITY_CATEGORIES, ABILITY_DOMAINS } from "@/lib/types"
+import { RESOURCE_TYPE_LABELS, RESOURCE_STATUS_LABELS, COLLEGES, ALL_ABILITY_ATTRIBUTES, ABILITY_MASTERY_LABELS, ABILITY_MASTERY_DESCRIPTIONS, ABILITY_DOMAINS } from "@/lib/types"
 import type { ResourceType, ResourceStatus, Resource, AbilityAttribute, AbilityMastery } from "@/lib/types"
 
 const STATUS_COLORS: Record<ResourceStatus, string> = {
@@ -52,11 +52,9 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
   const [formDesc, setFormDesc] = useState("")
   const [formTags, setFormTags] = useState("")
   const [formKnowledgeCode, setFormKnowledgeCode] = useState("")
-  const [formKnowledgeCategory, setFormKnowledgeCategory] = useState("")
   const [formKnowledgeCourses, setFormKnowledgeCourses] = useState("")
   const [formKnowledgeRelatedResources, setFormKnowledgeRelatedResources] = useState("")
   const [formAbilityDomain, setFormAbilityDomain] = useState("")
-  const [formAbilityCategory, setFormAbilityCategory] = useState("")
   const [formAbilityCode, setFormAbilityCode] = useState("")
   const [formAbilityAttribute, setFormAbilityAttribute] = useState<AbilityAttribute | "">("")
   const [formAbilityMastery, setFormAbilityMastery] = useState<AbilityMastery | "">("")
@@ -84,10 +82,8 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
         r.tags.some((t) => t.toLowerCase().includes(q)) ||
         r.uploaderName.toLowerCase().includes(q) ||
         (r.knowledgeCode && r.knowledgeCode.toLowerCase().includes(q)) ||
-        (r.knowledgeCategory && r.knowledgeCategory.toLowerCase().includes(q)) ||
         (r.knowledgeCourses && r.knowledgeCourses.toLowerCase().includes(q)) ||
         (r.abilityDomain && r.abilityDomain.toLowerCase().includes(q)) ||
-        (r.abilityCategory && r.abilityCategory.toLowerCase().includes(q)) ||
         (r.abilityCode && r.abilityCode.toLowerCase().includes(q)) ||
         (r.abilityStandard && r.abilityStandard.toLowerCase().includes(q))
       )
@@ -100,8 +96,8 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
 
   const openAdd = () => {
     setFormTitle(""); setFormContent(""); setFormDesc(""); setFormTags("");
-    setFormKnowledgeCode(""); setFormKnowledgeCategory(""); setFormKnowledgeCourses(""); setFormKnowledgeRelatedResources("");
-    setFormAbilityDomain(""); setFormAbilityCategory(""); setFormAbilityCode(""); setFormAbilityAttribute(""); setFormAbilityMastery(""); setFormAbilityStandard("");
+    setFormKnowledgeCode(""); setFormKnowledgeCourses(""); setFormKnowledgeRelatedResources("");
+    setFormAbilityDomain(""); setFormAbilityCode(""); setFormAbilityAttribute(""); setFormAbilityMastery(""); setFormAbilityStandard("");
     setAddOpen(true)
   }
 
@@ -112,11 +108,9 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
     setFormDesc(resource.description)
     setFormTags(resource.tags.join("，"))
     setFormKnowledgeCode(resource.knowledgeCode || "")
-    setFormKnowledgeCategory(resource.knowledgeCategory || "")
     setFormKnowledgeCourses(resource.knowledgeCourses || "")
     setFormKnowledgeRelatedResources(resource.knowledgeRelatedResources || "")
     setFormAbilityDomain(resource.abilityDomain || "")
-    setFormAbilityCategory(resource.abilityCategory || "")
     setFormAbilityCode(resource.abilityCode || "")
     setFormAbilityAttribute(resource.abilityAttribute || "")
     setFormAbilityMastery(resource.abilityMastery || "")
@@ -131,11 +125,9 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
       description: formDesc.trim(),
       tags: formTags.split(/[,，]/).map((t) => t.trim()).filter((t) => t.length > 0).slice(0, 5),
       knowledgeCode: formKnowledgeCode.trim() || undefined,
-      knowledgeCategory: formKnowledgeCategory || undefined,
       knowledgeCourses: formKnowledgeCourses.trim() || undefined,
       knowledgeRelatedResources: formKnowledgeRelatedResources.trim() || undefined,
       abilityDomain: formAbilityDomain || undefined,
-      abilityCategory: formAbilityCategory || undefined,
       abilityCode: formAbilityCode.trim() || undefined,
       abilityAttribute: formAbilityAttribute || undefined,
       abilityMastery: formAbilityMastery || undefined,
@@ -150,11 +142,9 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
         title: formTitle.trim(), description: formDesc.trim(),
         tags: formTags.split(/[,，]/).map((t) => t.trim()).filter((t) => t.length > 0).slice(0, 5),
         knowledgeCode: formKnowledgeCode.trim() || undefined,
-        knowledgeCategory: formKnowledgeCategory || undefined,
         knowledgeCourses: formKnowledgeCourses.trim() || undefined,
         knowledgeRelatedResources: formKnowledgeRelatedResources.trim() || undefined,
         abilityDomain: formAbilityDomain || undefined,
-        abilityCategory: formAbilityCategory || undefined,
         abilityCode: formAbilityCode.trim() || undefined,
         abilityAttribute: formAbilityAttribute || undefined,
         abilityMastery: formAbilityMastery || undefined,
@@ -318,20 +308,9 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
                 <div><Label>知识点名称 <span className="text-red-500">*</span></Label><Input value={formContent} onChange={(e) => setFormContent(e.target.value)} placeholder="输入知识点名称" className="mt-1.5" /></div>
                 <div className="grid grid-cols-2 gap-3">
                   <div><Label>编码</Label><Input value={formKnowledgeCode} onChange={(e) => setFormKnowledgeCode(e.target.value)} placeholder="例如：KP-001" className="mt-1.5" /></div>
-                  <div>
-                    <Label>分类</Label>
-                    <Select value={formKnowledgeCategory} onValueChange={setFormKnowledgeCategory}>
-                      <SelectTrigger className="mt-1.5"><SelectValue placeholder="选择分类" /></SelectTrigger>
-                      <SelectContent>
-                        {KNOWLEDGE_CATEGORIES.map((cat) => (
-                          <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  <div><Label>关联颗粒课</Label><Input value={formKnowledgeCourses} onChange={(e) => setFormKnowledgeCourses(e.target.value)} placeholder="逗号分隔" className="mt-1.5" /></div>
                 </div>
-                <div><Label>关联颗粒课</Label><Input value={formKnowledgeCourses} onChange={(e) => setFormKnowledgeCourses(e.target.value)} placeholder="输入关联颗粒课，逗号分隔" className="mt-1.5" /></div>
-                <div><Label>关联资源</Label><Input value={formKnowledgeRelatedResources} onChange={(e) => setFormKnowledgeRelatedResources(e.target.value)} placeholder="输入关联资源名称或ID，逗号分隔" className="mt-1.5" /></div>
+                <div><Label>关联资源</Label><Input value={formKnowledgeRelatedResources} onChange={(e) => setFormKnowledgeRelatedResources(e.target.value)} placeholder="逗号分隔" className="mt-1.5" /></div>
               </>
             )}
 
@@ -350,17 +329,7 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
                       </SelectContent>
                     </Select>
                   </div>
-                  <div>
-                    <Label>分类</Label>
-                    <Select value={formAbilityCategory} onValueChange={setFormAbilityCategory}>
-                      <SelectTrigger className="mt-1.5"><SelectValue placeholder="选择分类" /></SelectTrigger>
-                      <SelectContent>
-                        {ABILITY_CATEGORIES.map((cat) => (
-                          <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  <div><Label>编码</Label><Input value={formAbilityCode} onChange={(e) => setFormAbilityCode(e.target.value)} placeholder="例如：SD-001" className="mt-1.5" /></div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div><Label>编码</Label><Input value={formAbilityCode} onChange={(e) => setFormAbilityCode(e.target.value)} placeholder="例如：SD-001" className="mt-1.5" /></div>
@@ -439,19 +408,8 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
               <>
                 <div className="grid grid-cols-2 gap-3">
                   <div><Label>编码</Label><Input value={formKnowledgeCode} onChange={(e) => setFormKnowledgeCode(e.target.value)} placeholder="例如：KP-001" className="mt-1.5" /></div>
-                  <div>
-                    <Label>分类</Label>
-                    <Select value={formKnowledgeCategory} onValueChange={setFormKnowledgeCategory}>
-                      <SelectTrigger className="mt-1.5"><SelectValue placeholder="选择分类" /></SelectTrigger>
-                      <SelectContent>
-                        {KNOWLEDGE_CATEGORIES.map((cat) => (
-                          <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  <div><Label>关联颗粒课</Label><Input value={formKnowledgeCourses} onChange={(e) => setFormKnowledgeCourses(e.target.value)} placeholder="逗号分隔" className="mt-1.5" /></div>
                 </div>
-                <div><Label>关联颗粒课</Label><Input value={formKnowledgeCourses} onChange={(e) => setFormKnowledgeCourses(e.target.value)} placeholder="逗号分隔" className="mt-1.5" /></div>
                 <div><Label>关联资源</Label><Input value={formKnowledgeRelatedResources} onChange={(e) => setFormKnowledgeRelatedResources(e.target.value)} placeholder="逗号分隔" className="mt-1.5" /></div>
               </>
             )}
@@ -470,17 +428,7 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
                       </SelectContent>
                     </Select>
                   </div>
-                  <div>
-                    <Label>分类</Label>
-                    <Select value={formAbilityCategory} onValueChange={setFormAbilityCategory}>
-                      <SelectTrigger className="mt-1.5"><SelectValue placeholder="选择分类" /></SelectTrigger>
-                      <SelectContent>
-                        {ABILITY_CATEGORIES.map((cat) => (
-                          <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  <div><Label>编码</Label><Input value={formAbilityCode} onChange={(e) => setFormAbilityCode(e.target.value)} placeholder="例如：SD-001" className="mt-1.5" /></div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div><Label>编码</Label><Input value={formAbilityCode} onChange={(e) => setFormAbilityCode(e.target.value)} placeholder="例如：SD-001" className="mt-1.5" /></div>
@@ -559,7 +507,6 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
                 {detailResource.type === "knowledge-point" && (
                   <div className="bg-blue-50 rounded-lg p-3 space-y-1">
                     {detailResource.knowledgeCode && <p className="text-xs font-medium text-blue-700">编码：{detailResource.knowledgeCode}</p>}
-                    {detailResource.knowledgeCategory && <p className="text-xs text-blue-600">分类：{detailResource.knowledgeCategory}</p>}
                     {detailResource.knowledgeCourses && <p className="text-xs text-blue-600">关联颗粒课：{detailResource.knowledgeCourses}</p>}
                     {detailResource.knowledgeRelatedResources && <p className="text-xs text-blue-600">关联资源：{detailResource.knowledgeRelatedResources}</p>}
                   </div>
@@ -567,7 +514,6 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
                 {detailResource.type === "ability-point" && (
                   <div className="bg-purple-50 rounded-lg p-3 space-y-1">
                     {detailResource.abilityDomain && <p className="text-xs font-medium text-purple-700">所属能力领域：{detailResource.abilityDomain}</p>}
-                    {detailResource.abilityCategory && <p className="text-xs text-purple-600">分类：{detailResource.abilityCategory}</p>}
                     {detailResource.abilityCode && <p className="text-xs text-purple-600">编码：{detailResource.abilityCode}</p>}
                     {detailResource.abilityAttribute && <p className="text-xs text-purple-600">能力属性：{detailResource.abilityAttribute}</p>}
                     {detailResource.abilityMastery && <p className="text-xs text-purple-600">掌握程度：{ABILITY_MASTERY_LABELS[detailResource.abilityMastery]}</p>}

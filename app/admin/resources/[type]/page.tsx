@@ -79,7 +79,18 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
     if (statusFilter !== "all") list = list.filter((r) => r.status === statusFilter)
     if (search.trim()) {
       const q = search.toLowerCase()
-      list = list.filter((r) => r.title.toLowerCase().includes(q) || r.tags.some((t) => t.toLowerCase().includes(q)) || r.uploaderName.toLowerCase().includes(q))
+      list = list.filter((r) =>
+        r.title.toLowerCase().includes(q) ||
+        r.tags.some((t) => t.toLowerCase().includes(q)) ||
+        r.uploaderName.toLowerCase().includes(q) ||
+        (r.knowledgeCode && r.knowledgeCode.toLowerCase().includes(q)) ||
+        (r.knowledgeCategory && r.knowledgeCategory.toLowerCase().includes(q)) ||
+        (r.knowledgeCourses && r.knowledgeCourses.toLowerCase().includes(q)) ||
+        (r.abilityDomain && r.abilityDomain.toLowerCase().includes(q)) ||
+        (r.abilityCategory && r.abilityCategory.toLowerCase().includes(q)) ||
+        (r.abilityCode && r.abilityCode.toLowerCase().includes(q)) ||
+        (r.abilityStandard && r.abilityStandard.toLowerCase().includes(q))
+      )
     }
     return list
   }, [resources, type, collegeFilter, statusFilter, search])
@@ -402,10 +413,12 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
               <Label>资源描述</Label>
               <Textarea placeholder="输入资源简介、用途说明等" className="mt-1.5" rows={2} onChange={(e) => setFormDesc(e.target.value)} value={formDesc} maxLength={500} />
             </div>
-            <div>
-              <Label>关键词标签（逗号分隔，≤5个）</Label>
-              <Input value={formTags} onChange={(e) => setFormTags(e.target.value)} placeholder="标签1，标签2" className="mt-1.5" />
-            </div>
+            {!["knowledge-point", "ability-point"].includes(type) && (
+              <div>
+                <Label>关键词标签（逗号分隔，≤5个）</Label>
+                <Input value={formTags} onChange={(e) => setFormTags(e.target.value)} placeholder="标签1，标签2" className="mt-1.5" />
+              </div>
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setAddOpen(false)}>取消</Button>
@@ -502,7 +515,9 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
             )}
 
             <div><Label>描述</Label><Textarea value={formDesc} onChange={(e) => setFormDesc(e.target.value)} maxLength={500} rows={3} /></div>
-            <div><Label>标签（逗号分隔）</Label><Input value={formTags} onChange={(e) => setFormTags(e.target.value)} /></div>
+            {!["knowledge-point", "ability-point"].includes(type) && (
+              <div><Label>标签（逗号分隔）</Label><Input value={formTags} onChange={(e) => setFormTags(e.target.value)} /></div>
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditOpen(false)}>取消</Button>
@@ -538,7 +553,9 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
               <div className="space-y-3 mt-4">
                 <div className="flex items-center gap-2"><Badge variant="secondary">{RESOURCE_TYPE_LABELS[detailResource.type]}</Badge><Badge className={STATUS_COLORS[detailResource.status]}>{RESOURCE_STATUS_LABELS[detailResource.status]}</Badge></div>
                 <div><Label className="text-gray-500">描述</Label><p className="text-sm">{detailResource.description}</p></div>
-                <div className="flex flex-wrap gap-1">{detailResource.tags.map((tag) => (<Badge key={tag} variant="secondary">{tag}</Badge>))}</div>
+                {detailResource.type !== "knowledge-point" && detailResource.type !== "ability-point" && (
+                  <div className="flex flex-wrap gap-1">{detailResource.tags.map((tag) => (<Badge key={tag} variant="secondary">{tag}</Badge>))}</div>
+                )}
                 {detailResource.type === "knowledge-point" && (
                   <div className="bg-blue-50 rounded-lg p-3 space-y-1">
                     {detailResource.knowledgeCode && <p className="text-xs font-medium text-blue-700">编码：{detailResource.knowledgeCode}</p>}

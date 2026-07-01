@@ -374,7 +374,7 @@ export default function HomePage() {
                   </div>
                   <div style={{ padding: 16 }}>
                     <h3 style={{ fontSize: 15, marginBottom: 8, lineHeight: 1.5, color: "#1e293b", fontWeight: 600 }}>{resource.title}</h3>
-                    {resource.tags.length > 0 && (
+                    {resource.tags.length > 0 && resource.type !== "knowledge-point" && resource.type !== "ability-point" && (
                       <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 10 }}>
                         {resource.tags.map((tag) => (
                           <span key={tag} style={{ fontSize: 11, padding: "2px 8px", borderRadius: 4, background: "#f1f5f9", color: "#64748b" }}>{tag}</span>
@@ -430,7 +430,7 @@ export default function HomePage() {
                   <div style={{ fontSize: 13, fontWeight: 600, color: "#475569", marginBottom: 6 }}>资源描述</div>
                   <p style={{ fontSize: 14, color: "#64748b", lineHeight: 1.7 }}>{detailResource.description}</p>
                 </div>
-                {detailResource.tags.length > 0 && (
+                {detailResource.tags.length > 0 && detailResource.type !== "knowledge-point" && detailResource.type !== "ability-point" && (
                   <div>
                     <div style={{ fontSize: 13, fontWeight: 600, color: "#475569", marginBottom: 6 }}>关键词标签</div>
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>{detailResource.tags.map((tag) => <Badge key={tag} variant="secondary">{tag}</Badge>)}</div>

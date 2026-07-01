@@ -16,6 +16,21 @@ import {
   Share2,
   Sparkles,
   User,
+  Video,
+  Table,
+  Image,
+  Link,
+  Music,
+  MapPin,
+  Cpu,
+  Monitor,
+  FlaskConical,
+  Ellipsis,
+  Database,
+  Upload,
+  Heart,
+  Library,
+  Search,
 } from "lucide-react"
 
 export const platformIconMap = {
@@ -35,6 +50,21 @@ export const platformIconMap = {
   share2: Share2,
   sparkles: Sparkles,
   user: User,
+  video: Video,
+  table: Table,
+  image: Image,
+  link: Link,
+  music: Music,
+  mapPin: MapPin,
+  cpu: Cpu,
+  monitor: Monitor,
+  flaskConical: FlaskConical,
+  ellipsis: Ellipsis,
+  database: Database,
+  upload: Upload,
+  heart: Heart,
+  library: Library,
+  search: Search,
 } satisfies Record<string, LucideIcon>
 
 export type PlatformIconKey = keyof typeof platformIconMap

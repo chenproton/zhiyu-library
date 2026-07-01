@@ -5,32 +5,6 @@ import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { XIcon } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
-import { AnnotationSystem } from '@/components/annotations/annotation-system'
-
-function AnnotationContextConsumer({
-  annotationContext,
-  annotationContainerRef,
-}: {
-  annotationContext?: string | boolean
-  annotationContainerRef?: React.RefObject<HTMLElement | null>
-}) {
-  const idRef = React.useRef<string | null>(null)
-  if (idRef.current === null && annotationContext === true) {
-    idRef.current = `dialog-${Math.random().toString(36).slice(2, 9)}`
-  }
-  const ctx = annotationContext === true ? idRef.current : annotationContext || null
-  if (!ctx) return null
-  return (
-    <AnnotationSystem
-      context={ctx}
-      zIndex={100}
-      defaultMode="view"
-      hideController
-      fixed={!annotationContainerRef}
-      containerRef={annotationContainerRef}
-    />
-  )
-}
 
 function Dialog({
   ...props
@@ -76,13 +50,9 @@ function DialogContent({
   className,
   children,
   showCloseButton = true,
-  annotationContext,
-  annotationContainerRef,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean
-  annotationContext?: string | boolean
-  annotationContainerRef?: React.RefObject<HTMLElement | null>
 }) {
   return (
     <DialogPortal data-slot="dialog-portal">
@@ -105,7 +75,6 @@ function DialogContent({
             <span className="sr-only">Close</span>
           </DialogPrimitive.Close>
         )}
-        <AnnotationContextConsumer annotationContext={annotationContext} annotationContainerRef={annotationContainerRef} />
       </DialogPrimitive.Content>
     </DialogPortal>
   )

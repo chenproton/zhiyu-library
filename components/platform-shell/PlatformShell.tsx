@@ -106,10 +106,10 @@ export function PlatformTopNav({ config }: { config: PlatformNavigationConfig })
     <header className="fixed top-0 left-0 right-0 z-50 flex h-14 items-center justify-between border-b border-gray-100 bg-white px-6 shadow-sm">
       <div className="flex items-center gap-8">
         <Link href={config.brandHref || "/"} className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary shrink-0">
             <BrandIcon className="h-4 w-4 text-primary-foreground" />
           </div>
-          <span className="text-base font-semibold text-gray-800">{config.brandTitle}</span>
+          <span className="text-base font-semibold text-gray-800 truncate">{config.brandTitle}</span>
         </Link>
 
         <nav className="flex items-center gap-1">
@@ -261,8 +261,7 @@ export function PlatformSideNav({ config }: { config: PlatformNavigationConfig }
             <ChevronLeft className="h-4 w-4" />
           </Link>
           <div className="flex items-center gap-2">
-            <PlatformIcon className="h-4 w-4 text-primary" />
-            <h2 className="text-sm font-medium text-gray-800">{config.currentPlatformLabel}</h2>
+            <h2 className="text-sm font-medium text-gray-800 truncate">{config.currentPlatformLabel}</h2>
           </div>
         </div>
       </div>

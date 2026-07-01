@@ -1,18 +1,19 @@
 import type { PlatformNavigationConfig } from "@/components/platform-shell"
+import { COLLEGES } from "@/lib/types"
 
-export const evaluationNavigationConfig: PlatformNavigationConfig = {
-  brandTitle: "能力测评中心",
-  currentPlatformId: "evaluation",
-  currentPlatformLabel: "能力测评中心",
-  brandHref: "/",
-  brandIcon: "settings",
-  platformIcon: "settings",
-  sideBackHref: "/",
+const baseConfig: Omit<PlatformNavigationConfig, 'sideNavItems' | 'hideSideNav'> = {
+  brandTitle: "教学资源共享平台",
+  currentPlatformId: "resource-platform",
+  currentPlatformLabel: "教学资源共享平台",
+  brandHref: "/home",
+  brandIcon: "library",
+  platformIcon: "library",
+  sideBackHref: "/home",
   currentUserName: "管理员",
-  currentUserRoleLabel: "能力测评中心",
+  currentUserRoleLabel: "平台管理员",
   showCurrentTime: true,
   userMenuItems: [
-    { id: "profile", label: "个人中心", icon: "user" },
+    { id: "my", label: "个人中心", href: "/my", icon: "user" },
     { id: "account", label: "账号设置", icon: "settings" },
     { id: "logout", label: "退出登录", tone: "danger" },
   ],
@@ -21,55 +22,72 @@ export const evaluationNavigationConfig: PlatformNavigationConfig = {
     { id: "workspace", label: "我的服务台", href: "http://111.170.170.202:3001/portal/workspace", icon: "briefcase" },
     { id: "apps", label: "应用服务中心", href: "http://111.170.170.202:3001/portal/apps", icon: "layoutGrid" },
   ],
+}
+
+export const frontendNavigationConfig: PlatformNavigationConfig = {
+  ...baseConfig,
+  hideSideNav: true,
+  sideNavItems: [],
+  showCollegeFilter: false,
+}
+
+export const backendNavigationConfig: PlatformNavigationConfig = {
+  ...baseConfig,
+  showCollegeFilter: true,
+  collegeOptions: COLLEGES,
   sideNavItems: [
     {
-      id: "general-evaluation",
-      label: "通用测评资源管理",
+      id: "audit-center",
+      label: "审核中心",
+      icon: "badgeCheck",
+      href: "/admin/audit",
+      matchers: ["/admin/audit"],
+    },
+    {
+      id: "digital-resources",
+      label: "数字资源",
       icon: "folderKanban",
       children: [
-        { id: "question-banks", label: "题库管理", href: "/question-banks", matchers: ["/question-banks"] },
-        { id: "exams", label: "试卷管理", href: "/exams", matchers: ["/exams"] },
-        { id: "exam-usage", label: "考试管理", href: "/exam-usage", matchers: ["/exam-usage$", "/exam-usage/results"] },
-        { id: "approval-center", label: "审批中心", href: "/approval-center", matchers: ["/approval-center"] },
+        { id: "admin-video", label: "视频", href: "/admin/resources/video", matchers: ["/admin/resources/video"] },
+        { id: "admin-document", label: "文档", href: "/admin/resources/document", matchers: ["/admin/resources/document"] },
+        { id: "admin-spreadsheet", label: "表格", href: "/admin/resources/spreadsheet", matchers: ["/admin/resources/spreadsheet"] },
+        { id: "admin-image", label: "图片", href: "/admin/resources/image", matchers: ["/admin/resources/image"] },
+        { id: "admin-link", label: "链接", href: "/admin/resources/link", matchers: ["/admin/resources/link"] },
       ],
     },
     {
-      id: "job-ability",
-      label: "岗位能力认定管理",
-      icon: "briefcase",
+      id: "physical-resources",
+      label: "实体资源",
+      icon: "mapPin",
       children: [
-        { id: "job-ability-rules", label: "岗位能力认定规则配置", href: "/job-ability", matchers: ["/job-ability$"] },
-        { id: "job-ability-results", label: "岗位能力认定结果查看", href: "/job-ability/results", matchers: ["/job-ability/results"] },
+        { id: "admin-venue", label: "场地", href: "/admin/resources/venue", matchers: ["/admin/resources/venue"] },
+        { id: "admin-equipment", label: "仪器设备", href: "/admin/resources/equipment", matchers: ["/admin/resources/equipment"] },
+        { id: "admin-software", label: "软件", href: "/admin/resources/software", matchers: ["/admin/resources/software"] },
       ],
     },
     {
-      id: "scene-task",
-      label: "测评方式库",
-      icon: "layers3",
+      id: "professional-resources",
+      label: "专业资源",
+      icon: "flaskConical",
       children: [
-        { id: "scene-task-methods", label: "测评方式管理", href: "/evaluation-methods", matchers: ["/evaluation-methods"] },
-        { id: "scene-task-results", label: "测评结果管理", href: "/scene-task-results", matchers: ["/scene-task-results"] },
+        { id: "admin-simulation", label: "仿真", href: "/admin/resources/simulation", matchers: ["/admin/resources/simulation"] },
+        { id: "admin-audio", label: "音频", href: "/admin/resources/audio", matchers: ["/admin/resources/audio"] },
+        { id: "admin-other", label: "其他", href: "/admin/resources/other", matchers: ["/admin/resources/other"] },
       ],
     },
     {
-      id: "graduation-project",
-      label: "毕业设计管理",
-      icon: "graduationCap",
-      children: [
-        { id: "gp-topics", label: "毕业设计选题管理", href: "/graduation-project/topics", matchers: ["/graduation-project/topics"] },
-        { id: "gp-archives", label: "毕设档案管理", href: "/graduation-project/archives", matchers: ["/graduation-project/archives"] },
-        { id: "gp-evaluation", label: "毕设评价管理", href: "/graduation-project/evaluation", matchers: ["/graduation-project/evaluation"] },
-        { id: "gp-query", label: "毕业查询管理", href: "/graduation-project/query", matchers: ["/graduation-project/query"] },
-      ],
+      id: "admin-upload",
+      label: "资源上传",
+      icon: "upload",
+      href: "/admin/upload",
+      matchers: ["/admin/upload"],
     },
     {
-      id: "student-portrait",
-      label: "学生画像管理",
-      icon: "userCircle",
-      children: [
-        // { id: "sp-archives", label: "学生档案管理", href: "/student-portrait/archives", matchers: ["/student-portrait/archives"] },
-        { id: "sp-portraits", label: "学生画像管理", href: "/student-portrait/portraits", matchers: ["/student-portrait/portraits"] },
-      ],
+      id: "admin-my-resources",
+      label: "我的资源",
+      icon: "user",
+      href: "/admin/my-resources",
+      matchers: ["/admin/my-resources"],
     },
   ],
 }

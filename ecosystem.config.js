@@ -1,15 +1,15 @@
 module.exports = {
   apps: [
     {
-      name: 'evaluation',
-      cwd: '/var/www/evaluation',
+      name: 'zhiyu-library',
+      cwd: '/var/www/zhiyu-library',
       script: 'pnpm',
       args: 'start',
       instances: 1,
       exec_mode: 'fork',
       env: {
         NODE_ENV: 'production',
-        PORT: 3005,
+        PORT: 3009,
       },
       // 日志配置 - 使用相对路径或 PM2 默认路径，避免 /var/log/pm2 权限问题
       error_file: 'logs/error.log',

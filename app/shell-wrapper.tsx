@@ -1,14 +1,15 @@
 "use client"
 
-import { useSearchParams } from "next/navigation"
+import { usePathname, useSearchParams } from "next/navigation"
 import { PlatformShell } from "@/components/platform-shell"
-import { evaluationNavigationConfig } from "@/lib/navigation-config"
+import { frontendNavigationConfig, backendNavigationConfig } from "@/lib/navigation-config"
 
 export default function ShellWrapper({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const pathname = usePathname()
   const searchParams = useSearchParams()
   const isPreviewMode = searchParams.get("mode") === "preview"
 
@@ -16,8 +17,11 @@ export default function ShellWrapper({
     return <div className="min-h-screen bg-white">{children}</div>
   }
 
+  const isBackend = pathname.startsWith("/admin")
+  const config = isBackend ? backendNavigationConfig : frontendNavigationConfig
+
   return (
-    <PlatformShell config={evaluationNavigationConfig}>
+    <PlatformShell config={config}>
       {children}
     </PlatformShell>
   )

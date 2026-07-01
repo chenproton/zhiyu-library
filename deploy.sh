@@ -5,8 +5,8 @@
 set -euo pipefail
 
 # ==================== 配置区 ====================
-SITE_NAME="evaluation"
-PORT=3005
+SITE_NAME="zhiyu-library"
+PORT=3009
 
 # ==================== 自动推导 ====================
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"

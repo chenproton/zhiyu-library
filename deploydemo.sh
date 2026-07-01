@@ -12,8 +12,8 @@ DEMO_PASS="${DEMO_PASS:-lEL9cHcBQMjCEqp6}"
 OLD_IP="${OLD_IP:-111.170.170.202}"
 
 # ==================== 项目配置（每个项目只需改这里） ====================
-SITE_NAME="evaluation"
-PORT=3005
+SITE_NAME="zhiyu-library"
+PORT=3009
 
 # ==================== 自动推导 ====================
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"

@@ -94,11 +94,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       fileUrl: data.fileUrl,
       knowledgeCode: data.knowledgeCode,
       knowledgeCourses: data.knowledgeCourses,
-      abilityDomain: data.abilityDomain,
-      abilityCode: data.abilityCode,
       abilityAttribute: data.abilityAttribute,
-      abilityMastery: data.abilityMastery,
-      abilityStandard: data.abilityStandard,
       createdAt: new Date(),
       updatedAt: new Date(),
     }

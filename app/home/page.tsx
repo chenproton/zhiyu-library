@@ -17,7 +17,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { useData } from "@/components/providers/data-provider"
-import { RESOURCE_TYPE_LABELS, COLLEGES, MAJORS, ABILITY_MASTERY_LABELS } from "@/lib/types"
+import { RESOURCE_TYPE_LABELS, COLLEGES, MAJORS } from "@/lib/types"
 import { getResourceTypeStats, mockGranularLessons } from "@/lib/mock-data"
 import type { ResourceType, Resource } from "@/lib/types"
 
@@ -484,15 +484,10 @@ export default function HomePage() {
                     {detailResource.knowledgeCourses && <DetailRow label="关联颗粒课" value={detailResource.knowledgeCourses.split(',').map(id => mockGranularLessons.find(l => l.id === id)?.name || id).filter(Boolean).join('、')} />}
                   </div>
                 )}
-                {detailResource.type === "ability-point" && (
+                {detailResource.type === "ability-point" && detailResource.abilityAttribute && (
                   <div style={{ background: "#f5f3ff", borderRadius: 10, padding: 16, display: "flex", flexDirection: "column", gap: 8 }}>
                     <div style={{ fontSize: 13, fontWeight: 600, color: "#6d28d9", marginBottom: 4 }}>能力点信息</div>
-                    {detailResource.abilityDomain && <DetailRow label="所属能力领域" value={detailResource.abilityDomain} />}
-                    {detailResource.abilityCategory && <DetailRow label="分类" value={detailResource.abilityCategory} />}
-                    {detailResource.abilityCode && <DetailRow label="编码" value={detailResource.abilityCode} />}
-                    {detailResource.abilityAttribute && <DetailRow label="能力属性" value={detailResource.abilityAttribute} />}
-                    {detailResource.abilityMastery && <DetailRow label="掌握程度" value={ABILITY_MASTERY_LABELS[detailResource.abilityMastery]} />}
-                    {detailResource.abilityStandard && <DetailRow label="胜任标准" value={detailResource.abilityStandard} />}
+                    <DetailRow label="能力属性" value={detailResource.abilityAttribute} />
                   </div>
                 )}
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 12, borderTop: "1px solid #e2e8f0", fontSize: 13, color: "#94a3b8" }}>

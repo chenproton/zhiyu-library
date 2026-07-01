@@ -37,24 +37,6 @@ export const ABILITY_MASTERY_LABELS: Record<AbilityMastery, string> = {
   expert: '精通',
 }
 
-export const ABILITY_MASTERY_DESCRIPTIONS: Record<AbilityMastery, string> = {
-  understand: '了解基本概念，能在指导下完成简单任务',
-  comprehend: '理解原理和方法，能独立完成基本任务',
-  master: '能独立完成常规任务，处理一般问题',
-  proficient: '能处理复杂任务，指导他人，优化流程',
-  expert: '行业专家水平，能创新和引领发展方向',
-}
-
-export const ABILITY_DOMAINS = ['业务洞察', '专业工具', '通用素质', '团队协作', '创新思维']
-
-export const ABILITY_DOMAIN_DESCRIPTIONS: Record<string, string> = {
-  '业务洞察': '对业务场景、用户需求的理解与洞察能力',
-  '专业工具': '专业领域内的工具使用与技术应用能力',
-  '通用素质': '通用职业素养与基础素质能力',
-  '团队协作': '团队沟通、协作与领导能力',
-  '创新思维': '创新意识、问题解决与学习能力',
-}
-
 export type UserRole = 'teacher' | 'admin'
 
 export interface User {
@@ -103,11 +85,7 @@ export interface Resource {
   fileUrl?: string
   knowledgeCode?: string
   knowledgeCourses?: string
-  abilityDomain?: string
-  abilityCode?: string
   abilityAttribute?: AbilityAttribute
-  abilityMastery?: AbilityMastery
-  abilityStandard?: string
   createdAt: Date
   updatedAt: Date
 }
@@ -141,11 +119,7 @@ export interface ResourceFormData {
   fileUrl?: string
   knowledgeCode?: string
   knowledgeCourses?: string
-  abilityDomain?: string
-  abilityCode?: string
   abilityAttribute?: AbilityAttribute
-  abilityMastery?: AbilityMastery
-  abilityStandard?: string
 }
 
 export const COLLEGES = [

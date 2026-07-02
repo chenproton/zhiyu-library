@@ -68,7 +68,7 @@ export default function MyResourcesPage() {
     toggleFavorite, isFavorite,
   } = useData()
 
-  const [activeTab, setActiveTab] = useState<"uploads" | "favorites" | "shared" | "unshared">("uploads")
+  const [activeTab, setActiveTab] = useState<"mine" | "shared" | "unshared" | "favorites">("mine")
   const [search, setSearch] = useState("")
   const [typeFilter, setTypeFilter] = useState<ResourceType | "all">("all")
   const [statusFilter, setStatusFilter] = useState<ResourceStatus | "all">("all")
@@ -205,19 +205,19 @@ export default function MyResourcesPage() {
         <p className="text-sm text-gray-500">管理我上传的资源与收藏</p>
       </div>
 
-      <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v as "uploads" | "favorites" | "shared" | "unshared"); setSearch(""); setTypeFilter("all"); setStatusFilter("all") }}>
+      <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v as "mine" | "shared" | "unshared" | "favorites"); setSearch(""); setTypeFilter("all"); setStatusFilter("all") }}>
         <TabsList>
-          <TabsTrigger value="uploads">
-            <Upload className="size-4 mr-1.5" />我上传的 ({myUploads.length})
-          </TabsTrigger>
-          <TabsTrigger value="favorites">
-            <Heart className="size-4 mr-1.5" />我的收藏 ({favorites.length})
+          <TabsTrigger value="mine">
+            <Upload className="size-4 mr-1.5" />我的资源 ({myUploads.length})
           </TabsTrigger>
           <TabsTrigger value="shared">
             <Share2 className="size-4 mr-1.5" />已共享资源 ({myShared.length})
           </TabsTrigger>
           <TabsTrigger value="unshared">
             <Lock className="size-4 mr-1.5" />未共享资源 ({myUnshared.length})
+          </TabsTrigger>
+          <TabsTrigger value="favorites">
+            <Heart className="size-4 mr-1.5" />我收藏的资源 ({favorites.length})
           </TabsTrigger>
         </TabsList>
       </Tabs>
@@ -227,7 +227,7 @@ export default function MyResourcesPage() {
           <div className="flex items-center gap-3 flex-wrap">
             <div className="relative flex-1 min-w-[180px] max-w-[300px]">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-gray-400" />
-              <Input placeholder={`搜索${activeTab === "uploads" ? "我上传的" : activeTab === "favorites" ? "收藏的" : activeTab === "shared" ? "已共享的" : "未共享的"}资源...`} value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+              <Input placeholder={`搜索${activeTab === "mine" ? "我的" : activeTab === "favorites" ? "收藏的" : activeTab === "shared" ? "已共享的" : "未共享的"}资源...`} value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
             </div>
             <Select value={typeFilter} onValueChange={(v) => setTypeFilter(v as ResourceType | "all")}>
               <SelectTrigger className="w-[130px]"><SelectValue placeholder="类型" /></SelectTrigger>
@@ -236,7 +236,7 @@ export default function MyResourcesPage() {
                 {Object.entries(RESOURCE_TYPE_LABELS).map(([k, v]) => (<SelectItem key={k} value={k}>{v}</SelectItem>))}
               </SelectContent>
             </Select>
-            {activeTab !== "favorites" && (
+            {(activeTab === "mine" || activeTab === "shared" || activeTab === "unshared") && (
               <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as ResourceStatus | "all")}>
                 <SelectTrigger className="w-[120px]"><SelectValue placeholder="状态" /></SelectTrigger>
                 <SelectContent>
@@ -303,8 +303,8 @@ export default function MyResourcesPage() {
         </>
       ) : (
         renderResourceTable(
-          activeTab === "uploads" ? filteredUploads : activeTab === "shared" ? filteredShared : filteredUnshared,
-          activeTab === "uploads" ? "暂无上传的资源" : activeTab === "shared" ? "暂无已共享的资源" : "暂无未共享的资源"
+          activeTab === "mine" ? filteredUploads : activeTab === "shared" ? filteredShared : filteredUnshared,
+          activeTab === "mine" ? "暂无我的资源" : activeTab === "shared" ? "暂无已共享的资源" : "暂无未共享的资源"
         )
       )}
 

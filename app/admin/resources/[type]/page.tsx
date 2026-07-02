@@ -104,9 +104,10 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
   }
 
   const handleAdd = () => {
-    if (!formTitle.trim() || !formContent.trim()) return
+    if (!formTitle.trim()) return
+    const isMetaType = type === "knowledge-point" || type === "ability-point"
     createResource({
-      title: formTitle.trim(), type: type as ResourceType, content: formContent.trim(),
+      title: formTitle.trim(), type: type as ResourceType, content: isMetaType ? formTitle.trim() : formContent.trim(),
       description: formDesc.trim(),
       tags: formTags.split(/[,，]/).map((t) => t.trim()).filter((t) => t.length > 0).slice(0, 5),
       knowledgeCode: formKnowledgeCode.trim() || undefined,
@@ -218,10 +219,12 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
             <DialogDescription>补充本地资源，上传后将进入待审核状态</DialogDescription>
           </DialogHeader>
           <div className="space-y-5 py-2">
-            <div>
-              <Label>资源名称 <span className="text-red-500">*</span></Label>
-              <Input value={formTitle} onChange={(e) => setFormTitle(e.target.value)} placeholder="输入资源名称" className="mt-1.5" maxLength={50} />
-            </div>
+            {!["knowledge-point", "ability-point"].includes(type) && (
+              <div>
+                <Label>资源名称 <span className="text-red-500">*</span></Label>
+                <Input value={formTitle} onChange={(e) => setFormTitle(e.target.value)} placeholder="输入资源名称" className="mt-1.5" maxLength={50} />
+              </div>
+            )}
 
             {type === "link" && (
               <div>
@@ -273,7 +276,7 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
             {type === "knowledge-point" && (
               <div className="space-y-1.5">
                 <Label className="text-sm text-gray-700">知识点名称 <span className="text-red-500">*</span></Label>
-                <Input value={formContent} onChange={(e) => setFormContent(e.target.value)} placeholder="输入知识点名称" />
+                <Input value={formTitle} onChange={(e) => setFormTitle(e.target.value)} placeholder="输入知识点名称" />
               </div>
             )}
 
@@ -300,7 +303,7 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
               <>
                 <div className="space-y-1.5">
                   <Label className="text-sm text-gray-700">能力点名称 <span className="text-red-500">*</span></Label>
-                  <Input value={formContent} onChange={(e) => setFormContent(e.target.value)} placeholder="输入能力点名称" />
+                  <Input value={formTitle} onChange={(e) => setFormTitle(e.target.value)} placeholder="输入能力点名称" />
                 </div>
                 <div className="space-y-1.5">
                   <Label className="text-sm text-gray-700">能力属性</Label>
@@ -344,7 +347,7 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
           </div>
           <DialogFooter className="mt-6">
             <Button variant="outline" onClick={() => setAddOpen(false)}>取消</Button>
-             <Button onClick={handleAdd} disabled={!formTitle.trim() || (!formContent.trim() && !["venue", "equipment", "software", "simulation", "knowledge-point", "ability-point"].includes(type))}>
+             <Button onClick={handleAdd} disabled={!formTitle.trim()}>
               上传并提交审核
             </Button>
           </DialogFooter>

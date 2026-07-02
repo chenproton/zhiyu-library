@@ -81,7 +81,22 @@ export default function AuditPage() {
         </div>
         {selectedIds.length > 0 && (
           <div className="flex items-center gap-2">
-            <Button size="sm" variant="outline" onClick={() => setSelectedIds([])}>
+            <span className="text-sm text-gray-600 mr-1">已选 {selectedIds.length} 项</span>
+            <Button
+              size="sm"
+              onClick={() => {
+                batchApprove(selectedIds)
+                setSelectedIds([])
+              }}
+            >
+              <CheckCircle2 className="size-4 mr-1" />
+              批量通过
+            </Button>
+            <Button size="sm" variant="outline" onClick={() => setBatchRejectOpen(true)}>
+              <XCircle className="size-4 mr-1" />
+              批量拒绝
+            </Button>
+            <Button size="sm" variant="ghost" onClick={() => setSelectedIds([])}>
               取消选择
             </Button>
           </div>
@@ -178,28 +193,6 @@ export default function AuditPage() {
         </CardContent>
       </Card>
 
-      {selectedIds.length > 0 && (
-        <Card className="border-primary/50 bg-primary/5">
-          <CardContent className="p-3 flex items-center gap-3 flex-wrap">
-            <span className="text-sm text-gray-600">已选 {selectedIds.length} 项</span>
-            <Button
-              size="sm"
-              onClick={() => {
-                batchApprove(selectedIds)
-                setSelectedIds([])
-              }}
-            >
-              <CheckCircle2 className="size-4 mr-1" />
-              批量通过
-            </Button>
-            <Button size="sm" variant="outline" onClick={() => setBatchRejectOpen(true)}>
-              <XCircle className="size-4 mr-1" />
-              批量驳回
-            </Button>
-          </CardContent>
-        </Card>
-      )}
-
       <Card>
         <div className="overflow-x-auto">
           <Table>
@@ -291,7 +284,7 @@ export default function AuditPage() {
                         }}
                       >
                         <Eye className="size-3 mr-1" />
-                        预览
+                        查看详情
                       </Button>
                     </div>
                   </TableCell>

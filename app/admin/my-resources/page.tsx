@@ -235,9 +235,7 @@ export default function MyResourcesPage() {
                   <div className="flex items-center gap-1">
                     <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => { setDetailResource(resource); setDetailOpen(true) }}><Eye className="size-3 mr-1" />预览</Button>
                     <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => { setEditResource(resource); setEditDescription(resource.description); setEditTags(resource.tags.join("，")); setEditOpen(true) }}><Pencil className="size-3 mr-1" />编辑</Button>
-                    {(resource.status === "pending" || resource.status === "rejected") && (
-                      <Button size="sm" variant="ghost" className="h-7 text-xs text-red-500" onClick={() => { setDeleteTarget(resource); setDeleteOpen(true) }}><Trash2 className="size-3" /></Button>
-                    )}
+                    <Button size="sm" variant="ghost" className="h-7 text-xs text-red-500" onClick={() => { setDeleteTarget(resource); setDeleteOpen(true) }}><Trash2 className="size-3" /></Button>
                   </div>
                 </TableCell>
               </TableRow>

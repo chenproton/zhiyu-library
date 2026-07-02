@@ -5,7 +5,7 @@ import { useState, useMemo } from "react"
 import {
   Video, FileText, Table, Image, LinkIcon, Music, MapPin, Cpu,
   Monitor, FlaskConical, Ellipsis, Heart, Eye, User, Building2,
-  Search, Clock, Sparkles, TrendingUp, RotateCcw, Download,
+  Search, Clock, Sparkles, TrendingUp, RotateCcw,
   Flame, ArrowRight, Filter, BookOpen, Target,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -425,6 +425,85 @@ export default function HomePage() {
                   </div>
                 </DialogTitle>
               </DialogHeader>
+
+              {/* ── Preview area ── */}
+              {(detailResource.type === "video" || detailResource.type === "image" || detailResource.type === "document" || detailResource.type === "audio" || detailResource.type === "spreadsheet" || detailResource.type === "link") && (
+                <div style={{ borderRadius: 12, overflow: "hidden", border: "1px solid #e2e8f0", backgroundColor: "#f8fafc", marginTop: 8 }}>
+                  {detailResource.type === "video" && (
+                    <div style={{ background: "#0f172a", aspectRatio: "16/9", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
+                      <Video style={{ width: 48, height: 48, color: "rgba(255,255,255,0.2)" }} />
+                      <div style={{ position: "absolute", width: 56, height: 56, borderRadius: "50%", background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", backdropFilter: "blur(4px)", transition: "background 0.2s" }}>
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><polygon points="8,5 19,12 8,19" /></svg>
+                      </div>
+                      <div style={{ position: "absolute", bottom: 10, left: 14, right: 14, display: "flex", justifyContent: "space-between", color: "rgba(255,255,255,0.5)", fontSize: 11 }}>
+                        <span>00:00 / 45:32</span>
+                        <span style={{ background: "rgba(255,255,255,0.1)", padding: "2px 8px", borderRadius: 4 }}>系统内预览</span>
+                      </div>
+                    </div>
+                  )}
+                  {detailResource.type === "image" && (
+                    <div style={{ aspectRatio: "16/10", display: "flex", alignItems: "center", justifyContent: "center", background: "#f1f5f9", position: "relative", flexDirection: "column", gap: 12 }}>
+                      <Image style={{ width: 48, height: 48, color: "#cbd5e1" }} />
+                      <span style={{ fontSize: 12, color: "#94a3b8" }}>图片预览 · 仅限系统内查看</span>
+                      <span style={{ position: "absolute", bottom: 10, right: 12, fontSize: 11, color: "#94a3b8", background: "#fff", padding: "3px 10px", borderRadius: 6, boxShadow: "0 1px 3px rgba(0,0,0,0.08)" }}>{detailResource.fileUrl?.replace("/files/", "") || "预览"}</span>
+                    </div>
+                  )}
+                  {detailResource.type === "document" && (
+                    <div style={{ padding: 20, background: "#fff", minHeight: 200, display: "flex", flexDirection: "column", gap: 12 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10, borderBottom: "1px solid #e2e8f0", paddingBottom: 12 }}>
+                        <FileText style={{ width: 22, height: 22, color: "#f97316" }} />
+                        <div style={{ fontSize: 13, fontWeight: 600, color: "#1e293b" }}>{detailResource.title}</div>
+                      </div>
+                      <div style={{ flex: 1, background: "#fafaf9", borderRadius: 8, padding: 24, display: "flex", alignItems: "center", justifyContent: "center", color: "#94a3b8", fontSize: 13, flexDirection: "column", gap: 8 }}>
+                        <FileText style={{ width: 28, height: 28, opacity: 0.25 }} />
+                        <span>文档内容仅限系统内在线预览</span>
+                      </div>
+                    </div>
+                  )}
+                  {detailResource.type === "audio" && (
+                    <div style={{ padding: 16, background: "linear-gradient(135deg, #fce7f3, #fbcfe8)", display: "flex", alignItems: "center", gap: 14 }}>
+                      <Music style={{ width: 28, height: 28, color: "#ec4899" }} />
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: "#1e293b" }}>{detailResource.title}</div>
+                        <div style={{ fontSize: 11, color: "#94a3b8", marginTop: 2 }}>{detailResource.uploaderName}</div>
+                      </div>
+                      <div style={{ width: 120, height: 4, background: "rgba(236,72,153,0.15)", borderRadius: 2, position: "relative" }}>
+                        <div style={{ width: "35%", height: "100%", background: "#ec4899", borderRadius: 2 }} />
+                      </div>
+                      <span style={{ fontSize: 11, color: "#94a3b8", whiteSpace: "nowrap" }}>03:24 / 12:18</span>
+                    </div>
+                  )}
+                  {detailResource.type === "spreadsheet" && (
+                    <div style={{ padding: 14, background: "#fff" }}>
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 1, background: "#e2e8f0", borderRadius: 6, overflow: "hidden", fontSize: 11 }}>
+                        {["名称", "数量", "单价", "总价"].map(h => (
+                          <div key={h} style={{ background: "#f8fafc", padding: "7px 10px", fontWeight: 600, color: "#475569", textAlign: "center" }}>{h}</div>
+                        ))}
+                        {Array.from({ length: 3 }).map((_, i) => [
+                          `项目 ${i + 1}`, String(Math.floor(Math.random() * 100) + 1),
+                          `¥${(Math.random() * 1000).toFixed(2)}`, `¥${(Math.random() * 10000).toFixed(2)}`,
+                        ].map((c, j) => (
+                          <div key={j} style={{ background: "#fff", padding: "7px 10px", color: "#64748b", textAlign: "center" }}>{c}</div>
+                        )))}
+                      </div>
+                      <div style={{ textAlign: "center", marginTop: 10, fontSize: 11, color: "#94a3b8" }}>表格预览 · 仅限系统内查看</div>
+                    </div>
+                  )}
+                  {detailResource.type === "link" && (
+                    <div style={{ padding: 14, background: "#ecfeff", display: "flex", alignItems: "center", gap: 10 }}>
+                      <LinkIcon style={{ width: 24, height: 24, color: "#06b6d4", flexShrink: 0 }} />
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: "#0e7490" }}>{detailResource.title}</div>
+                        <div style={{ fontSize: 11, color: "#0891b2", marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{detailResource.linkUrl}</div>
+                      </div>
+                      <a href={detailResource.linkUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: "#2563eb", textDecoration: "none", whiteSpace: "nowrap", flexShrink: 0 }}>
+                        前往查看 →
+                      </a>
+                    </div>
+                  )}
+                </div>
+              )}
+
               <div style={{ display: "flex", flexDirection: "column", gap: 16, marginTop: 4 }}>
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 600, color: "#475569", marginBottom: 6 }}>资源描述</div>
@@ -501,9 +580,6 @@ export default function HomePage() {
                   <Button variant={isFavorite(detailResource.id) ? "default" : "outline"} size="sm" onClick={() => toggleFavorite(detailResource.id)}>
                     <Heart className="size-4 mr-1.5" fill={isFavorite(detailResource.id) ? "currentColor" : "none"} />
                     {isFavorite(detailResource.id) ? "已收藏" : "取消收藏"}
-                  </Button>
-                  <Button size="sm" onClick={() => incrementUsage(detailResource.id)}>
-                    <Download className="size-4 mr-1.5" />下载
                   </Button>
                 </div>
               </div>

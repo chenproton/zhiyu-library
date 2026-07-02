@@ -527,17 +527,6 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
               </div>
             )}
 
-            {type === "knowledge-point" && (
-              <div className="space-y-1.5">
-                <Label className="text-sm text-gray-700">关联颗粒课</Label>
-                <TransferLessonsSelector
-                  options={mockGranularLessons.map((l) => ({ label: l.name, value: l.id, subtitle: l.code }))}
-                  selected={formKnowledgeCourses}
-                  onChange={setFormKnowledgeCourses}
-                />
-              </div>
-            )}
-
             {type === "ability-point" && (
               <>
                 <div className="space-y-1.5">
@@ -577,6 +566,17 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
               <Label className="text-sm text-gray-700">{type === "ability-point" ? "能力点描述" : "资源描述"}</Label>
               <Textarea placeholder={type === "ability-point" ? "输入能力点描述" : "输入资源简介、用途说明等"} rows={2} onChange={(e) => setFormDesc(e.target.value)} value={formDesc} maxLength={500} />
             </div>
+
+            {type === "knowledge-point" && (
+              <div className="space-y-1.5">
+                <Label className="text-sm text-gray-700">关联颗粒课</Label>
+                <TransferLessonsSelector
+                  options={mockGranularLessons.map((l) => ({ label: l.name, value: l.id, subtitle: l.code }))}
+                  selected={formKnowledgeCourses}
+                  onChange={setFormKnowledgeCourses}
+                />
+              </div>
+            )}
           </div>
           <DialogFooter className="mt-6">
             <Button variant="outline" onClick={() => setAddOpen(false)}>取消</Button>
@@ -600,17 +600,6 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
               <div className="space-y-1.5">
                 <Label className="text-sm text-gray-700">编码</Label>
                 <Input value={formKnowledgeCode} onChange={(e) => setFormKnowledgeCode(e.target.value)} placeholder="例如：KP-001" />
-              </div>
-            )}
-
-            {type === "knowledge-point" && (
-              <div className="space-y-1.5">
-                <Label className="text-sm text-gray-700">关联颗粒课</Label>
-                <TransferLessonsSelector
-                  options={mockGranularLessons.map((l) => ({ label: l.name, value: l.id, subtitle: l.code }))}
-                  selected={formKnowledgeCourses}
-                  onChange={setFormKnowledgeCourses}
-                />
               </div>
             )}
 
@@ -666,6 +655,17 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
               <Label className="text-sm text-gray-700">{type === "ability-point" ? "能力点描述" : "资源描述"}</Label>
               <Textarea value={formDesc} onChange={(e) => setFormDesc(e.target.value)} maxLength={500} rows={3} />
             </div>
+
+            {type === "knowledge-point" && (
+              <div className="space-y-1.5">
+                <Label className="text-sm text-gray-700">关联颗粒课</Label>
+                <TransferLessonsSelector
+                  options={mockGranularLessons.map((l) => ({ label: l.name, value: l.id, subtitle: l.code }))}
+                  selected={formKnowledgeCourses}
+                  onChange={setFormKnowledgeCourses}
+                />
+              </div>
+            )}
           </div>
           <DialogFooter className="mt-6">
             <Button variant="outline" onClick={() => setEditOpen(false)}>取消</Button>

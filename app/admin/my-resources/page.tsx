@@ -298,6 +298,23 @@ export default function MyResourcesPage() {
                 </SelectContent>
               </Select>
             )}
+            {showBatchActions && (
+              <div className="flex items-center gap-2 ml-auto">
+                <span className="text-sm text-gray-600">已选 {selectedIds.size} 项</span>
+                {activeTab === "shared" ? (
+                  <Button size="sm" variant="outline" onClick={() => handleBatchShare(false)} disabled={selectedIds.size === 0}>
+                    <Lock className="size-4 mr-1.5" />取消共享
+                  </Button>
+                ) : (
+                  <Button size="sm" variant="outline" onClick={() => handleBatchShare(true)} disabled={selectedIds.size === 0}>
+                    <Share2 className="size-4 mr-1.5" />一键共享
+                  </Button>
+                )}
+                <Button size="sm" variant="ghost" onClick={() => setSelectedIds(new Set())} disabled={selectedIds.size === 0}>
+                  清空
+                </Button>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -314,30 +331,6 @@ export default function MyResourcesPage() {
           </Tabs>
         </CardContent>
       </Card>
-
-      {showBatchActions && (
-        <Card>
-          <CardContent className="p-3 flex items-center justify-between flex-wrap gap-3">
-            <div className="text-sm text-gray-600">
-              已选择 <span className="font-semibold text-gray-900">{selectedIds.size}</span> 项
-            </div>
-            <div className="flex items-center gap-2">
-              {activeTab === "shared" ? (
-                <Button size="sm" variant="outline" onClick={() => handleBatchShare(false)} disabled={selectedIds.size === 0}>
-                  <Lock className="size-4 mr-1.5" />取消共享
-                </Button>
-              ) : (
-                <Button size="sm" variant="outline" onClick={() => handleBatchShare(true)} disabled={selectedIds.size === 0}>
-                  <Share2 className="size-4 mr-1.5" />一键共享
-                </Button>
-              )}
-              <Button size="sm" variant="ghost" onClick={() => setSelectedIds(new Set())} disabled={selectedIds.size === 0}>
-                清空选择
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
       {activeTab === "favorites" ? (
         <>

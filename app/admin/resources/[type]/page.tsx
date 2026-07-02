@@ -3,7 +3,7 @@
 import { useState, useMemo, use } from "react"
 import {
   Search, RotateCcw, Trash2,
-  Eye, Pencil, Plus, Upload, BookOpen,
+  Eye, Pencil, Plus, Upload, BookOpen, X, ChevronRight,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Textarea } from "@/components/ui/textarea"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import { Label } from "@/components/ui/label"
 import { useData } from "@/components/providers/data-provider"
 import { useToast } from "@/hooks/use-toast"
@@ -26,6 +27,143 @@ const STATUS_COLORS: Record<ResourceStatus, string> = {
   pending: "bg-amber-50 text-amber-600 border-amber-200",
   approved: "bg-green-50 text-green-600 border-green-200",
   rejected: "bg-red-50 text-red-600 border-red-200",
+}
+
+interface TransferOption {
+  label: string
+  value: string
+  subtitle?: string
+}
+
+function TransferLessonsSelector({
+  options,
+  selected,
+  onChange,
+}: {
+  options: TransferOption[]
+  selected: string[]
+  onChange: (selected: string[]) => void
+}) {
+  const [leftSearch, setLeftSearch] = useState("")
+  const [rightSearch, setRightSearch] = useState("")
+
+  const selectedSet = new Set(selected)
+
+  const leftOptions = useMemo(() => {
+    const available = options.filter((o) => !selectedSet.has(o.value))
+    if (!leftSearch.trim()) return available
+    const q = leftSearch.toLowerCase()
+    return available.filter(
+      (o) =>
+        o.label.toLowerCase().includes(q) ||
+        (o.subtitle && o.subtitle.toLowerCase().includes(q))
+    )
+  }, [options, selected, leftSearch])
+
+  const rightOptions = useMemo(() => {
+    const chosen = options.filter((o) => selectedSet.has(o.value))
+    if (!rightSearch.trim()) return chosen
+    const q = rightSearch.toLowerCase()
+    return chosen.filter(
+      (o) =>
+        o.label.toLowerCase().includes(q) ||
+        (o.subtitle && o.subtitle.toLowerCase().includes(q))
+    )
+  }, [options, selected, rightSearch])
+
+  const moveToRight = (value: string) => {
+    if (!selected.includes(value)) onChange([...selected, value])
+  }
+
+  const moveToLeft = (value: string) => {
+    onChange(selected.filter((v) => v !== value))
+  }
+
+  return (
+    <div className="grid grid-cols-2 gap-4 h-[360px]">
+      <div className="border rounded-lg flex flex-col overflow-hidden">
+        <div className="px-3 py-2 border-b bg-gray-50 flex items-center justify-between">
+          <span className="text-sm font-medium text-gray-700">全部颗粒课</span>
+          <span className="text-xs text-gray-400">{leftOptions.length}</span>
+        </div>
+        <div className="p-2 border-b">
+          <div className="relative">
+            <Search className="absolute left-2 top-1/2 size-3.5 -translate-y-1/2 text-gray-400" />
+            <Input
+              placeholder="搜索颗粒课..."
+              value={leftSearch}
+              onChange={(e) => setLeftSearch(e.target.value)}
+              className="pl-7 h-8 text-sm"
+            />
+          </div>
+        </div>
+        <ScrollArea className="flex-1">
+          {leftOptions.length === 0 ? (
+            <div className="h-full flex items-center justify-center text-sm text-gray-400 p-4">暂无可用颗粒课</div>
+          ) : (
+            <div className="p-1">
+              {leftOptions.map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => moveToRight(option.value)}
+                  className="w-full flex items-center justify-between gap-2 px-2 py-1.5 rounded hover:bg-gray-50 text-left"
+                >
+                  <div className="min-w-0">
+                    <div className="text-sm text-gray-700 truncate">{option.label}</div>
+                    {option.subtitle && <div className="text-xs text-gray-400">{option.subtitle}</div>}
+                  </div>
+                  <ChevronRight className="size-4 text-gray-300 shrink-0" />
+                </button>
+              ))}
+            </div>
+          )}
+        </ScrollArea>
+      </div>
+
+      <div className="border rounded-lg flex flex-col overflow-hidden">
+        <div className="px-3 py-2 border-b bg-blue-50 flex items-center justify-between">
+          <span className="text-sm font-medium text-blue-700">已关联颗粒课</span>
+          <span className="text-xs text-blue-400">{rightOptions.length}</span>
+        </div>
+        <div className="p-2 border-b">
+          <div className="relative">
+            <Search className="absolute left-2 top-1/2 size-3.5 -translate-y-1/2 text-gray-400" />
+            <Input
+              placeholder="搜索已关联..."
+              value={rightSearch}
+              onChange={(e) => setRightSearch(e.target.value)}
+              className="pl-7 h-8 text-sm"
+            />
+          </div>
+        </div>
+        <ScrollArea className="flex-1">
+          {rightOptions.length === 0 ? (
+            <div className="h-full flex items-center justify-center text-sm text-gray-400 p-4">暂无已关联颗粒课</div>
+          ) : (
+            <div className="p-1">
+              {rightOptions.map((option) => (
+                <div
+                  key={option.value}
+                  className="flex items-center justify-between gap-2 px-2 py-1.5 rounded bg-blue-50/50 border border-blue-100 mb-1"
+                >
+                  <div className="min-w-0">
+                    <div className="text-sm text-blue-700 truncate">{option.label}</div>
+                    {option.subtitle && <div className="text-xs text-blue-400">{option.subtitle}</div>}
+                  </div>
+                  <button
+                    onClick={() => moveToLeft(option.value)}
+                    className="shrink-0 p-0.5 rounded hover:bg-blue-100 text-blue-400 hover:text-blue-600"
+                  >
+                    <X className="size-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </ScrollArea>
+      </div>
+    </div>
+  )
 }
 
 function FileIcon({ className }: { className?: string }) {
@@ -440,17 +578,13 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
       </Dialog>
 
       <Dialog open={coursesEditOpen} onOpenChange={setCoursesEditOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-2xl">
           <DialogHeader><DialogTitle>关联颗粒课</DialogTitle></DialogHeader>
-          <div className="py-2">
-            <MultiSelectSearch
-              options={mockGranularLessons.map((l) => ({ label: l.name, value: l.id, subtitle: l.code }))}
-              selected={coursesEditValue}
-              onChange={setCoursesEditValue}
-              placeholder="选择关联颗粒课"
-              searchPlaceholder="搜索颗粒课..."
-            />
-          </div>
+          <TransferLessonsSelector
+            options={mockGranularLessons.map((l) => ({ label: l.name, value: l.id, subtitle: l.code }))}
+            selected={coursesEditValue}
+            onChange={setCoursesEditValue}
+          />
           <DialogFooter>
             <Button variant="outline" onClick={() => setCoursesEditOpen(false)}>取消</Button>
             <Button onClick={handleCoursesEditSave}>保存</Button>

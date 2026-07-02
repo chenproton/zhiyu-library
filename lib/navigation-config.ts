@@ -41,6 +41,8 @@ export const backendNavigationConfig: PlatformNavigationConfig = {
       label: "公共资源库",
       icon: "folderKanban",
       children: [
+        { id: "admin-knowledge-point", label: "知识点", href: "/admin/resources/knowledge-point", matchers: ["/admin/resources/knowledge-point"] },
+        { id: "admin-ability-point", label: "能力点", href: "/admin/resources/ability-point", matchers: ["/admin/resources/ability-point"] },
         { id: "admin-video", label: "视频", href: "/admin/resources/video", matchers: ["/admin/resources/video"] },
         { id: "admin-document", label: "文档", href: "/admin/resources/document", matchers: ["/admin/resources/document"] },
         { id: "admin-spreadsheet", label: "表格", href: "/admin/resources/spreadsheet", matchers: ["/admin/resources/spreadsheet"] },
@@ -52,8 +54,6 @@ export const backendNavigationConfig: PlatformNavigationConfig = {
         { id: "admin-simulation", label: "仿真", href: "/admin/resources/simulation", matchers: ["/admin/resources/simulation"] },
         { id: "admin-audio", label: "音频", href: "/admin/resources/audio", matchers: ["/admin/resources/audio"] },
         { id: "admin-other", label: "其他", href: "/admin/resources/other", matchers: ["/admin/resources/other"] },
-        { id: "admin-knowledge-point", label: "知识点", href: "/admin/resources/knowledge-point", matchers: ["/admin/resources/knowledge-point"] },
-        { id: "admin-ability-point", label: "能力点", href: "/admin/resources/ability-point", matchers: ["/admin/resources/ability-point"] },
       ],
     },
     {

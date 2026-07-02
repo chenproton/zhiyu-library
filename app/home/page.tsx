@@ -97,7 +97,7 @@ const TYPE_ICONS: Record<ResourceType, React.ReactNode> = {
   "ability-point": <Target className="size-5" />,
 }
 
-const ALL_TYPES: ResourceType[] = ["video", "document", "spreadsheet", "image", "link", "audio", "venue", "equipment", "software", "simulation", "other", "knowledge-point", "ability-point"]
+const ALL_TYPES: ResourceType[] = ["knowledge-point", "ability-point", "video", "document", "spreadsheet", "image", "link", "audio", "venue", "equipment", "software", "simulation", "other"]
 const ALL_COLLEGES = ["全部", ...COLLEGES]
 
 const TIME_RANGES = [

@@ -17,6 +17,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { useData } from "@/components/providers/data-provider"
+import { useToast } from "@/hooks/use-toast"
 import { RESOURCE_TYPE_LABELS, COLLEGES, MAJORS } from "@/lib/types"
 import { getResourceTypeStats, mockGranularLessons } from "@/lib/mock-data"
 import type { ResourceType, Resource } from "@/lib/types"
@@ -112,6 +113,7 @@ export default function HomePage() {
     resources, isFavorite, toggleFavorite, incrementUsage,
     getApprovedResources, getFavorites,
   } = useData()
+  const { toast } = useToast()
 
   const [search, setSearch] = useState("")
   const [typeFilter, setTypeFilter] = useState<ResourceType | "全部">("全部")
@@ -557,16 +559,38 @@ export default function HomePage() {
                   </div>
                 )}
                 {detailResource.type === "knowledge-point" && (
-                  <div style={{ background: "#f0f9ff", borderRadius: 10, padding: 16, display: "flex", flexDirection: "column", gap: 8 }}>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: "#0369a1", marginBottom: 4 }}>知识点信息</div>
+                  <div style={{ background: "#f0f9ff", borderRadius: 10, padding: 16, display: "flex", flexDirection: "column", gap: 10 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: "#0369a1" }}>知识点信息</div>
                     {detailResource.knowledgeCode && <DetailRow label="编码" value={detailResource.knowledgeCode} />}
-                    {detailResource.knowledgeCourses && <DetailRow label="关联颗粒课" value={detailResource.knowledgeCourses.split(',').map(id => mockGranularLessons.find(l => l.id === id)?.name || id).filter(Boolean).join('、')} />}
+                    <div>
+                      <div style={{ fontSize: 13, color: "#0369a1", marginBottom: 8 }}>关联颗粒课</div>
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                        {detailResource.knowledgeCourses?.split(',').filter(Boolean).map((id) => {
+                          const lesson = mockGranularLessons.find((l) => l.id === id)
+                          if (!lesson) return null
+                          return (
+                            <button
+                              key={id}
+                              onClick={() => toast({ title: `即将跳转：${lesson.name}`, description: '颗粒课详情页面开发中' })}
+                              style={{ textAlign: "left", background: "#fff", border: "1px solid #bae6fd", borderRadius: 8, padding: "8px 12px", minWidth: 140, cursor: "pointer", transition: "all 0.2s" }}
+                              onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "0 2px 8px rgba(2,132,199,0.12)"; e.currentTarget.style.borderColor = "#7dd3fc" }}
+                              onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.borderColor = "#bae6fd" }}
+                            >
+                              <div style={{ fontSize: 13, fontWeight: 500, color: "#0369a1", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{lesson.name}</div>
+                              <div style={{ fontSize: 11, color: "#38bdf8" }}>{lesson.code}</div>
+                            </button>
+                          )
+                        })}
+                        {!detailResource.knowledgeCourses && <span style={{ fontSize: 13, color: "#7dd3fc" }}>暂无关联颗粒课</span>}
+                      </div>
+                    </div>
                   </div>
                 )}
-                {detailResource.type === "ability-point" && detailResource.abilityAttribute && (
+                {detailResource.type === "ability-point" && (
                   <div style={{ background: "#f5f3ff", borderRadius: 10, padding: 16, display: "flex", flexDirection: "column", gap: 8 }}>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: "#6d28d9", marginBottom: 4 }}>能力点信息</div>
-                    <DetailRow label="能力属性" value={detailResource.abilityAttribute} />
+                    <div style={{ fontSize: 13, fontWeight: 600, color: "#6d28d9" }}>能力点信息</div>
+                    {detailResource.abilityAttribute && <DetailRow label="能力属性" value={detailResource.abilityAttribute} />}
+                    {!detailResource.abilityAttribute && <span style={{ fontSize: 13, color: "#a78bfa" }}>暂无能力属性</span>}
                   </div>
                 )}
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 12, borderTop: "1px solid #e2e8f0", fontSize: 13, color: "#94a3b8" }}>

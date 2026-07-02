@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import { Analytics } from '@vercel/analytics/next'
 import { DataProvider } from '@/components/providers/data-provider'
+import { Toaster } from '@/components/ui/toaster'
 import ShellWrapper from './shell-wrapper'
 import './globals.css'
 
@@ -27,6 +28,7 @@ export default function RootLayout({
             <ShellWrapper>{children}</ShellWrapper>
           </Suspense>
         </DataProvider>
+        <Toaster />
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>

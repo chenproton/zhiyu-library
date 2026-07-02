@@ -3,7 +3,7 @@
 import { useState, useMemo, use } from "react"
 import {
   Search, RotateCcw, Trash2,
-  Eye, Pencil, Plus, Upload,
+  Eye, Pencil, Plus, Upload, BookOpen,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -16,6 +16,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogD
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { useData } from "@/components/providers/data-provider"
+import { useToast } from "@/hooks/use-toast"
 import { MultiSelectSearch } from "@/components/ui/multi-select-search"
 import { RESOURCE_TYPE_LABELS, RESOURCE_STATUS_LABELS, COLLEGES, ALL_ABILITY_ATTRIBUTES } from "@/lib/types"
 import type { ResourceType, ResourceStatus, Resource, AbilityAttribute } from "@/lib/types"
@@ -40,6 +41,7 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
     batchDelete,
     updateResource, createResource,
   } = useData()
+  const { toast } = useToast()
 
   const [search, setSearch] = useState("")
   const [collegeFilter, setCollegeFilter] = useState("all")
@@ -60,6 +62,9 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
 
   const [detailOpen, setDetailOpen] = useState(false)
   const [detailResource, setDetailResource] = useState<Resource | null>(null)
+  const [coursesEditOpen, setCoursesEditOpen] = useState(false)
+  const [coursesEditTarget, setCoursesEditTarget] = useState<Resource | null>(null)
+  const [coursesEditValue, setCoursesEditValue] = useState<string[]>([])
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<Resource | null>(null)
 
@@ -127,6 +132,23 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
         abilityAttribute: formAbilityAttribute || undefined,
       })
       setEditOpen(false); setEditResource(null)
+    }
+  }
+
+  const openCoursesEdit = (resource: Resource) => {
+    setCoursesEditTarget(resource)
+    setCoursesEditValue(resource.knowledgeCourses?.split(',').filter(Boolean) || [])
+    setCoursesEditOpen(true)
+  }
+
+  const handleCoursesEditSave = () => {
+    if (coursesEditTarget) {
+      updateResource(coursesEditTarget.id, {
+        knowledgeCourses: coursesEditValue.join(',') || undefined,
+      })
+      setCoursesEditOpen(false)
+      setCoursesEditTarget(null)
+      setCoursesEditValue([])
     }
   }
 
@@ -201,6 +223,9 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
                     <div className="flex items-center gap-1">
                       <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => { setDetailResource(resource); setDetailOpen(true) }}><Eye className="size-3 mr-1" />预览</Button>
                       <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => openEdit(resource)}><Pencil className="size-3 mr-1" />编辑</Button>
+                      {type === "knowledge-point" && (
+                        <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => openCoursesEdit(resource)}><BookOpen className="size-3 mr-1" />关联颗粒课</Button>
+                      )}
                       <Button size="sm" variant="ghost" className="h-7 text-xs text-red-500" onClick={() => { setDeleteTarget(resource); setDeleteConfirmOpen(true) }}><Trash2 className="size-3" /></Button>
                     </div>
                   </TableCell>
@@ -414,6 +439,25 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
         </DialogContent>
       </Dialog>
 
+      <Dialog open={coursesEditOpen} onOpenChange={setCoursesEditOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader><DialogTitle>关联颗粒课</DialogTitle></DialogHeader>
+          <div className="py-2">
+            <MultiSelectSearch
+              options={mockGranularLessons.map((l) => ({ label: l.name, value: l.id, subtitle: l.code }))}
+              selected={coursesEditValue}
+              onChange={setCoursesEditValue}
+              placeholder="选择关联颗粒课"
+              searchPlaceholder="搜索颗粒课..."
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setCoursesEditOpen(false)}>取消</Button>
+            <Button onClick={handleCoursesEditSave}>保存</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={batchUploadOpen} onOpenChange={setBatchUploadOpen}>
         <DialogContent className="max-w-lg">
           <DialogHeader><DialogTitle>批量上传{typeLabel}资源</DialogTitle><DialogDescription>支持一次性上传多个{typeLabel}资源文件（演示）</DialogDescription></DialogHeader>
@@ -440,20 +484,51 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
               <DialogHeader><DialogTitle>{detailResource.title}</DialogTitle></DialogHeader>
               <div className="space-y-3 mt-4">
                 <div className="flex items-center gap-2"><Badge variant="secondary">{RESOURCE_TYPE_LABELS[detailResource.type]}</Badge><Badge className={STATUS_COLORS[detailResource.status]}>{RESOURCE_STATUS_LABELS[detailResource.status]}</Badge></div>
-                <div><Label className="text-gray-500">描述</Label><p className="text-sm">{detailResource.description}</p></div>
-                {detailResource.type !== "knowledge-point" && detailResource.type !== "ability-point" && (
-                  <div className="flex flex-wrap gap-1">{detailResource.tags.map((tag) => (<Badge key={tag} variant="secondary">{tag}</Badge>))}</div>
-                )}
                 {detailResource.type === "knowledge-point" && (
-                  <div className="bg-blue-50 rounded-lg p-3 space-y-1">
-                    {detailResource.knowledgeCode && <p className="text-xs font-medium text-blue-700">编码：{detailResource.knowledgeCode}</p>}
-                    {detailResource.knowledgeCourses && <p className="text-xs text-blue-600">关联颗粒课：{detailResource.knowledgeCourses.split(',').map(id => mockGranularLessons.find(l => l.id === id)?.name || id).filter(Boolean).join('、')}</p>}
-                  </div>
+                  <>
+                    <div><Label className="text-gray-500">知识点名称</Label><p className="text-sm">{detailResource.title}</p></div>
+                    <div><Label className="text-gray-500">描述</Label><p className="text-sm">{detailResource.description}</p></div>
+                    <div className="bg-blue-50 rounded-lg p-3 space-y-3">
+                      <div className="text-xs font-medium text-blue-700">知识点信息</div>
+                      {detailResource.knowledgeCode && <div className="text-xs text-blue-600"><span className="text-blue-400">编码：</span>{detailResource.knowledgeCode}</div>}
+                      <div>
+                        <div className="text-xs text-blue-600 mb-2"><span className="text-blue-400">关联颗粒课：</span></div>
+                        <div className="flex flex-wrap gap-2">
+                          {detailResource.knowledgeCourses?.split(',').filter(Boolean).map((id) => {
+                            const lesson = mockGranularLessons.find((l) => l.id === id)
+                            if (!lesson) return null
+                            return (
+                              <button
+                                key={id}
+                                onClick={() => toast({ title: `即将跳转：${lesson.name}`, description: '颗粒课详情页面开发中' })}
+                                className="text-left bg-white border border-blue-200 rounded-lg p-2 min-w-[140px] hover:shadow-md hover:border-blue-300 transition-all"
+                              >
+                                <div className="text-xs font-medium text-blue-700 line-clamp-1">{lesson.name}</div>
+                                <div className="text-[10px] text-blue-400">{lesson.code}</div>
+                              </button>
+                            )
+                          })}
+                          {!detailResource.knowledgeCourses && <span className="text-xs text-blue-400">暂无关联颗粒课</span>}
+                        </div>
+                      </div>
+                    </div>
+                  </>
                 )}
-                {detailResource.type === "ability-point" && detailResource.abilityAttribute && (
-                  <div className="bg-purple-50 rounded-lg p-3 space-y-1">
-                    <p className="text-xs font-medium text-purple-700">能力属性：{detailResource.abilityAttribute}</p>
-                  </div>
+                {detailResource.type === "ability-point" && (
+                  <>
+                    <div><Label className="text-gray-500">能力点名称</Label><p className="text-sm">{detailResource.title}</p></div>
+                    <div><Label className="text-gray-500">描述</Label><p className="text-sm">{detailResource.description}</p></div>
+                    <div className="bg-purple-50 rounded-lg p-3 space-y-1">
+                      <div className="text-xs font-medium text-purple-700">能力点信息</div>
+                      {detailResource.abilityAttribute && <div className="text-xs text-purple-600"><span className="text-purple-400">能力属性：</span>{detailResource.abilityAttribute}</div>}
+                    </div>
+                  </>
+                )}
+                {detailResource.type !== "knowledge-point" && detailResource.type !== "ability-point" && (
+                  <>
+                    <div><Label className="text-gray-500">描述</Label><p className="text-sm">{detailResource.description}</p></div>
+                    <div className="flex flex-wrap gap-1">{detailResource.tags.map((tag) => (<Badge key={tag} variant="secondary">{tag}</Badge>))}</div>
+                  </>
                 )}
                 <div><Label className="text-gray-500">上传人</Label><p className="text-sm">{detailResource.uploaderName} · {detailResource.uploaderDepartment}</p></div>
                 {detailResource.rejectReason && <p className="text-sm text-red-600">驳回原因：{detailResource.rejectReason}</p>}

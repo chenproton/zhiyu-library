@@ -86,6 +86,7 @@ export interface Resource {
   knowledgeCode?: string
   knowledgeCourses?: string
   abilityAttribute?: AbilityAttribute
+  isShared?: boolean
   createdAt: Date
   updatedAt: Date
 }

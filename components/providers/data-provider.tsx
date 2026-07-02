@@ -23,6 +23,8 @@ interface DataContextValue {
   incrementUsage: (id: string) => void
   getApprovedResources: () => Resource[]
   getMyUploads: () => Resource[]
+  getMySharedResources: () => Resource[]
+  getMyUnsharedResources: () => Resource[]
   getPendingResources: () => Resource[]
 }
 
@@ -95,6 +97,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       knowledgeCode: data.knowledgeCode,
       knowledgeCourses: data.knowledgeCourses,
       abilityAttribute: data.abilityAttribute,
+      isShared: false,
       createdAt: new Date(),
       updatedAt: new Date(),
     }
@@ -168,6 +171,12 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const getMyUploads = useCallback(() =>
     resources.filter(r => r.uploaderId === mockCurrentUser.id), [resources])
 
+  const getMySharedResources = useCallback(() =>
+    resources.filter(r => r.uploaderId === mockCurrentUser.id && r.isShared), [resources])
+
+  const getMyUnsharedResources = useCallback(() =>
+    resources.filter(r => r.uploaderId === mockCurrentUser.id && !r.isShared), [resources])
+
   const getPendingResources = useCallback(() =>
     resources.filter(r => r.status === 'pending'), [resources])
 
@@ -190,6 +199,8 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     incrementUsage,
     getApprovedResources,
     getMyUploads,
+    getMySharedResources,
+    getMyUnsharedResources,
     getPendingResources,
   }
 

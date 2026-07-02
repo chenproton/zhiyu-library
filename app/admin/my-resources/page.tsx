@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react"
 import {
-  Search, Pencil, Trash2, Eye, XCircle, Heart, Upload,
+  Search, Pencil, Trash2, Eye, XCircle, Heart, Upload, Share2, Lock,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -63,11 +63,12 @@ const TYPE_EMOJI: Record<ResourceType, string> = {
 
 export default function MyResourcesPage() {
   const {
-    getMyUploads, getFavorites, updateResource, deleteResource,
+    getMyUploads, getFavorites, getMySharedResources, getMyUnsharedResources,
+    updateResource, deleteResource,
     toggleFavorite, isFavorite,
   } = useData()
 
-  const [activeTab, setActiveTab] = useState<"uploads" | "favorites">("uploads")
+  const [activeTab, setActiveTab] = useState<"uploads" | "favorites" | "shared" | "unshared">("uploads")
   const [search, setSearch] = useState("")
   const [typeFilter, setTypeFilter] = useState<ResourceType | "all">("all")
   const [statusFilter, setStatusFilter] = useState<ResourceStatus | "all">("all")
@@ -83,6 +84,8 @@ export default function MyResourcesPage() {
 
   const myUploads = useMemo(() => getMyUploads(), [getMyUploads])
   const favorites = useMemo(() => getFavorites(), [getFavorites])
+  const myShared = useMemo(() => getMySharedResources(), [getMySharedResources])
+  const myUnshared = useMemo(() => getMyUnsharedResources(), [getMyUnsharedResources])
 
   const filteredUploads = useMemo(() => {
     let list = [...myUploads]
@@ -105,6 +108,28 @@ export default function MyResourcesPage() {
     return list
   }, [favorites, typeFilter, search])
 
+  const filteredShared = useMemo(() => {
+    let list = [...myShared]
+    if (typeFilter !== "all") list = list.filter((r) => r.type === typeFilter)
+    if (statusFilter !== "all") list = list.filter((r) => r.status === statusFilter)
+    if (search.trim()) {
+      const q = search.toLowerCase()
+      list = list.filter((r) => r.title.toLowerCase().includes(q) || r.tags.some((t) => t.toLowerCase().includes(q)))
+    }
+    return list
+  }, [myShared, typeFilter, statusFilter, search])
+
+  const filteredUnshared = useMemo(() => {
+    let list = [...myUnshared]
+    if (typeFilter !== "all") list = list.filter((r) => r.type === typeFilter)
+    if (statusFilter !== "all") list = list.filter((r) => r.status === statusFilter)
+    if (search.trim()) {
+      const q = search.toLowerCase()
+      list = list.filter((r) => r.title.toLowerCase().includes(q) || r.tags.some((t) => t.toLowerCase().includes(q)))
+    }
+    return list
+  }, [myUnshared, typeFilter, statusFilter, search])
+
   const handleEdit = () => {
     if (editResource && editDescription.trim()) {
       updateResource(editResource.id, {
@@ -116,6 +141,63 @@ export default function MyResourcesPage() {
     }
   }
 
+  const renderResourceTable = (list: Resource[], emptyText: string) => (
+    <Card>
+      <div className="overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>资源标题</TableHead>
+              <TableHead className="w-20">类型</TableHead>
+              <TableHead className="w-20">状态</TableHead>
+              <TableHead className="w-24">是否共享</TableHead>
+              <TableHead className="w-20">使用次数</TableHead>
+              <TableHead className="w-28">上传时间</TableHead>
+              <TableHead className="w-52">操作</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {list.map((resource) => (
+              <TableRow key={resource.id}>
+                <TableCell><div className="text-sm font-medium text-gray-800 line-clamp-1 max-w-[300px]">{resource.title}</div></TableCell>
+                <TableCell><Badge variant="secondary" className="text-xs">{RESOURCE_TYPE_LABELS[resource.type]}</Badge></TableCell>
+                <TableCell>
+                  <div className="flex flex-col gap-1">
+                    <Badge className={`text-xs ${STATUS_COLORS[resource.status]}`}>{RESOURCE_STATUS_LABELS[resource.status]}</Badge>
+                    {resource.rejectReason && <span className="text-[10px] text-red-500 line-clamp-1" title={resource.rejectReason}>{resource.rejectReason}</span>}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  {resource.isShared ? (
+                    <Badge variant="outline" className="text-xs bg-green-50 text-green-600 border-green-200">
+                      <Share2 className="size-3 mr-1" />已共享
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="text-xs bg-gray-50 text-gray-500 border-gray-200">
+                      <Lock className="size-3 mr-1" />未共享
+                    </Badge>
+                  )}
+                </TableCell>
+                <TableCell><span className="text-xs text-gray-500">{resource.usageCount}</span></TableCell>
+                <TableCell><span className="text-xs text-gray-400">{resource.createdAt.toLocaleDateString("zh-CN")}</span></TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-1">
+                    <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => { setDetailResource(resource); setDetailOpen(true) }}><Eye className="size-3 mr-1" />预览</Button>
+                    <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => { setEditResource(resource); setEditDescription(resource.description); setEditTags(resource.tags.join("，")); setEditOpen(true) }}><Pencil className="size-3 mr-1" />编辑</Button>
+                    {(resource.status === "pending" || resource.status === "rejected") && (
+                      <Button size="sm" variant="ghost" className="h-7 text-xs text-red-500" onClick={() => { setDeleteTarget(resource); setDeleteOpen(true) }}><Trash2 className="size-3" /></Button>
+                    )}
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+            {list.length === 0 && <TableRow><TableCell colSpan={7} className="text-center py-12 text-gray-400">{emptyText}</TableCell></TableRow>}
+          </TableBody>
+        </Table>
+      </div>
+    </Card>
+  )
+
   return (
     <div className="space-y-4">
       <div>
@@ -123,13 +205,19 @@ export default function MyResourcesPage() {
         <p className="text-sm text-gray-500">管理我上传的资源与收藏</p>
       </div>
 
-      <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v as "uploads" | "favorites"); setSearch(""); setTypeFilter("all"); setStatusFilter("all") }}>
+      <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v as "uploads" | "favorites" | "shared" | "unshared"); setSearch(""); setTypeFilter("all"); setStatusFilter("all") }}>
         <TabsList>
           <TabsTrigger value="uploads">
             <Upload className="size-4 mr-1.5" />我上传的 ({myUploads.length})
           </TabsTrigger>
           <TabsTrigger value="favorites">
             <Heart className="size-4 mr-1.5" />我的收藏 ({favorites.length})
+          </TabsTrigger>
+          <TabsTrigger value="shared">
+            <Share2 className="size-4 mr-1.5" />已共享资源 ({myShared.length})
+          </TabsTrigger>
+          <TabsTrigger value="unshared">
+            <Lock className="size-4 mr-1.5" />未共享资源 ({myUnshared.length})
           </TabsTrigger>
         </TabsList>
       </Tabs>
@@ -139,7 +227,7 @@ export default function MyResourcesPage() {
           <div className="flex items-center gap-3 flex-wrap">
             <div className="relative flex-1 min-w-[180px] max-w-[300px]">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-gray-400" />
-              <Input placeholder={`搜索${activeTab === "uploads" ? "我上传的" : "收藏的"}资源...`} value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+              <Input placeholder={`搜索${activeTab === "uploads" ? "我上传的" : activeTab === "favorites" ? "收藏的" : activeTab === "shared" ? "已共享的" : "未共享的"}资源...`} value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
             </div>
             <Select value={typeFilter} onValueChange={(v) => setTypeFilter(v as ResourceType | "all")}>
               <SelectTrigger className="w-[130px]"><SelectValue placeholder="类型" /></SelectTrigger>
@@ -148,7 +236,7 @@ export default function MyResourcesPage() {
                 {Object.entries(RESOURCE_TYPE_LABELS).map(([k, v]) => (<SelectItem key={k} value={k}>{v}</SelectItem>))}
               </SelectContent>
             </Select>
-            {activeTab === "uploads" && (
+            {activeTab !== "favorites" && (
               <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as ResourceStatus | "all")}>
                 <SelectTrigger className="w-[120px]"><SelectValue placeholder="状态" /></SelectTrigger>
                 <SelectContent>
@@ -176,50 +264,7 @@ export default function MyResourcesPage() {
         </CardContent>
       </Card>
 
-      {activeTab === "uploads" ? (
-        <Card>
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>资源标题</TableHead>
-                  <TableHead className="w-20">类型</TableHead>
-                  <TableHead className="w-20">状态</TableHead>
-                  <TableHead className="w-20">使用次数</TableHead>
-                  <TableHead className="w-28">上传时间</TableHead>
-                  <TableHead className="w-52">操作</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredUploads.map((resource) => (
-                  <TableRow key={resource.id}>
-                    <TableCell><div className="text-sm font-medium text-gray-800 line-clamp-1 max-w-[300px]">{resource.title}</div></TableCell>
-                    <TableCell><Badge variant="secondary" className="text-xs">{RESOURCE_TYPE_LABELS[resource.type]}</Badge></TableCell>
-                    <TableCell>
-                      <div className="flex flex-col gap-1">
-                        <Badge className={`text-xs ${STATUS_COLORS[resource.status]}`}>{RESOURCE_STATUS_LABELS[resource.status]}</Badge>
-                        {resource.rejectReason && <span className="text-[10px] text-red-500 line-clamp-1" title={resource.rejectReason}>{resource.rejectReason}</span>}
-                      </div>
-                    </TableCell>
-                    <TableCell><span className="text-xs text-gray-500">{resource.usageCount}</span></TableCell>
-                    <TableCell><span className="text-xs text-gray-400">{resource.createdAt.toLocaleDateString("zh-CN")}</span></TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => { setDetailResource(resource); setDetailOpen(true) }}><Eye className="size-3 mr-1" />预览</Button>
-                        <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => { setEditResource(resource); setEditDescription(resource.description); setEditTags(resource.tags.join("，")); setEditOpen(true) }}><Pencil className="size-3 mr-1" />编辑</Button>
-                        {(resource.status === "pending" || resource.status === "rejected") && (
-                          <Button size="sm" variant="ghost" className="h-7 text-xs text-red-500" onClick={() => { setDeleteTarget(resource); setDeleteOpen(true) }}><Trash2 className="size-3" /></Button>
-                        )}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-                {filteredUploads.length === 0 && <TableRow><TableCell colSpan={6} className="text-center py-12 text-gray-400">暂无上传的资源</TableCell></TableRow>}
-              </TableBody>
-            </Table>
-          </div>
-        </Card>
-      ) : (
+      {activeTab === "favorites" ? (
         <>
           {filteredFavorites.length === 0 ? (
             <div className="text-center py-16 text-gray-400">
@@ -243,7 +288,12 @@ export default function MyResourcesPage() {
                     <div className="text-xs text-gray-500 mb-2">{RESOURCE_TYPE_LABELS[resource.type]} · {resource.department}</div>
                     <div className="flex items-center justify-between text-xs text-gray-400">
                       <span className="flex items-center gap-0.5"><Eye className="size-3" />{resource.usageCount}</span>
-                      <button onClick={() => toggleFavorite(resource.id)} className="text-red-500"><Heart className="size-4" fill="currentColor" /></button>
+                      <div className="flex items-center gap-2">
+                        <span className={resource.isShared ? "text-green-600" : "text-gray-400"}>
+                          {resource.isShared ? "已共享" : "未共享"}
+                        </span>
+                        <button onClick={() => toggleFavorite(resource.id)} className="text-red-500"><Heart className="size-4" fill="currentColor" /></button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -251,6 +301,11 @@ export default function MyResourcesPage() {
             </div>
           )}
         </>
+      ) : (
+        renderResourceTable(
+          activeTab === "uploads" ? filteredUploads : activeTab === "shared" ? filteredShared : filteredUnshared,
+          activeTab === "uploads" ? "暂无上传的资源" : activeTab === "shared" ? "暂无已共享的资源" : "暂无未共享的资源"
+        )
       )}
 
       <Dialog open={editOpen} onOpenChange={setEditOpen}>

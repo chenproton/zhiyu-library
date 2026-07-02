@@ -3,7 +3,7 @@
 import { useState, useMemo, use } from "react"
 import {
   Search, RotateCcw, Trash2,
-  Eye, Pencil, Plus, Upload, BookOpen, X, ChevronRight,
+  Eye, Pencil, Plus, Upload, BookOpen, X, ChevronRight, Target,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -498,8 +498,8 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
             )}
 
             <div className="space-y-1.5">
-              <Label className="text-sm text-gray-700">资源描述</Label>
-              <Textarea placeholder="输入资源简介、用途说明等" rows={2} onChange={(e) => setFormDesc(e.target.value)} value={formDesc} maxLength={500} />
+              <Label className="text-sm text-gray-700">{type === "ability-point" ? "能力点描述" : "资源描述"}</Label>
+              <Textarea placeholder={type === "ability-point" ? "输入能力点描述" : "输入资源简介、用途说明等"} rows={2} onChange={(e) => setFormDesc(e.target.value)} value={formDesc} maxLength={500} />
             </div>
             {!["knowledge-point", "ability-point"].includes(type) && (
               <div className="space-y-1.5">
@@ -560,7 +560,7 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
             )}
 
             <div className="space-y-1.5">
-              <Label className="text-sm text-gray-700">描述</Label>
+              <Label className="text-sm text-gray-700">{type === "ability-point" ? "能力点描述" : "描述"}</Label>
               <Textarea value={formDesc} onChange={(e) => setFormDesc(e.target.value)} maxLength={500} rows={3} />
             </div>
             {!["knowledge-point", "ability-point"].includes(type) && (
@@ -651,10 +651,22 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
                 {detailResource.type === "ability-point" && (
                   <>
                     <div><Label className="text-gray-500">能力点名称</Label><p className="text-sm">{detailResource.title}</p></div>
-                    <div><Label className="text-gray-500">描述</Label><p className="text-sm">{detailResource.description}</p></div>
-                    <div className="bg-purple-50 rounded-lg p-3 space-y-1">
-                      <div className="text-xs font-medium text-purple-700">能力点信息</div>
-                      {detailResource.abilityAttribute && <div className="text-xs text-purple-600"><span className="text-purple-400">能力属性：</span>{detailResource.abilityAttribute}</div>}
+                    <div><Label className="text-gray-500">能力点描述</Label><p className="text-sm">{detailResource.description}</p></div>
+                    <div className="bg-gradient-to-br from-purple-50 to-violet-50 border border-purple-100 rounded-xl p-4 space-y-3">
+                      <div className="flex items-center gap-2 text-purple-700">
+                        <Target className="size-4" />
+                        <span className="text-sm font-semibold">能力点信息</span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="bg-white/70 rounded-lg p-2.5">
+                          <div className="text-[10px] text-purple-400 mb-0.5">能力属性</div>
+                          <div className="text-sm font-medium text-purple-700">{detailResource.abilityAttribute || "-"}</div>
+                        </div>
+                        <div className="bg-white/70 rounded-lg p-2.5">
+                          <div className="text-[10px] text-purple-400 mb-0.5">状态</div>
+                          <div className="text-sm font-medium text-purple-700">{RESOURCE_STATUS_LABELS[detailResource.status]}</div>
+                        </div>
+                      </div>
                     </div>
                   </>
                 )}
@@ -664,7 +676,15 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
                     <div className="flex flex-wrap gap-1">{detailResource.tags.map((tag) => (<Badge key={tag} variant="secondary">{tag}</Badge>))}</div>
                   </>
                 )}
-                <div><Label className="text-gray-500">上传人</Label><p className="text-sm">{detailResource.uploaderName} · {detailResource.uploaderDepartment}</p></div>
+                <div className="bg-gray-50 rounded-lg p-3 space-y-2">
+                  <div className="text-xs font-medium text-gray-600">元信息</div>
+                  <div className="grid grid-cols-2 gap-3 text-xs text-gray-500">
+                    <div><span className="text-gray-400">创建人：</span>{detailResource.uploaderName}</div>
+                    <div><span className="text-gray-400">所属院系：</span>{detailResource.uploaderDepartment}</div>
+                    <div><span className="text-gray-400">创建时间：</span>{detailResource.createdAt.toLocaleString("zh-CN")}</div>
+                    <div><span className="text-gray-400">最后更新：</span>{detailResource.updatedAt.toLocaleString("zh-CN")}</div>
+                  </div>
+                </div>
                 {detailResource.rejectReason && <p className="text-sm text-red-600">驳回原因：{detailResource.rejectReason}</p>}
               </div>
             </>

@@ -192,10 +192,22 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
   const [formTitle, setFormTitle] = useState("")
   const [formContent, setFormContent] = useState("")
   const [formDesc, setFormDesc] = useState("")
-  const [formTags, setFormTags] = useState("")
   const [formKnowledgeCode, setFormKnowledgeCode] = useState("")
   const [formKnowledgeCourses, setFormKnowledgeCourses] = useState<string[]>([])
   const [formAbilityAttribute, setFormAbilityAttribute] = useState<AbilityAttribute | "">("")
+  // 类型特定字段
+  const [formVenueLocation, setFormVenueLocation] = useState("")
+  const [formVenueOpenTime, setFormVenueOpenTime] = useState("")
+  const [formVenueCapacity, setFormVenueCapacity] = useState("")
+  const [formVenueContact, setFormVenueContact] = useState("")
+  const [formEquipmentLocation, setFormEquipmentLocation] = useState("")
+  const [formEquipmentQuantity, setFormEquipmentQuantity] = useState("")
+  const [formSoftwareVersion, setFormSoftwareVersion] = useState("")
+  const [formSoftwareDownloadUrl, setFormSoftwareDownloadUrl] = useState("")
+  const [formSoftwareLicense, setFormSoftwareLicense] = useState("")
+  const [formSoftwareInstallerUrl, setFormSoftwareInstallerUrl] = useState("")
+  const [formLinkUrl, setFormLinkUrl] = useState("")
+  const [formFileUrl, setFormFileUrl] = useState("")
   const [batchUploadOpen, setBatchUploadOpen] = useState(false)
 
   const [detailOpen, setDetailOpen] = useState(false)
@@ -227,10 +239,18 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
   const toggleSelect = (id: string) => setSelectedIds((prev) => prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id])
   const toggleSelectAll = () => { if (selectedIds.length === filtered.length) setSelectedIds([]); else setSelectedIds(filtered.map((r) => r.id)) }
 
-  const openAdd = () => {
-    setFormTitle(""); setFormContent(""); setFormDesc(""); setFormTags("");
+  const resetForm = () => {
+    setFormTitle(""); setFormContent(""); setFormDesc("");
     setFormKnowledgeCode(""); setFormKnowledgeCourses([]);
     setFormAbilityAttribute("");
+    setFormVenueLocation(""); setFormVenueOpenTime(""); setFormVenueCapacity(""); setFormVenueContact("");
+    setFormEquipmentLocation(""); setFormEquipmentQuantity("");
+    setFormSoftwareVersion(""); setFormSoftwareDownloadUrl(""); setFormSoftwareLicense(""); setFormSoftwareInstallerUrl("");
+    setFormLinkUrl(""); setFormFileUrl("");
+  }
+
+  const openAdd = () => {
+    resetForm()
     setAddOpen(true)
   }
 
@@ -239,36 +259,94 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
     setFormTitle(resource.title)
     setFormContent(resource.content)
     setFormDesc(resource.description)
-    setFormTags(resource.tags.join("，"))
     setFormKnowledgeCode(resource.knowledgeCode || "")
     setFormKnowledgeCourses(resource.knowledgeCourses?.split(',').filter(Boolean) || [])
     setFormAbilityAttribute(resource.abilityAttribute || "")
+    setFormVenueLocation(resource.venueLocation || "")
+    setFormVenueOpenTime(resource.venueOpenTime || "")
+    setFormVenueCapacity(resource.venueCapacity?.toString() || "")
+    setFormVenueContact(resource.venueContact || "")
+    setFormEquipmentLocation(resource.equipmentLocation || "")
+    setFormEquipmentQuantity(resource.equipmentQuantity?.toString() || "")
+    setFormSoftwareVersion(resource.softwareVersion || "")
+    setFormSoftwareDownloadUrl(resource.softwareDownloadUrl || "")
+    setFormSoftwareLicense(resource.softwareLicense || "")
+    setFormSoftwareInstallerUrl(resource.softwareInstallerUrl || "")
+    setFormLinkUrl(resource.linkUrl || "")
+    setFormFileUrl(resource.fileUrl || "")
     setEditOpen(true)
+  }
+
+  const buildFormData = (): Partial<ResourceFormData> => {
+    const base: Partial<ResourceFormData> = {
+      title: formTitle.trim(),
+      description: formDesc.trim(),
+    }
+    switch (type) {
+      case "knowledge-point":
+        return {
+          ...base,
+          content: formTitle.trim(),
+          knowledgeCode: formKnowledgeCode.trim() || undefined,
+          knowledgeCourses: formKnowledgeCourses.join(',') || undefined,
+        }
+      case "ability-point":
+        return {
+          ...base,
+          content: formTitle.trim(),
+          abilityAttribute: formAbilityAttribute || undefined,
+        }
+      case "link":
+        return { ...base, content: formLinkUrl.trim(), linkUrl: formLinkUrl.trim() }
+      case "venue":
+        return {
+          ...base,
+          content: formVenueLocation.trim(),
+          venueLocation: formVenueLocation.trim() || undefined,
+          venueOpenTime: formVenueOpenTime.trim() || undefined,
+          venueCapacity: formVenueCapacity ? Number(formVenueCapacity) : undefined,
+          venueContact: formVenueContact.trim() || undefined,
+        }
+      case "equipment":
+        return {
+          ...base,
+          content: formTitle.trim(),
+          equipmentLocation: formEquipmentLocation.trim() || undefined,
+          equipmentQuantity: formEquipmentQuantity ? Number(formEquipmentQuantity) : undefined,
+        }
+      case "software":
+        return {
+          ...base,
+          content: formTitle.trim(),
+          softwareVersion: formSoftwareVersion.trim() || undefined,
+          softwareDownloadUrl: formSoftwareDownloadUrl.trim() || undefined,
+          softwareLicense: formSoftwareLicense.trim() || undefined,
+          softwareInstallerUrl: formSoftwareInstallerUrl.trim() || undefined,
+        }
+      case "simulation":
+        return { ...base, content: formTitle.trim() }
+      case "document":
+      case "spreadsheet":
+      case "image":
+      case "audio":
+      case "video":
+      case "other":
+        return { ...base, content: formFileUrl.trim(), fileUrl: formFileUrl.trim() || undefined }
+      default:
+        return { ...base, content: formTitle.trim() }
+    }
   }
 
   const handleAdd = () => {
     if (!formTitle.trim()) return
-    const isMetaType = type === "knowledge-point" || type === "ability-point"
-    createResource({
-      title: formTitle.trim(), type: type as ResourceType, content: isMetaType ? formTitle.trim() : formContent.trim(),
-      description: formDesc.trim(),
-      tags: formTags.split(/[,，]/).map((t) => t.trim()).filter((t) => t.length > 0).slice(0, 5),
-      knowledgeCode: formKnowledgeCode.trim() || undefined,
-      knowledgeCourses: formKnowledgeCourses.join(',') || undefined,
-      abilityAttribute: formAbilityAttribute || undefined,
-    })
+    if (type === "link" && !formLinkUrl.trim()) return
+    createResource(buildFormData() as ResourceFormData)
     setAddOpen(false)
   }
 
   const handleEdit = () => {
     if (editResource && formTitle.trim()) {
-      updateResource(editResource.id, {
-        title: formTitle.trim(), description: formDesc.trim(),
-        tags: formTags.split(/[,，]/).map((t) => t.trim()).filter((t) => t.length > 0).slice(0, 5),
-        knowledgeCode: formKnowledgeCode.trim() || undefined,
-        knowledgeCourses: formKnowledgeCourses.join(',') || undefined,
-        abilityAttribute: formAbilityAttribute || undefined,
-      })
+      updateResource(editResource.id, buildFormData())
       setEditOpen(false); setEditResource(null)
     }
   }
@@ -392,46 +470,46 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
             {type === "link" && (
               <div>
                 <Label>URL 地址</Label>
-                <Input value={formContent} onChange={(e) => setFormContent(e.target.value)} placeholder="https://..." className="mt-1.5" />
+                <Input value={formLinkUrl} onChange={(e) => setFormLinkUrl(e.target.value)} placeholder="https://..." className="mt-1.5" />
               </div>
             )}
 
             {type === "venue" && (
               <>
-                <div><Label>场地地址</Label><Input value={formContent} onChange={(e) => setFormContent(e.target.value)} placeholder="输入场地详细地址" className="mt-1.5" /></div>
-                <div><Label>开放时间</Label><Input placeholder="例如：周一至周五 09:00-18:00" className="mt-1.5" /></div>
+                <div><Label>场地地址</Label><Input value={formVenueLocation} onChange={(e) => setFormVenueLocation(e.target.value)} placeholder="输入场地详细地址" className="mt-1.5" /></div>
+                <div><Label>开放时间</Label><Input value={formVenueOpenTime} onChange={(e) => setFormVenueOpenTime(e.target.value)} placeholder="例如：周一至周五 09:00-18:00" className="mt-1.5" /></div>
                 <div className="grid grid-cols-2 gap-3">
-                  <div><Label>容纳人数</Label><Input type="number" placeholder="例如：50" className="mt-1.5" /></div>
-                  <div><Label>联系人/电话</Label><Input placeholder="输入联系人或电话" className="mt-1.5" /></div>
+                  <div><Label>容纳人数</Label><Input value={formVenueCapacity} onChange={(e) => setFormVenueCapacity(e.target.value)} placeholder="例如：50" className="mt-1.5" /></div>
+                  <div><Label>联系人/电话</Label><Input value={formVenueContact} onChange={(e) => setFormVenueContact(e.target.value)} placeholder="输入联系人或电话" className="mt-1.5" /></div>
                 </div>
               </>
             )}
 
             {type === "equipment" && (
               <>
-                <div><Label>设备名称</Label><Input value={formContent} onChange={(e) => setFormContent(e.target.value)} placeholder="输入设备名称" className="mt-1.5" /></div>
                 <div className="grid grid-cols-2 gap-3">
-                  <div><Label>所在位置</Label><Input placeholder="输入设备所在位置" className="mt-1.5" /></div>
-                  <div><Label>数量</Label><Input type="number" placeholder="例如：5" className="mt-1.5" /></div>
+                  <div><Label>所在位置</Label><Input value={formEquipmentLocation} onChange={(e) => setFormEquipmentLocation(e.target.value)} placeholder="输入设备所在位置" className="mt-1.5" /></div>
+                  <div><Label>数量</Label><Input value={formEquipmentQuantity} onChange={(e) => setFormEquipmentQuantity(e.target.value)} placeholder="例如：5" className="mt-1.5" /></div>
                 </div>
               </>
             )}
 
             {type === "software" && (
               <>
-                <div><Label>软件名称</Label><Input value={formContent} onChange={(e) => setFormContent(e.target.value)} placeholder="输入软件名称" className="mt-1.5" /></div>
-                <div><Label>版本号</Label><Input placeholder="例如：v2.1.0" className="mt-1.5" /></div>
-                <div><Label>下载链接</Label><Input placeholder="https://..." className="mt-1.5" /></div>
-                <div><Label>授权信息</Label><Input placeholder="例如：MIT / 商业授权 / 校内授权" className="mt-1.5" /></div>
-              </>
-            )}
-
-            {type === "simulation" && (
-              <>
-                <div><Label>仿真名称</Label><Input value={formContent} onChange={(e) => setFormContent(e.target.value)} placeholder="输入仿真资源名称" className="mt-1.5" /></div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div><Label>仿真平台</Label><Input placeholder="例如：Web-based SPICE" className="mt-1.5" /></div>
-                  <div><Label>学科领域</Label><Input placeholder="例如：电子电路" className="mt-1.5" /></div>
+                <div><Label>版本号</Label><Input value={formSoftwareVersion} onChange={(e) => setFormSoftwareVersion(e.target.value)} placeholder="例如：v2.1.0" className="mt-1.5" /></div>
+                <div><Label>下载链接</Label><Input value={formSoftwareDownloadUrl} onChange={(e) => setFormSoftwareDownloadUrl(e.target.value)} placeholder="https://..." className="mt-1.5" /></div>
+                <div><Label>授权信息</Label><Input value={formSoftwareLicense} onChange={(e) => setFormSoftwareLicense(e.target.value)} placeholder="例如：MIT / 商业授权 / 校内授权" className="mt-1.5" /></div>
+                <div className="space-y-1.5">
+                  <Label>安装包</Label>
+                  <div className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center space-y-2 hover:border-primary/50 transition-colors cursor-pointer">
+                    <div className="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center mx-auto">
+                      <Upload className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-700">点击或拖拽上传安装包</p>
+                      <p className="text-xs text-gray-500 mt-1">支持 exe、zip、dmg 等格式</p>
+                    </div>
+                  </div>
                 </div>
               </>
             )}
@@ -482,7 +560,7 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
               </>
             )}
 
-            {["document", "spreadsheet", "image", "audio", "video", "other"].includes(type) && (
+            {["document", "spreadsheet", "image", "audio", "video", "archive", "other"].includes(type) && (
               <div className="space-y-1.5">
                 <Label className="text-sm text-gray-700">资源文件 <span className="text-red-500">*</span></Label>
                 <div className="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center space-y-3 hover:border-primary/50 transition-colors cursor-pointer">
@@ -501,16 +579,10 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
               <Label className="text-sm text-gray-700">{type === "ability-point" ? "能力点描述" : "资源描述"}</Label>
               <Textarea placeholder={type === "ability-point" ? "输入能力点描述" : "输入资源简介、用途说明等"} rows={2} onChange={(e) => setFormDesc(e.target.value)} value={formDesc} maxLength={500} />
             </div>
-            {!["knowledge-point", "ability-point"].includes(type) && (
-              <div className="space-y-1.5">
-                <Label className="text-sm text-gray-700">关键词标签（逗号分隔，≤5个）</Label>
-                <Input value={formTags} onChange={(e) => setFormTags(e.target.value)} placeholder="标签1，标签2" />
-              </div>
-            )}
           </div>
           <DialogFooter className="mt-6">
             <Button variant="outline" onClick={() => setAddOpen(false)}>取消</Button>
-             <Button onClick={handleAdd} disabled={!formTitle.trim()}>
+             <Button onClick={handleAdd} disabled={!formTitle.trim() || (type === "link" && !formLinkUrl.trim())}>
               上传并提交审核
             </Button>
           </DialogFooter>
@@ -559,16 +631,44 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
               </div>
             )}
 
-            <div className="space-y-1.5">
-              <Label className="text-sm text-gray-700">{type === "ability-point" ? "能力点描述" : "描述"}</Label>
-              <Textarea value={formDesc} onChange={(e) => setFormDesc(e.target.value)} maxLength={500} rows={3} />
-            </div>
-            {!["knowledge-point", "ability-point"].includes(type) && (
+            {type === "link" && (
               <div className="space-y-1.5">
-                <Label className="text-sm text-gray-700">标签（逗号分隔）</Label>
-                <Input value={formTags} onChange={(e) => setFormTags(e.target.value)} />
+                <Label className="text-sm text-gray-700">URL 地址</Label>
+                <Input value={formLinkUrl} onChange={(e) => setFormLinkUrl(e.target.value)} placeholder="https://..." />
               </div>
             )}
+
+            {type === "venue" && (
+              <>
+                <div className="space-y-1.5"><Label className="text-sm text-gray-700">场地地址</Label><Input value={formVenueLocation} onChange={(e) => setFormVenueLocation(e.target.value)} placeholder="输入场地详细地址" /></div>
+                <div className="space-y-1.5"><Label className="text-sm text-gray-700">开放时间</Label><Input value={formVenueOpenTime} onChange={(e) => setFormVenueOpenTime(e.target.value)} placeholder="例如：周一至周五 09:00-18:00" /></div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5"><Label className="text-sm text-gray-700">容纳人数</Label><Input value={formVenueCapacity} onChange={(e) => setFormVenueCapacity(e.target.value)} placeholder="例如：50" /></div>
+                  <div className="space-y-1.5"><Label className="text-sm text-gray-700">联系人/电话</Label><Input value={formVenueContact} onChange={(e) => setFormVenueContact(e.target.value)} placeholder="输入联系人或电话" /></div>
+                </div>
+              </>
+            )}
+
+            {type === "equipment" && (
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5"><Label className="text-sm text-gray-700">所在位置</Label><Input value={formEquipmentLocation} onChange={(e) => setFormEquipmentLocation(e.target.value)} placeholder="输入设备所在位置" /></div>
+                <div className="space-y-1.5"><Label className="text-sm text-gray-700">数量</Label><Input value={formEquipmentQuantity} onChange={(e) => setFormEquipmentQuantity(e.target.value)} placeholder="例如：5" /></div>
+              </div>
+            )}
+
+            {type === "software" && (
+              <>
+                <div className="space-y-1.5"><Label className="text-sm text-gray-700">版本号</Label><Input value={formSoftwareVersion} onChange={(e) => setFormSoftwareVersion(e.target.value)} placeholder="例如：v2.1.0" /></div>
+                <div className="space-y-1.5"><Label className="text-sm text-gray-700">下载链接</Label><Input value={formSoftwareDownloadUrl} onChange={(e) => setFormSoftwareDownloadUrl(e.target.value)} placeholder="https://..." /></div>
+                <div className="space-y-1.5"><Label className="text-sm text-gray-700">授权信息</Label><Input value={formSoftwareLicense} onChange={(e) => setFormSoftwareLicense(e.target.value)} placeholder="例如：MIT / 商业授权 / 校内授权" /></div>
+                <div className="space-y-1.5"><Label className="text-sm text-gray-700">安装包</Label><Input value={formSoftwareInstallerUrl} onChange={(e) => setFormSoftwareInstallerUrl(e.target.value)} placeholder="/files/installer.zip" /></div>
+              </>
+            )}
+
+            <div className="space-y-1.5">
+              <Label className="text-sm text-gray-700">{type === "ability-point" ? "能力点描述" : "资源描述"}</Label>
+              <Textarea value={formDesc} onChange={(e) => setFormDesc(e.target.value)} maxLength={500} rows={3} />
+            </div>
           </div>
           <DialogFooter className="mt-6">
             <Button variant="outline" onClick={() => setEditOpen(false)}>取消</Button>
@@ -621,7 +721,7 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
                 {detailResource.type === "knowledge-point" && (
                   <>
                     <div><Label className="text-gray-500">知识点名称</Label><p className="text-sm">{detailResource.title}</p></div>
-                    <div><Label className="text-gray-500">描述</Label><p className="text-sm">{detailResource.description}</p></div>
+                    <div><Label className="text-gray-500">知识点描述</Label><p className="text-sm">{detailResource.description}</p></div>
                     <div className="bg-blue-50 rounded-lg p-3 space-y-3">
                       <div className="text-xs font-medium text-blue-700">知识点信息</div>
                       {detailResource.knowledgeCode && <div className="text-xs text-blue-600"><span className="text-blue-400">编码：</span>{detailResource.knowledgeCode}</div>}
@@ -670,11 +770,45 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
                     </div>
                   </>
                 )}
-                {detailResource.type !== "knowledge-point" && detailResource.type !== "ability-point" && (
-                  <>
-                    <div><Label className="text-gray-500">描述</Label><p className="text-sm">{detailResource.description}</p></div>
-                    <div className="flex flex-wrap gap-1">{detailResource.tags.map((tag) => (<Badge key={tag} variant="secondary">{tag}</Badge>))}</div>
-                  </>
+                {detailResource.type === "link" && (
+                  <div className="bg-cyan-50 rounded-lg p-3 space-y-2">
+                    <div className="text-xs font-medium text-cyan-700">链接信息</div>
+                    <div className="text-xs text-cyan-600"><span className="text-cyan-400">URL：</span>{detailResource.linkUrl || "-"}</div>
+                  </div>
+                )}
+                {detailResource.type === "venue" && (
+                  <div className="bg-orange-50 rounded-lg p-3 space-y-2">
+                    <div className="text-xs font-medium text-orange-700">场地信息</div>
+                    <div className="grid grid-cols-2 gap-2 text-xs text-orange-600">
+                      <div><span className="text-orange-400">场地地址：</span>{detailResource.venueLocation || "-"}</div>
+                      <div><span className="text-orange-400">开放时间：</span>{detailResource.venueOpenTime || "-"}</div>
+                      <div><span className="text-orange-400">容纳人数：</span>{detailResource.venueCapacity || "-"}</div>
+                      <div><span className="text-orange-400">联系人/电话：</span>{detailResource.venueContact || "-"}</div>
+                    </div>
+                  </div>
+                )}
+                {detailResource.type === "equipment" && (
+                  <div className="bg-rose-50 rounded-lg p-3 space-y-2">
+                    <div className="text-xs font-medium text-rose-700">设备信息</div>
+                    <div className="grid grid-cols-2 gap-2 text-xs text-rose-600">
+                      <div><span className="text-rose-400">所在位置：</span>{detailResource.equipmentLocation || "-"}</div>
+                      <div><span className="text-rose-400">数量：</span>{detailResource.equipmentQuantity || "-"}</div>
+                    </div>
+                  </div>
+                )}
+                {detailResource.type === "software" && (
+                  <div className="bg-purple-50 rounded-lg p-3 space-y-2">
+                    <div className="text-xs font-medium text-purple-700">软件信息</div>
+                    <div className="grid grid-cols-2 gap-2 text-xs text-purple-600">
+                      <div><span className="text-purple-400">版本号：</span>{detailResource.softwareVersion || "-"}</div>
+                      <div><span className="text-purple-400">授权信息：</span>{detailResource.softwareLicense || "-"}</div>
+                      <div className="col-span-2"><span className="text-purple-400">下载链接：</span>{detailResource.softwareDownloadUrl || "-"}</div>
+                      <div className="col-span-2"><span className="text-purple-400">安装包：</span>{detailResource.softwareInstallerUrl || "-"}</div>
+                    </div>
+                  </div>
+                )}
+                {!["knowledge-point", "ability-point", "link", "venue", "equipment", "software"].includes(detailResource.type) && (
+                  <div><Label className="text-gray-500">{type === "ability-point" ? "能力点描述" : "资源描述"}</Label><p className="text-sm">{detailResource.description}</p></div>
                 )}
                 <div className="bg-gray-50 rounded-lg p-3 space-y-2">
                   <div className="text-xs font-medium text-gray-600">元信息</div>

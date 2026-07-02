@@ -65,23 +65,15 @@ export interface Resource {
   rejectReason?: string
   venueCapacity?: number
   venueLocation?: string
-  venueFacilities?: string
   venueOpenTime?: string
   venueContact?: string
-  equipmentModel?: string
-  equipmentSpec?: string
   equipmentLocation?: string
-  equipmentManager?: string
   equipmentQuantity?: number
   softwareVersion?: string
-  softwareEnv?: string
   softwareLicense?: string
   softwareDownloadUrl?: string
-  simulationPlatform?: string
-  simulationDomain?: string
-  simulationInstructions?: string
+  softwareInstallerUrl?: string
   linkUrl?: string
-  linkSource?: string
   fileUrl?: string
   knowledgeCode?: string
   knowledgeCourses?: string
@@ -100,23 +92,15 @@ export interface ResourceFormData {
   major?: string
   venueCapacity?: number
   venueLocation?: string
-  venueFacilities?: string
   venueOpenTime?: string
   venueContact?: string
-  equipmentModel?: string
-  equipmentSpec?: string
   equipmentLocation?: string
-  equipmentManager?: string
   equipmentQuantity?: number
   softwareVersion?: string
-  softwareEnv?: string
   softwareLicense?: string
   softwareDownloadUrl?: string
-  simulationPlatform?: string
-  simulationDomain?: string
-  simulationInstructions?: string
+  softwareInstallerUrl?: string
   linkUrl?: string
-  linkSource?: string
   fileUrl?: string
   knowledgeCode?: string
   knowledgeCourses?: string

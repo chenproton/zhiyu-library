@@ -508,54 +508,34 @@ export default function HomePage() {
 
               <div style={{ display: "flex", flexDirection: "column", gap: 16, marginTop: 4 }}>
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: "#475569", marginBottom: 6 }}>资源描述</div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "#475569", marginBottom: 6 }}>
+                    {detailResource.type === "knowledge-point" ? "知识点描述" : detailResource.type === "ability-point" ? "能力点描述" : "资源描述"}
+                  </div>
                   <p style={{ fontSize: 14, color: "#64748b", lineHeight: 1.7 }}>{detailResource.description}</p>
                 </div>
-                {detailResource.tags.length > 0 && detailResource.type !== "knowledge-point" && detailResource.type !== "ability-point" && (
-                  <div>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: "#475569", marginBottom: 6 }}>关键词标签</div>
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>{detailResource.tags.map((tag) => <Badge key={tag} variant="secondary">{tag}</Badge>)}</div>
-                  </div>
-                )}
                 {detailResource.type === "venue" && (
-                  <div style={{ background: "#f8fafc", borderRadius: 10, padding: 16, display: "flex", flexDirection: "column", gap: 8 }}>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: "#475569", marginBottom: 4 }}>场地信息</div>
-                    <DetailRow label="容纳人数" value={`${detailResource.venueCapacity} 人`} />
-                    <DetailRow label="位置" value={detailResource.venueLocation || "-"} />
-                    <DetailRow label="配套设施" value={detailResource.venueFacilities || "-"} />
+                  <div style={{ background: "#fff7ed", borderRadius: 10, padding: 16, display: "flex", flexDirection: "column", gap: 8 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: "#c2410c", marginBottom: 4 }}>场地信息</div>
+                    <DetailRow label="场地地址" value={detailResource.venueLocation || "-"} />
+                    <DetailRow label="开放时间" value={detailResource.venueOpenTime || "-"} />
+                    <DetailRow label="容纳人数" value={detailResource.venueCapacity ? `${detailResource.venueCapacity} 人` : "-"} />
+                    <DetailRow label="联系人/电话" value={detailResource.venueContact || "-"} />
                   </div>
                 )}
                 {detailResource.type === "equipment" && (
-                  <div style={{ background: "#f8fafc", borderRadius: 10, padding: 16, display: "flex", flexDirection: "column", gap: 8 }}>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: "#475569", marginBottom: 4 }}>设备信息</div>
-                    <DetailRow label="型号" value={detailResource.equipmentModel || "-"} />
-                    <DetailRow label="规格" value={detailResource.equipmentSpec || "-"} />
-                    <DetailRow label="存放地点" value={detailResource.equipmentLocation || "-"} />
-                    <DetailRow label="负责人" value={detailResource.equipmentManager || "-"} />
+                  <div style={{ background: "#fff1f2", borderRadius: 10, padding: 16, display: "flex", flexDirection: "column", gap: 8 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: "#be123c", marginBottom: 4 }}>设备信息</div>
+                    <DetailRow label="所在位置" value={detailResource.equipmentLocation || "-"} />
+                    <DetailRow label="数量" value={detailResource.equipmentQuantity ? `${detailResource.equipmentQuantity}` : "-"} />
                   </div>
                 )}
                 {detailResource.type === "software" && (
-                  <div style={{ background: "#f8fafc", borderRadius: 10, padding: 16, display: "flex", flexDirection: "column", gap: 8 }}>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: "#475569", marginBottom: 4 }}>软件信息</div>
-                    <DetailRow label="版本" value={detailResource.softwareVersion || "-"} />
-                    <DetailRow label="运行环境" value={detailResource.softwareEnv || "-"} />
-                    <DetailRow label="授权方式" value={detailResource.softwareLicense || "-"} />
-                    <DetailRow label="下载地址" value={detailResource.softwareDownloadUrl || "-"} />
-                  </div>
-                )}
-                {detailResource.type === "simulation" && (
-                  <div style={{ background: "#f8fafc", borderRadius: 10, padding: 16, display: "flex", flexDirection: "column", gap: 8 }}>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: "#475569", marginBottom: 4 }}>仿真信息</div>
-                    <DetailRow label="仿真平台" value={detailResource.simulationPlatform || "-"} />
-                    <DetailRow label="学科领域" value={detailResource.simulationDomain || "-"} />
-                    <DetailRow label="操作说明" value={detailResource.simulationInstructions || "-"} />
-                  </div>
-                )}
-                {detailResource.type === "link" && (
-                  <div style={{ background: "#f8fafc", borderRadius: 10, padding: 16, display: "flex", flexDirection: "column", gap: 8 }}>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: "#475569", marginBottom: 4 }}>链接信息</div>
-                    <DetailRow label="URL" value={detailResource.linkUrl || "-"} />
-                    <DetailRow label="来源网站" value={detailResource.linkSource || "-"} />
+                  <div style={{ background: "#faf5ff", borderRadius: 10, padding: 16, display: "flex", flexDirection: "column", gap: 8 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: "#7e22ce", marginBottom: 4 }}>软件信息</div>
+                    <DetailRow label="版本号" value={detailResource.softwareVersion || "-"} />
+                    <DetailRow label="授权信息" value={detailResource.softwareLicense || "-"} />
+                    <DetailRow label="下载链接" value={detailResource.softwareDownloadUrl || "-"} />
+                    <DetailRow label="安装包" value={detailResource.softwareInstallerUrl || "-"} />
                   </div>
                 )}
                 {detailResource.type === "knowledge-point" && (
@@ -597,8 +577,12 @@ export default function HomePage() {
                   <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
                     <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Eye className="size-4" /> {detailResource.usageCount} 次使用</span>
                     <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Heart className="size-4" /> {detailResource.favoriteCount} 人收藏</span>
+                    <span style={{ display: "flex", alignItems: "center", gap: 4 }}><User className="size-3.5" /> {detailResource.uploaderName}</span>
                   </div>
-                  <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Clock className="size-3.5" /> {detailResource.createdAt.toLocaleDateString("zh-CN")}</span>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Clock className="size-3.5" /> 创建 {detailResource.createdAt.toLocaleString("zh-CN")}</span>
+                    <span>更新 {detailResource.updatedAt.toLocaleString("zh-CN")}</span>
+                  </div>
                 </div>
                 <div style={{ display: "flex", gap: 8, paddingTop: 4 }}>
                   <Button variant={isFavorite(detailResource.id) ? "default" : "outline"} size="sm" onClick={() => toggleFavorite(detailResource.id)}>

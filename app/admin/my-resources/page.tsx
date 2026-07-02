@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select"
@@ -64,11 +65,12 @@ const TYPE_EMOJI: Record<ResourceType, string> = {
 export default function MyResourcesPage() {
   const {
     getMyUploads, getFavorites, getMySharedResources, getMyUnsharedResources,
-    updateResource, deleteResource,
+    updateResource, deleteResource, batchUpdateShared,
     toggleFavorite, isFavorite,
   } = useData()
 
   const [activeTab, setActiveTab] = useState<"mine" | "shared" | "unshared" | "favorites">("mine")
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [search, setSearch] = useState("")
   const [typeFilter, setTypeFilter] = useState<ResourceType | "all">("all")
   const [statusFilter, setStatusFilter] = useState<ResourceStatus | "all">("all")
@@ -141,12 +143,52 @@ export default function MyResourcesPage() {
     }
   }
 
+  const showBatchActions = activeTab === "shared" || activeTab === "unshared"
+
+  const toggleSelection = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  const toggleSelectAll = (list: Resource[]) => {
+    const ids = list.map(r => r.id)
+    const allSelected = ids.every(id => selectedIds.has(id))
+    setSelectedIds(prev => {
+      const next = new Set(prev)
+      if (allSelected) {
+        ids.forEach(id => next.delete(id))
+      } else {
+        ids.forEach(id => next.add(id))
+      }
+      return next
+    })
+  }
+
+  const handleBatchShare = (isShared: boolean) => {
+    if (selectedIds.size === 0) return
+    batchUpdateShared(Array.from(selectedIds), isShared)
+    setSelectedIds(new Set())
+  }
+
   const renderResourceTable = (list: Resource[], emptyText: string) => (
     <Card>
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
+              {showBatchActions && (
+                <TableHead className="w-10">
+                  <Checkbox
+                    checked={list.length > 0 && list.every(r => selectedIds.has(r.id))}
+                    onCheckedChange={() => toggleSelectAll(list)}
+                    aria-label="全选"
+                  />
+                </TableHead>
+              )}
               <TableHead>资源标题</TableHead>
               <TableHead className="w-20">类型</TableHead>
               <TableHead className="w-20">状态</TableHead>
@@ -159,6 +201,15 @@ export default function MyResourcesPage() {
           <TableBody>
             {list.map((resource) => (
               <TableRow key={resource.id}>
+                {showBatchActions && (
+                  <TableCell className="w-10">
+                    <Checkbox
+                      checked={selectedIds.has(resource.id)}
+                      onCheckedChange={() => toggleSelection(resource.id)}
+                      aria-label={`选择 ${resource.title}`}
+                    />
+                  </TableCell>
+                )}
                 <TableCell><div className="text-sm font-medium text-gray-800 line-clamp-1 max-w-[300px]">{resource.title}</div></TableCell>
                 <TableCell><Badge variant="secondary" className="text-xs">{RESOURCE_TYPE_LABELS[resource.type]}</Badge></TableCell>
                 <TableCell>
@@ -191,7 +242,7 @@ export default function MyResourcesPage() {
                 </TableCell>
               </TableRow>
             ))}
-            {list.length === 0 && <TableRow><TableCell colSpan={7} className="text-center py-12 text-gray-400">{emptyText}</TableCell></TableRow>}
+            {list.length === 0 && <TableRow><TableCell colSpan={showBatchActions ? 8 : 7} className="text-center py-12 text-gray-400">{emptyText}</TableCell></TableRow>}
           </TableBody>
         </Table>
       </div>
@@ -205,7 +256,7 @@ export default function MyResourcesPage() {
         <p className="text-sm text-gray-500">管理我上传的资源与收藏</p>
       </div>
 
-      <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v as "mine" | "shared" | "unshared" | "favorites"); setSearch(""); setTypeFilter("all"); setStatusFilter("all") }}>
+      <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v as "mine" | "shared" | "unshared" | "favorites"); setSearch(""); setTypeFilter("all"); setStatusFilter("all"); setSelectedIds(new Set()) }}>
         <TabsList>
           <TabsTrigger value="mine">
             <Upload className="size-4 mr-1.5" />我的资源 ({myUploads.length})
@@ -263,6 +314,30 @@ export default function MyResourcesPage() {
           </Tabs>
         </CardContent>
       </Card>
+
+      {showBatchActions && (
+        <Card>
+          <CardContent className="p-3 flex items-center justify-between flex-wrap gap-3">
+            <div className="text-sm text-gray-600">
+              已选择 <span className="font-semibold text-gray-900">{selectedIds.size}</span> 项
+            </div>
+            <div className="flex items-center gap-2">
+              {activeTab === "shared" ? (
+                <Button size="sm" variant="outline" onClick={() => handleBatchShare(false)} disabled={selectedIds.size === 0}>
+                  <Lock className="size-4 mr-1.5" />取消共享
+                </Button>
+              ) : (
+                <Button size="sm" variant="outline" onClick={() => handleBatchShare(true)} disabled={selectedIds.size === 0}>
+                  <Share2 className="size-4 mr-1.5" />一键共享
+                </Button>
+              )}
+              <Button size="sm" variant="ghost" onClick={() => setSelectedIds(new Set())} disabled={selectedIds.size === 0}>
+                清空选择
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {activeTab === "favorites" ? (
         <>

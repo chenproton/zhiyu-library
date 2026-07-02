@@ -20,6 +20,7 @@ interface DataContextValue {
   batchApprove: (ids: string[]) => void
   batchReject: (ids: string[], reason: string) => void
   batchDelete: (ids: string[]) => void
+  batchUpdateShared: (ids: string[], isShared: boolean) => void
   incrementUsage: (id: string) => void
   getApprovedResources: () => Resource[]
   getMyUploads: () => Resource[]
@@ -158,6 +159,13 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     })
   }, [])
 
+  const batchUpdateShared = useCallback((ids: string[], isShared: boolean) => {
+    setResources(prev => prev.map(r => {
+      if (!ids.includes(r.id)) return r
+      return { ...r, isShared, updatedAt: new Date() }
+    }))
+  }, [])
+
   const incrementUsage = useCallback((id: string) => {
     setResources(prev => prev.map(r => {
       if (r.id !== id) return r
@@ -196,6 +204,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     batchApprove,
     batchReject,
     batchDelete,
+    batchUpdateShared,
     incrementUsage,
     getApprovedResources,
     getMyUploads,

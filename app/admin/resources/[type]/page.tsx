@@ -18,7 +18,6 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Label } from "@/components/ui/label"
 import { useData } from "@/components/providers/data-provider"
 import { useToast } from "@/hooks/use-toast"
-import { MultiSelectSearch } from "@/components/ui/multi-select-search"
 import { RESOURCE_TYPE_LABELS, RESOURCE_STATUS_LABELS, COLLEGES, ALL_ABILITY_ATTRIBUTES } from "@/lib/types"
 import type { ResourceType, ResourceStatus, Resource, AbilityAttribute } from "@/lib/types"
 import { mockGranularLessons } from "@/lib/mock-data"
@@ -454,7 +453,7 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
       </Card>
 
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
-        <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
+        <DialogContent className={`${type === "knowledge-point" ? "max-w-2xl" : "max-w-md"} max-h-[80vh] overflow-y-auto`}>
           <DialogHeader>
             <DialogTitle>上传{typeLabel}资源到公共库</DialogTitle>
             <DialogDescription>补充本地资源，上传后将进入待审核状态</DialogDescription>
@@ -522,21 +521,20 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
             )}
 
             {type === "knowledge-point" && (
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <Label className="text-sm text-gray-700">编码</Label>
-                  <Input value={formKnowledgeCode} onChange={(e) => setFormKnowledgeCode(e.target.value)} placeholder="例如：KP-001" />
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-sm text-gray-700">关联颗粒课</Label>
-                  <MultiSelectSearch
-                    options={mockGranularLessons.map((l) => ({ label: l.name, value: l.id, subtitle: l.code }))}
-                    selected={formKnowledgeCourses}
-                    onChange={setFormKnowledgeCourses}
-                    placeholder="选择关联颗粒课"
-                    searchPlaceholder="搜索颗粒课..."
-                  />
-                </div>
+              <div className="space-y-1.5">
+                <Label className="text-sm text-gray-700">编码</Label>
+                <Input value={formKnowledgeCode} onChange={(e) => setFormKnowledgeCode(e.target.value)} placeholder="例如：KP-001" />
+              </div>
+            )}
+
+            {type === "knowledge-point" && (
+              <div className="space-y-1.5">
+                <Label className="text-sm text-gray-700">关联颗粒课</Label>
+                <TransferLessonsSelector
+                  options={mockGranularLessons.map((l) => ({ label: l.name, value: l.id, subtitle: l.code }))}
+                  selected={formKnowledgeCourses}
+                  onChange={setFormKnowledgeCourses}
+                />
               </div>
             )}
 
@@ -590,7 +588,7 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
       </Dialog>
 
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
-        <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
+        <DialogContent className={`${type === "knowledge-point" ? "max-w-2xl" : "max-w-lg"} max-h-[80vh] overflow-y-auto`}>
           <DialogHeader><DialogTitle>编辑资源</DialogTitle></DialogHeader>
           <div className="space-y-5">
             <div className="space-y-1.5">
@@ -599,21 +597,20 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
             </div>
 
             {type === "knowledge-point" && (
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <Label className="text-sm text-gray-700">编码</Label>
-                  <Input value={formKnowledgeCode} onChange={(e) => setFormKnowledgeCode(e.target.value)} placeholder="例如：KP-001" />
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-sm text-gray-700">关联颗粒课</Label>
-                  <MultiSelectSearch
-                    options={mockGranularLessons.map((l) => ({ label: l.name, value: l.id, subtitle: l.code }))}
-                    selected={formKnowledgeCourses}
-                    onChange={setFormKnowledgeCourses}
-                    placeholder="选择关联颗粒课"
-                    searchPlaceholder="搜索颗粒课..."
-                  />
-                </div>
+              <div className="space-y-1.5">
+                <Label className="text-sm text-gray-700">编码</Label>
+                <Input value={formKnowledgeCode} onChange={(e) => setFormKnowledgeCode(e.target.value)} placeholder="例如：KP-001" />
+              </div>
+            )}
+
+            {type === "knowledge-point" && (
+              <div className="space-y-1.5">
+                <Label className="text-sm text-gray-700">关联颗粒课</Label>
+                <TransferLessonsSelector
+                  options={mockGranularLessons.map((l) => ({ label: l.name, value: l.id, subtitle: l.code }))}
+                  selected={formKnowledgeCourses}
+                  onChange={setFormKnowledgeCourses}
+                />
               </div>
             )}
 

@@ -2,7 +2,7 @@
 
 import { useState, useMemo, use } from "react"
 import {
-  Search, RotateCcw, CheckCircle2, XCircle, Trash2,
+  Search, RotateCcw, Trash2,
   Eye, Pencil, Plus, Upload,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -36,8 +36,8 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
   const typeLabel = RESOURCE_TYPE_LABELS[type as ResourceType] || type
 
   const {
-    resources, approveResource, rejectResource, deleteResource,
-    batchApprove, batchReject, batchDelete,
+    resources, deleteResource,
+    batchDelete,
     updateResource, createResource,
   } = useData()
 
@@ -60,11 +60,6 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
 
   const [detailOpen, setDetailOpen] = useState(false)
   const [detailResource, setDetailResource] = useState<Resource | null>(null)
-  const [rejectOpen, setRejectOpen] = useState(false)
-  const [rejectTarget, setRejectTarget] = useState<Resource | null>(null)
-  const [rejectReason, setRejectReason] = useState("")
-  const [batchRejectOpen, setBatchRejectOpen] = useState(false)
-  const [batchRejectReason, setBatchRejectReason] = useState("")
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<Resource | null>(null)
 
@@ -171,8 +166,6 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
         <Card className="border-primary/50 bg-primary/5">
           <CardContent className="p-3 flex items-center gap-3 flex-wrap">
             <span className="text-sm text-gray-600">已选 {selectedIds.length} 项</span>
-            <Button size="sm" onClick={() => { batchApprove(selectedIds); setSelectedIds([]) }}><CheckCircle2 className="size-4 mr-1" />批量通过</Button>
-            <Button size="sm" variant="outline" onClick={() => setBatchRejectOpen(true)}><XCircle className="size-4 mr-1" />批量驳回</Button>
             <Button size="sm" variant="destructive" onClick={() => { batchDelete(selectedIds); setSelectedIds([]) }}><Trash2 className="size-4 mr-1" />批量删除</Button>
           </CardContent>
         </Card>
@@ -205,12 +198,6 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
                   <TableCell><span className="text-xs text-gray-400">{resource.createdAt.toLocaleDateString("zh-CN")}</span></TableCell>
                   <TableCell>
                     <div className="flex items-center gap-1">
-                      {resource.status === "pending" && (
-                        <>
-                          <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => approveResource(resource.id)}><CheckCircle2 className="size-3 mr-1" />通过</Button>
-                          <Button size="sm" variant="ghost" className="h-7 text-xs text-red-500" onClick={() => { setRejectTarget(resource); setRejectOpen(true); setRejectReason("") }}><XCircle className="size-3 mr-1" />驳回</Button>
-                        </>
-                      )}
                       <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => { setDetailResource(resource); setDetailOpen(true) }}><Eye className="size-3 mr-1" />预览</Button>
                       <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => openEdit(resource)}><Pencil className="size-3 mr-1" />编辑</Button>
                       <Button size="sm" variant="ghost" className="h-7 text-xs text-red-500" onClick={() => { setDeleteTarget(resource); setDeleteConfirmOpen(true) }}><Trash2 className="size-3" /></Button>
@@ -470,22 +457,6 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
               </div>
             </>
           )}
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={rejectOpen} onOpenChange={setRejectOpen}>
-        <DialogContent>
-          <DialogHeader><DialogTitle>驳回资源</DialogTitle></DialogHeader>
-          <div className="space-y-2"><Label>驳回原因</Label><Textarea value={rejectReason} onChange={(e) => setRejectReason(e.target.value)} rows={3} /></div>
-          <DialogFooter><Button variant="outline" onClick={() => setRejectOpen(false)}>取消</Button><Button variant="destructive" onClick={() => { if (rejectTarget) { rejectResource(rejectTarget.id, rejectReason); setRejectOpen(false); setRejectTarget(null); setRejectReason("") } }} disabled={!rejectReason.trim()}>确认驳回</Button></DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={batchRejectOpen} onOpenChange={setBatchRejectOpen}>
-        <DialogContent>
-          <DialogHeader><DialogTitle>批量驳回</DialogTitle></DialogHeader>
-          <div className="space-y-2"><Label>驳回原因</Label><Textarea value={batchRejectReason} onChange={(e) => setBatchRejectReason(e.target.value)} rows={3} /></div>
-          <DialogFooter><Button variant="outline" onClick={() => setBatchRejectOpen(false)}>取消</Button><Button variant="destructive" onClick={() => { batchReject(selectedIds, batchRejectReason); setSelectedIds([]); setBatchRejectOpen(false); setBatchRejectReason("") }} disabled={!batchRejectReason.trim()}>确认批量驳回</Button></DialogFooter>
         </DialogContent>
       </Dialog>
 

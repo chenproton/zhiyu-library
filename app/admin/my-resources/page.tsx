@@ -64,16 +64,17 @@ const TYPE_EMOJI: Record<ResourceType, string> = {
 
 export default function MyResourcesPage() {
   const {
-    getMyUploads, getFavorites, getMySharedResources, getMyUnsharedResources,
+    getMyUploads, getFavorites,
     updateResource, deleteResource, batchUpdateShared,
     toggleFavorite, isFavorite,
   } = useData()
 
-  const [activeTab, setActiveTab] = useState<"mine" | "shared" | "unshared" | "favorites">("mine")
+  const [activeTab, setActiveTab] = useState<"mine" | "favorites">("mine")
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [search, setSearch] = useState("")
   const [typeFilter, setTypeFilter] = useState<ResourceType | "all">("all")
   const [statusFilter, setStatusFilter] = useState<ResourceStatus | "all">("all")
+  const [shareFilter, setShareFilter] = useState<"all" | "shared" | "unshared">("all")
 
   const [editOpen, setEditOpen] = useState(false)
   const [editResource, setEditResource] = useState<Resource | null>(null)
@@ -86,19 +87,18 @@ export default function MyResourcesPage() {
 
   const myUploads = useMemo(() => getMyUploads(), [getMyUploads])
   const favorites = useMemo(() => getFavorites(), [getFavorites])
-  const myShared = useMemo(() => getMySharedResources(), [getMySharedResources])
-  const myUnshared = useMemo(() => getMyUnsharedResources(), [getMyUnsharedResources])
 
   const filteredUploads = useMemo(() => {
     let list = [...myUploads]
     if (typeFilter !== "all") list = list.filter((r) => r.type === typeFilter)
     if (statusFilter !== "all") list = list.filter((r) => r.status === statusFilter)
+    if (shareFilter !== "all") list = list.filter((r) => r.isShared === (shareFilter === "shared"))
     if (search.trim()) {
       const q = search.toLowerCase()
       list = list.filter((r) => r.title.toLowerCase().includes(q) || r.tags.some((t) => t.toLowerCase().includes(q)))
     }
     return list
-  }, [myUploads, typeFilter, statusFilter, search])
+  }, [myUploads, typeFilter, statusFilter, shareFilter, search])
 
   const filteredFavorites = useMemo(() => {
     let list = [...favorites]
@@ -109,28 +109,6 @@ export default function MyResourcesPage() {
     }
     return list
   }, [favorites, typeFilter, search])
-
-  const filteredShared = useMemo(() => {
-    let list = [...myShared]
-    if (typeFilter !== "all") list = list.filter((r) => r.type === typeFilter)
-    if (statusFilter !== "all") list = list.filter((r) => r.status === statusFilter)
-    if (search.trim()) {
-      const q = search.toLowerCase()
-      list = list.filter((r) => r.title.toLowerCase().includes(q) || r.tags.some((t) => t.toLowerCase().includes(q)))
-    }
-    return list
-  }, [myShared, typeFilter, statusFilter, search])
-
-  const filteredUnshared = useMemo(() => {
-    let list = [...myUnshared]
-    if (typeFilter !== "all") list = list.filter((r) => r.type === typeFilter)
-    if (statusFilter !== "all") list = list.filter((r) => r.status === statusFilter)
-    if (search.trim()) {
-      const q = search.toLowerCase()
-      list = list.filter((r) => r.title.toLowerCase().includes(q) || r.tags.some((t) => t.toLowerCase().includes(q)))
-    }
-    return list
-  }, [myUnshared, typeFilter, statusFilter, search])
 
   const handleEdit = () => {
     if (editResource && editDescription.trim()) {
@@ -143,7 +121,7 @@ export default function MyResourcesPage() {
     }
   }
 
-  const showBatchActions = activeTab === "shared" || activeTab === "unshared"
+  const showBatchActions = activeTab === "mine"
 
   const toggleSelection = (id: string) => {
     setSelectedIds(prev => {
@@ -254,16 +232,10 @@ export default function MyResourcesPage() {
         <p className="text-sm text-gray-500">管理我上传的资源与收藏</p>
       </div>
 
-      <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v as "mine" | "shared" | "unshared" | "favorites"); setSearch(""); setTypeFilter("all"); setStatusFilter("all"); setSelectedIds(new Set()) }}>
+      <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v as "mine" | "favorites"); setSearch(""); setTypeFilter("all"); setStatusFilter("all"); setShareFilter("all"); setSelectedIds(new Set()) }}>
         <TabsList>
           <TabsTrigger value="mine">
             <Upload className="size-4 mr-1.5" />我的资源 ({myUploads.length})
-          </TabsTrigger>
-          <TabsTrigger value="shared">
-            <Share2 className="size-4 mr-1.5" />已共享资源 ({myShared.length})
-          </TabsTrigger>
-          <TabsTrigger value="unshared">
-            <Lock className="size-4 mr-1.5" />未共享资源 ({myUnshared.length})
           </TabsTrigger>
           <TabsTrigger value="favorites">
             <Heart className="size-4 mr-1.5" />我收藏的资源 ({favorites.length})
@@ -276,7 +248,7 @@ export default function MyResourcesPage() {
           <div className="flex items-center gap-3 flex-wrap">
             <div className="relative flex-1 min-w-[180px] max-w-[300px]">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-gray-400" />
-              <Input placeholder={`搜索${activeTab === "mine" ? "我的" : activeTab === "favorites" ? "收藏的" : activeTab === "shared" ? "已共享的" : "未共享的"}资源...`} value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+              <Input placeholder={`搜索${activeTab === "mine" ? "我的" : "收藏的"}资源...`} value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
             </div>
             <Select value={typeFilter} onValueChange={(v) => setTypeFilter(v as ResourceType | "all")}>
               <SelectTrigger className="w-[130px]"><SelectValue placeholder="类型" /></SelectTrigger>
@@ -285,48 +257,42 @@ export default function MyResourcesPage() {
                 {Object.entries(RESOURCE_TYPE_LABELS).map(([k, v]) => (<SelectItem key={k} value={k}>{v}</SelectItem>))}
               </SelectContent>
             </Select>
-            {(activeTab === "mine" || activeTab === "shared" || activeTab === "unshared") && (
-              <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as ResourceStatus | "all")}>
-                <SelectTrigger className="w-[120px]"><SelectValue placeholder="状态" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">全部状态</SelectItem>
-                  <SelectItem value="pending">待审核</SelectItem>
-                  <SelectItem value="approved">已通过</SelectItem>
-                  <SelectItem value="rejected">已驳回</SelectItem>
-                </SelectContent>
-              </Select>
+            {activeTab === "mine" && (
+              <>
+                <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as ResourceStatus | "all")}>
+                  <SelectTrigger className="w-[120px]"><SelectValue placeholder="状态" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">全部状态</SelectItem>
+                    <SelectItem value="pending">待审核</SelectItem>
+                    <SelectItem value="approved">已通过</SelectItem>
+                    <SelectItem value="rejected">已驳回</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={shareFilter} onValueChange={(v) => setShareFilter(v as "all" | "shared" | "unshared")}>
+                  <SelectTrigger className="w-[140px]"><SelectValue placeholder="共享状态" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">全部资源</SelectItem>
+                    <SelectItem value="shared">已共享资源</SelectItem>
+                    <SelectItem value="unshared">未共享资源</SelectItem>
+                  </SelectContent>
+                </Select>
+              </>
             )}
             {showBatchActions && (
               <div className="flex items-center gap-2 ml-auto">
                 <span className="text-sm text-gray-600">已选 {selectedIds.size} 项</span>
-                {activeTab === "shared" ? (
-                  <Button size="sm" variant="outline" onClick={() => handleBatchShare(false)} disabled={selectedIds.size === 0}>
-                    <Lock className="size-4 mr-1.5" />取消共享
-                  </Button>
-                ) : (
-                  <Button size="sm" variant="outline" onClick={() => handleBatchShare(true)} disabled={selectedIds.size === 0}>
-                    <Share2 className="size-4 mr-1.5" />一键共享
-                  </Button>
-                )}
+                <Button size="sm" variant="outline" onClick={() => handleBatchShare(true)} disabled={selectedIds.size === 0}>
+                  <Share2 className="size-4 mr-1.5" />一键共享
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => handleBatchShare(false)} disabled={selectedIds.size === 0}>
+                  <Lock className="size-4 mr-1.5" />取消共享
+                </Button>
                 <Button size="sm" variant="ghost" onClick={() => setSelectedIds(new Set())} disabled={selectedIds.size === 0}>
                   清空
                 </Button>
               </div>
             )}
           </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardContent className="p-3">
-          <Tabs value={typeFilter} onValueChange={(v) => setTypeFilter(v as ResourceType | "all")}>
-            <TabsList className="flex-wrap h-auto gap-1">
-              <TabsTrigger value="all" className="text-xs">全部</TabsTrigger>
-              {Object.entries(RESOURCE_TYPE_LABELS).map(([key, label]) => (
-                <TabsTrigger key={key} value={key} className="text-xs">{label}</TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
         </CardContent>
       </Card>
 
@@ -368,10 +334,7 @@ export default function MyResourcesPage() {
           )}
         </>
       ) : (
-        renderResourceTable(
-          activeTab === "mine" ? filteredUploads : activeTab === "shared" ? filteredShared : filteredUnshared,
-          activeTab === "mine" ? "暂无我的资源" : activeTab === "shared" ? "暂无已共享的资源" : "暂无未共享的资源"
-        )
+        renderResourceTable(filteredUploads, "暂无我的资源")
       )}
 
       <Dialog open={editOpen} onOpenChange={setEditOpen}>

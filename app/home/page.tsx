@@ -368,44 +368,53 @@ export default function HomePage() {
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
               {filteredResources.map((resource) => (
                 <button key={resource.id} onClick={() => handleCardClick(resource)}
-                  style={{ background: "#fff", borderRadius: 10, overflow: "hidden", boxShadow: "0 1px 3px rgba(0,0,0,0.06)", transition: "all 0.25s", cursor: "pointer", border: "none", textAlign: "left" as const, width: "100%", display: "block" }}
-                  onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 8px 16px rgba(0,0,0,0.08)" }}
+                  style={{ background: "#fff", borderRadius: 12, overflow: "hidden", boxShadow: "0 1px 3px rgba(0,0,0,0.06)", transition: "all 0.25s", cursor: "pointer", border: "1px solid #f1f5f9", textAlign: "left" as const, width: "100%", display: "block", borderTop: `3px solid ${TYPE_COLORS[resource.type]}` }}
+                  onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-3px)"; e.currentTarget.style.boxShadow = "0 10px 20px rgba(0,0,0,0.08)" }}
                   onMouseLeave={(e) => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.06)" }}
                 >
-                  <div style={{ height: 100, background: TYPE_GRADIENTS[resource.type], display: "flex", alignItems: "center", justifyContent: "center", fontSize: 36, position: "relative" }}>
-                    {TYPE_EMOJI[resource.type]}
-                    {resource.usageCount > 2000 && (
-                      <span style={{ position: "absolute", top: 8, left: 8, background: "rgba(255,255,255,0.25)", color: "#fff", fontSize: 10, padding: "2px 8px", borderRadius: 8, backdropFilter: "blur(4px)", fontWeight: 600 }}>热门</span>
-                    )}
-                  </div>
                   <div style={{ padding: 16 }}>
-                    <h3 style={{ fontSize: 15, marginBottom: 8, lineHeight: 1.5, color: "#1e293b", fontWeight: 600 }}>{resource.title}</h3>
-                    {resource.tags.length > 0 && resource.type !== "knowledge-point" && resource.type !== "ability-point" && (
-                      <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 10 }}>
-                        {resource.tags.map((tag) => (
-                          <span key={tag} style={{ fontSize: 11, padding: "2px 8px", borderRadius: 4, background: "#f1f5f9", color: "#64748b" }}>{tag}</span>
-                        ))}
+                    <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                      <div style={{ width: 44, height: 44, borderRadius: "50%", background: TYPE_GRADIENTS[resource.type], display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}>
+                        {TYPE_EMOJI[resource.type]}
                       </div>
-                    )}
-                    <p style={{ fontSize: 12, color: "#94a3b8", lineHeight: 1.5, marginBottom: 12, height: 36, overflow: "hidden" }}>{resource.description}</p>
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, fontSize: 12, color: "#64748b", marginBottom: 12 }}>
-                      <span>类型：<strong style={{ color: TYPE_COLORS[resource.type] }}>{RESOURCE_TYPE_LABELS[resource.type]}</strong></span>
-                      <span style={{ display: "flex", alignItems: "center", gap: 2 }}><Building2 style={{ width: 12, height: 12 }} /> {resource.department.slice(0, 8)}</span>
-                      <span style={{ display: "flex", alignItems: "center", gap: 2 }}><Eye style={{ width: 12, height: 12 }} /> 使用：<strong style={{ color: "#2563eb" }}>{resource.usageCount}</strong></span>
-                      <span style={{ display: "flex", alignItems: "center", gap: 2 }}><Heart style={{ width: 12, height: 12 }} /> 收藏：<strong style={{ color: "#2563eb" }}>{resource.favoriteCount}</strong></span>
-                      <span style={{ display: "flex", alignItems: "center", gap: 2 }}><User style={{ width: 12, height: 12 }} /> {resource.uploaderName}</span>
-                      <span style={{ display: "flex", alignItems: "center", gap: 2 }}><Clock style={{ width: 12, height: 12 }} /> {resource.createdAt.toLocaleDateString("zh-CN")}</span>
-                    </div>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 12, borderTop: "1px dashed #f1f5f9" }}>
-                      <button onClick={(e) => { e.stopPropagation(); toggleFavorite(resource.id) }}
-                        style={{ background: "transparent", border: "none", cursor: "pointer", color: isFavorite(resource.id) ? "#ef4444" : "#94a3b8", fontSize: 12, display: "flex", alignItems: "center", gap: 4, padding: 0, transition: "all 0.2s" }}
-                        onMouseEnter={(e) => { if (!isFavorite(resource.id)) e.currentTarget.style.color = "#fca5a5" }}
-                        onMouseLeave={(e) => { if (!isFavorite(resource.id)) e.currentTarget.style.color = "#94a3b8" }}
-                      >
-                        <Heart style={{ width: 14, height: 14 }} fill={isFavorite(resource.id) ? "currentColor" : "none"} />
-                        {isFavorite(resource.id) ? "已收藏" : "收藏"}
-                      </button>
-                      <span style={{ background: TYPE_COLORS[resource.type], color: "#fff", padding: "5px 14px", borderRadius: 4, fontSize: 12, fontWeight: 500 }}>查看详情</span>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                          <h3 style={{ fontSize: 15, fontWeight: 600, color: "#1e293b", lineHeight: 1.4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{resource.title}</h3>
+                          {resource.usageCount > 2000 && (
+                            <span style={{ flexShrink: 0, background: "#fee2e2", color: "#ef4444", fontSize: 10, padding: "2px 8px", borderRadius: 10, fontWeight: 600 }}>热门</span>
+                          )}
+                        </div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8, flexWrap: "wrap" }}>
+                          <span style={{ fontSize: 12, color: TYPE_COLORS[resource.type], background: `${TYPE_COLORS[resource.type]}15`, padding: "2px 8px", borderRadius: 4, fontWeight: 500 }}>
+                            {RESOURCE_TYPE_LABELS[resource.type]}
+                          </span>
+                          <span style={{ fontSize: 12, color: "#94a3b8", display: "flex", alignItems: "center", gap: 2 }}>
+                            <Building2 style={{ width: 12, height: 12 }} />
+                            {resource.department.slice(0, 8)}
+                          </span>
+                        </div>
+                        <p style={{ fontSize: 12, color: "#64748b", lineHeight: 1.6, marginBottom: 12, height: 38, overflow: "hidden" }}>{resource.description}</p>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 12, borderTop: "1px dashed #f1f5f9" }}>
+                          <div style={{ display: "flex", gap: 14, fontSize: 12, color: "#94a3b8" }}>
+                            <span style={{ display: "flex", alignItems: "center", gap: 3 }}>
+                              <Eye style={{ width: 12, height: 12 }} />
+                              {resource.usageCount}
+                            </span>
+                            <span style={{ display: "flex", alignItems: "center", gap: 3 }}>
+                              <Heart style={{ width: 12, height: 12 }} />
+                              {resource.favoriteCount}
+                            </span>
+                          </div>
+                          <button onClick={(e) => { e.stopPropagation(); toggleFavorite(resource.id) }}
+                            style={{ background: "transparent", border: "none", cursor: "pointer", color: isFavorite(resource.id) ? "#ef4444" : "#94a3b8", fontSize: 12, display: "flex", alignItems: "center", gap: 4, padding: 0, transition: "all 0.2s" }}
+                            onMouseEnter={(e) => { if (!isFavorite(resource.id)) e.currentTarget.style.color = "#fca5a5" }}
+                            onMouseLeave={(e) => { if (!isFavorite(resource.id)) e.currentTarget.style.color = "#94a3b8" }}
+                          >
+                            <Heart style={{ width: 14, height: 14 }} fill={isFavorite(resource.id) ? "currentColor" : "none"} />
+                            {isFavorite(resource.id) ? "已收藏" : "收藏"}
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </button>

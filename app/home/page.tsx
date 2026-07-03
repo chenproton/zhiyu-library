@@ -168,7 +168,7 @@ export default function HomePage() {
       {/* ═══ Hero Banner ═══ */}
       <div style={{
         color: "#fff", padding: "60px 20px 50px", textAlign: "center",
-        position: "relative", overflow: "hidden",
+        position: "relative", overflow: "hidden", minHeight: 300,
         backgroundImage: "url('/资源共享平台.png')",
         backgroundSize: "cover",
         backgroundPosition: "center",

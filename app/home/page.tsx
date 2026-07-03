@@ -111,7 +111,7 @@ const TIME_RANGES = [
 export default function HomePage() {
   const {
     resources, isFavorite, toggleFavorite, incrementUsage,
-    getApprovedResources, getFavorites,
+    getApprovedResources,
   } = useData()
   const { toast } = useToast()
 
@@ -127,8 +127,6 @@ export default function HomePage() {
 
   const stats = useMemo(() => getResourceTypeStats(resources), [resources])
   const approvedResources = useMemo(() => getApprovedResources(), [getApprovedResources])
-  const favorites = useMemo(() => getFavorites(), [getFavorites])
-  const totalUsage = useMemo(() => approvedResources.reduce((s, r) => s + r.usageCount, 0), [approvedResources])
 
   const filteredResources = useMemo(() => {
     let list = approvedResources
@@ -166,46 +164,12 @@ export default function HomePage() {
   return (
     <div>
       {/* ═══ Hero Banner ═══ */}
-      <div style={{
-        background: "linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #3b82f6 100%)",
-        color: "#fff", padding: "60px 20px 50px", textAlign: "center",
-        position: "relative", overflow: "hidden",
-      }}>
-        <div style={{ position: "absolute", top: -80, right: -80, width: 300, height: 300, background: "rgba(255,255,255,0.04)", borderRadius: "50%" }} />
-        <div style={{ position: "absolute", bottom: -60, left: "5%", width: 200, height: 200, background: "rgba(255,255,255,0.04)", borderRadius: "50%" }} />
-        <div style={{ position: "absolute", top: "30%", right: "15%", width: 100, height: 100, background: "rgba(255,255,255,0.03)", borderRadius: "50%" }} />
-        <div style={{ maxWidth: 720, margin: "0 auto", position: "relative", zIndex: 1 }}>
-           <h1 style={{ fontSize: 40, fontWeight: "bold", marginBottom: 12, letterSpacing: 1 }}>教学资源共享服务平台</h1>
-          <p style={{ fontSize: 15, opacity: 0.85, marginBottom: 28 }}>
-            汇聚视频、文档、软件、仿真等 13 类教学资源，为教师提供一站式资源共享服务
-          </p>
-          <div style={{
-            background: "#fff", borderRadius: 50, padding: "5px 5px 5px 24px",
-            display: "flex", alignItems: "center", boxShadow: "0 10px 30px rgba(0,0,0,0.15)", marginBottom: 28,
-          }}>
-            <Search style={{ width: 18, height: 18, color: "#94a3b8", marginRight: 10, flexShrink: 0 }} />
-            <input type="text" placeholder="搜索视频、文档、软件、仿真等教学资源..." value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              style={{ flex: 1, border: "none", outline: "none", fontSize: 14, padding: "12px 0", color: "#333", background: "transparent" }} />
-            <button onClick={() => document.getElementById("resource-list")?.scrollIntoView({ behavior: "smooth" })}
-              style={{ background: "linear-gradient(135deg, #2563eb, #3b82f6)", color: "#fff", border: "none", padding: "11px 32px", borderRadius: 50, cursor: "pointer", fontSize: 14, fontWeight: 500, whiteSpace: "nowrap" }}>
-              搜索
-            </button>
-          </div>
-          <div style={{ display: "flex", justifyContent: "center", gap: 48 }}>
-            {[
-              { num: stats.total, label: "资源总量" },
-              { num: totalUsage.toLocaleString(), label: "累计使用" },
-              { num: COLLEGES.length, label: "覆盖院系" },
-              { num: favorites.length, label: "我的收藏" },
-            ].map((s, i) => (
-              <div key={i} style={{ textAlign: "center" }}>
-                <div style={{ fontSize: 28, fontWeight: "bold", lineHeight: 1.2 }}>{s.num}</div>
-                <div style={{ fontSize: 12, opacity: 0.75, marginTop: 4 }}>{s.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
+      <div style={{ width: "100%", overflow: "hidden", lineHeight: 0 }}>
+        <img
+          src="/资源共享平台.png"
+          alt="教学资源共享服务平台"
+          style={{ width: "100%", height: "auto", display: "block" }}
+        />
       </div>
 
       <div style={{ maxWidth: 1280, margin: "0 auto", padding: "40px 20px 0" }}>

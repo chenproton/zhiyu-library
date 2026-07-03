@@ -175,8 +175,7 @@ export default function HomePage() {
       }}>
         <div style={{
           position: "absolute", inset: 0,
-          background: "rgba(15, 23, 42, 0.45)",
-          backdropFilter: "blur(1px)",
+          background: "rgba(15, 23, 42, 0.55)",
         }} />
         <div style={{ maxWidth: 720, margin: "0 auto", position: "relative", zIndex: 1 }}>
           <h1 style={{ fontSize: 40, fontWeight: "bold", marginBottom: 12, letterSpacing: 1 }}>教学资源共享服务平台</h1>

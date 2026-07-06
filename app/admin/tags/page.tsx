@@ -1,16 +1,19 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { Plus, Pencil, Trash2, Tag, FolderOpen, Hash } from "lucide-react"
+import { Plus, Pencil, Trash2, Tag, FolderOpen, Hash, Eye } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import {
   Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog"
 import { useData } from "@/components/providers/data-provider"
+import { RESOURCE_TYPE_LABELS, RESOURCE_STATUS_LABELS } from "@/lib/types"
+import type { Resource, ResourceStatus } from "@/lib/types"
 
 export default function TagsPage() {
   const {
@@ -27,6 +30,8 @@ export default function TagsPage() {
   const [tagEditTarget, setTagEditTarget] = useState<string | null>(null)
   const [tagName, setTagName] = useState("")
   const [deleteConfirm, setDeleteConfirm] = useState<{ type: "cat" | "tag"; id: string } | null>(null)
+  const [resourceDialogOpen, setResourceDialogOpen] = useState(false)
+  const [resourceDialogTag, setResourceDialogTag] = useState<string>("")
 
   const selectedCategory = tagCategories.find(c => c.id === selectedCatId)
 
@@ -37,6 +42,16 @@ export default function TagsPage() {
 
   const getTagUsageCount = (tagName: string) => {
     return resources.filter(r => r.tags.includes(tagName)).length
+  }
+
+  const getResourcesByTag = (tagName: string) => {
+    return resources.filter(r => r.tags.includes(tagName))
+  }
+
+  const STATUS_COLORS: Record<ResourceStatus, string> = {
+    pending: "bg-amber-50 text-amber-600 border-amber-200",
+    approved: "bg-green-50 text-green-600 border-green-200",
+    rejected: "bg-red-50 text-red-600 border-red-200",
   }
 
   const getResourceCountForCategory = (catId: string) => {
@@ -147,10 +162,6 @@ export default function TagsPage() {
                   }`}
                 >
                   <span className="flex items-center gap-2">
-                    <span
-                      className="size-2 rounded-full shrink-0"
-                      style={{ backgroundColor: tagDefinitions.find(t => t.categoryId === cat.id)?.color || '#94a3b8' }}
-                    />
                     {cat.name}
                   </span>
                   <span className="flex items-center gap-1">
@@ -227,6 +238,17 @@ export default function TagsPage() {
                               </Badge>
                             </div>
                             <div className="flex items-center gap-0.5">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="h-7 text-xs"
+                                onClick={() => {
+                                  setResourceDialogTag(tag.name)
+                                  setResourceDialogOpen(true)
+                                }}
+                              >
+                                <Eye className="size-3 mr-1" />查看 ({usageCount})
+                              </Button>
                               <Button
                                 size="sm"
                                 variant="ghost"
@@ -320,6 +342,67 @@ export default function TagsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={resourceDialogOpen} onOpenChange={setResourceDialogOpen}>
+        <DialogContent className="max-w-3xl max-h-[80vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Tag className="size-4 text-primary" />
+              使用标签「{resourceDialogTag}」的资源
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 overflow-auto -mx-6">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>资源标题</TableHead>
+                  <TableHead className="w-20">类型</TableHead>
+                  <TableHead className="w-20">状态</TableHead>
+                  <TableHead className="w-24">院系</TableHead>
+                  <TableHead className="w-28">上传时间</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {getResourcesByTag(resourceDialogTag).map((resource) => (
+                  <TableRow key={resource.id}>
+                    <TableCell>
+                      <div className="text-sm font-medium text-gray-800 line-clamp-1 max-w-[280px]">
+                        {resource.title}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="secondary" className="text-xs">
+                        {RESOURCE_TYPE_LABELS[resource.type]}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={`text-xs border ${STATUS_COLORS[resource.status]}`}>
+                        {RESOURCE_STATUS_LABELS[resource.status]}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-xs text-gray-500">{resource.department}</span>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-xs text-gray-400">
+                        {resource.createdAt.toLocaleDateString("zh-CN")}
+                      </span>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {getResourcesByTag(resourceDialogTag).length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center py-8 text-gray-400">
+                      暂无使用该标签的资源
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </DialogContent>
+      </Dialog>
+
     </div>
   )
 }

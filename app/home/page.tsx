@@ -1,6 +1,5 @@
 "use client"
 
-import Link from "next/link"
 import { useState, useMemo } from "react"
 import {
   Video, FileText, Table, Image, LinkIcon, Music, MapPin, Cpu,
@@ -112,6 +111,7 @@ export default function HomePage() {
   const {
     resources, isFavorite, toggleFavorite, incrementUsage,
     getApprovedResources, getFavorites,
+    getAllUsedTagNames, getTagColor,
   } = useData()
   const { toast } = useToast()
 
@@ -122,6 +122,7 @@ export default function HomePage() {
   const [timeFilter, setTimeFilter] = useState("all")
   const [sortBy, setSortBy] = useState<"newest" | "popular">("newest")
   const [titleSearch, setTitleSearch] = useState("")
+  const [tagFilter, setTagFilter] = useState<string[]>([])
   const [detailOpen, setDetailOpen] = useState(false)
   const [detailResource, setDetailResource] = useState<Resource | null>(null)
 
@@ -147,6 +148,9 @@ export default function HomePage() {
       const q = search.toLowerCase()
       list = list.filter((r) => r.title.toLowerCase().includes(q) || r.description.toLowerCase().includes(q) || r.tags.some((t) => t.toLowerCase().includes(q)) || r.uploaderName.toLowerCase().includes(q))
     }
+    if (tagFilter.length > 0) {
+      list = list.filter((r) => tagFilter.some((t) => r.tags.includes(t)))
+    }
     if (sortBy === "popular") {
       list = [...list].sort((a, b) => b.usageCount - a.usageCount)
     } else {
@@ -155,7 +159,20 @@ export default function HomePage() {
     return list
   }, [approvedResources, typeFilter, collegeFilter, majorFilter, timeFilter, search, titleSearch, sortBy])
 
-  const filterCount = (typeFilter !== "全部" ? 1 : 0) + (collegeFilter !== "全部" ? 1 : 0) + (majorFilter !== "全部" ? 1 : 0) + (timeFilter !== "all" ? 1 : 0)
+  const allUsedTags = useMemo(() => {
+    const tagCounts = new Map<string, number>()
+    for (const r of approvedResources) {
+      for (const t of r.tags) {
+        tagCounts.set(t, (tagCounts.get(t) || 0) + 1)
+      }
+    }
+    return Array.from(tagCounts.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 20)
+      .map(([name, count]) => ({ name, count }))
+  }, [approvedResources])
+
+  const filterCount = (typeFilter !== "全部" ? 1 : 0) + (collegeFilter !== "全部" ? 1 : 0) + (majorFilter !== "全部" ? 1 : 0) + (timeFilter !== "all" ? 1 : 0) + (tagFilter.length > 0 ? 1 : 0) + (tagFilter.length > 0 ? 1 : 0)
 
   const handleCardClick = (resource: Resource) => {
     setDetailResource(resource)
@@ -304,10 +321,48 @@ export default function HomePage() {
                 ))}
               </div>
             </div>
+            <div style={{ display: "flex", alignItems: "flex-start", padding: "8px 0", fontSize: 13 }}>
+              <span style={{ color: "#94a3b8", width: 80, flexShrink: 0, lineHeight: "28px" }}>标签筛选：</span>
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                {allUsedTags.map(({ name, count }) => {
+                  const active = tagFilter.includes(name)
+                  const color = getTagColor(name)
+                  return (
+                    <span
+                      key={name}
+                      onClick={() => {
+                        if (active) {
+                          setTagFilter(tagFilter.filter(t => t !== name))
+                        } else {
+                          setTagFilter([...tagFilter, name])
+                        }
+                      }}
+                      style={{
+                        padding: "3px 10px", borderRadius: 4, cursor: "pointer",
+                        color: active ? "#fff" : color,
+                        background: active ? color : `${color}10`,
+                        border: `1px solid ${active ? color : `${color}30`}`,
+                        fontWeight: active ? 500 : 400,
+                        fontSize: 12, transition: "all 0.2s",
+                        display: "inline-flex", alignItems: "center", gap: 4,
+                      }}
+                    >
+                      {name}
+                      <span style={{ opacity: active ? 0.8 : 0.5, fontSize: 11 }}>
+                        {count}
+                      </span>
+                    </span>
+                  )
+                })}
+                {allUsedTags.length === 0 && (
+                  <span style={{ color: "#94a3b8", fontSize: 12, fontStyle: "italic" }}>暂无可用标签</span>
+                )}
+              </div>
+            </div>
             {filterCount > 0 && (
               <div style={{ marginTop: 12, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <span style={{ fontSize: 13, color: "#64748b" }}>已筛选到 <strong style={{ color: "#2563eb" }}>{filteredResources.length}</strong> 个资源</span>
-                <button onClick={() => { setSearch(""); setTitleSearch(""); setTypeFilter("全部"); setCollegeFilter("全部"); setMajorFilter("全部"); setTimeFilter("all") }}
+                <button onClick={() => { setSearch(""); setTitleSearch(""); setTypeFilter("全部"); setCollegeFilter("全部"); setMajorFilter("全部"); setTimeFilter("all"); setTagFilter([]) }}
                   style={{ padding: "6px 16px", borderRadius: 6, fontSize: 13, cursor: "pointer", border: "1px solid #e2e8f0", background: "#fff", color: "#64748b", display: "inline-flex", alignItems: "center", gap: 6, transition: "all 0.2s" }}
                   onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#cbd5e1"; e.currentTarget.style.color = "#334155" }}
                   onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#e2e8f0"; e.currentTarget.style.color = "#64748b" }}

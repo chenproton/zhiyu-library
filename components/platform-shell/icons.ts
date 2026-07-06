@@ -31,6 +31,7 @@ import {
   Heart,
   Library,
   Search,
+  Tag,
 } from "lucide-react"
 
 export const platformIconMap = {
@@ -65,6 +66,7 @@ export const platformIconMap = {
   heart: Heart,
   library: Library,
   search: Search,
+  tag: Tag,
 } satisfies Record<string, LucideIcon>
 
 export type PlatformIconKey = keyof typeof platformIconMap

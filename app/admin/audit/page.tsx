@@ -25,11 +25,12 @@ const STATUS_COLORS: Record<ResourceStatus, string> = {
 }
 
 export default function AuditPage() {
-  const { resources, approveResource, rejectResource, batchApprove, batchReject } = useData()
+  const { resources, approveResource, rejectResource, batchApprove, batchReject, getTagColor } = useData()
 
   const [search, setSearch] = useState("")
   const [typeFilter, setTypeFilter] = useState<ResourceType | "all">("all")
   const [collegeFilter, setCollegeFilter] = useState("all")
+  const [tagFilter, setTagFilter] = useState<string[]>([])
   const [selectedIds, setSelectedIds] = useState<string[]>([])
 
   const [detailOpen, setDetailOpen] = useState(false)
@@ -59,8 +60,23 @@ export default function AuditPage() {
           r.uploaderName.toLowerCase().includes(q)
       )
     }
+    if (tagFilter.length > 0) {
+      list = list.filter((r) => tagFilter.some((t) => r.tags.includes(t)))
+    }
     return list
-  }, [pendingResources, typeFilter, collegeFilter, search])
+  }, [pendingResources, typeFilter, collegeFilter, search, tagFilter])
+
+  const allUsedTags = useMemo(() => {
+    const tagCounts = new Map<string, number>()
+    for (const r of pendingResources) {
+      for (const t of r.tags) {
+        tagCounts.set(t, (tagCounts.get(t) || 0) + 1)
+      }
+    }
+    return Array.from(tagCounts.entries())
+      .sort((a, b) => b[1] - a[1])
+      .map(([name, count]) => ({ name, count }))
+  }, [pendingResources])
 
   const toggleSelect = (id: string) =>
     setSelectedIds((prev) => (prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]))
@@ -184,12 +200,42 @@ export default function AuditPage() {
                 setSearch("")
                 setTypeFilter("all")
                 setCollegeFilter("all")
+                setTagFilter([])
               }}
             >
               <RotateCcw className="size-4 mr-1" />
               重置
             </Button>
           </div>
+          {allUsedTags.length > 0 && (
+            <div className="flex items-start gap-3 mt-3 pt-3 border-t border-dashed">
+              <span className="text-xs text-gray-400 mt-1 shrink-0">标签：</span>
+              <div className="flex gap-1.5 flex-wrap">
+                {allUsedTags.map(({ name, count }) => {
+                  const active = tagFilter.includes(name)
+                  const color = getTagColor(name)
+                  return (
+                    <span
+                      key={name}
+                      onClick={() => {
+                        if (active) setTagFilter(tagFilter.filter(t => t !== name))
+                        else setTagFilter([...tagFilter, name])
+                      }}
+                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] cursor-pointer transition-colors border"
+                      style={{
+                        color: active ? '#fff' : color,
+                        backgroundColor: active ? color : `${color}10`,
+                        borderColor: active ? color : `${color}30`,
+                      }}
+                    >
+                      {name}
+                      <span style={{ opacity: active ? 0.7 : 0.4 }}>{count}</span>
+                    </span>
+                  )
+                })}
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 

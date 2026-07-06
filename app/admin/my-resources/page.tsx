@@ -22,6 +22,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { useData } from "@/components/providers/data-provider"
+import { TagSelector } from "@/components/tag-selector"
 import { RESOURCE_TYPE_LABELS, RESOURCE_STATUS_LABELS } from "@/lib/types"
 import type { ResourceType, ResourceStatus, Resource } from "@/lib/types"
 
@@ -79,7 +80,7 @@ export default function MyResourcesPage() {
   const [editOpen, setEditOpen] = useState(false)
   const [editResource, setEditResource] = useState<Resource | null>(null)
   const [editDescription, setEditDescription] = useState("")
-  const [editTags, setEditTags] = useState("")
+  const [editTags, setEditTags] = useState<string[]>([])
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<Resource | null>(null)
   const [detailOpen, setDetailOpen] = useState(false)
@@ -114,7 +115,7 @@ export default function MyResourcesPage() {
     if (editResource && editDescription.trim()) {
       updateResource(editResource.id, {
         description: editDescription.trim(),
-        tags: editTags.split(/[,，]/).map((t) => t.trim()).filter((t) => t.length > 0).slice(0, 5),
+        tags: editTags.filter((t) => t.length > 0).slice(0, 10),
       })
       setEditOpen(false)
       setEditResource(null)
@@ -212,7 +213,7 @@ export default function MyResourcesPage() {
                 <TableCell>
                   <div className="flex items-center gap-1">
                     <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => { setDetailResource(resource); setDetailOpen(true) }}><Eye className="size-3 mr-1" />预览</Button>
-                    <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => { setEditResource(resource); setEditDescription(resource.description); setEditTags(resource.tags.join("，")); setEditOpen(true) }}><Pencil className="size-3 mr-1" />编辑</Button>
+                        <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => { setEditResource(resource); setEditDescription(resource.description); setEditTags([...resource.tags]); setEditOpen(true) }}><Pencil className="size-3 mr-1" />编辑</Button>
                     <Button size="sm" variant="ghost" className="h-7 text-xs text-red-500" onClick={() => { setDeleteTarget(resource); setDeleteOpen(true) }}><Trash2 className="size-3" /></Button>
                   </div>
                 </TableCell>
@@ -343,7 +344,7 @@ export default function MyResourcesPage() {
           <div className="space-y-3">
             <div><Label>资源标题</Label><Input value={editResource?.title || ""} disabled className="bg-gray-50" /></div>
             <div><Label>描述</Label><Textarea value={editDescription} onChange={(e) => setEditDescription(e.target.value)} maxLength={500} rows={3} /></div>
-            <div><Label>标签（逗号分隔）</Label><Input value={editTags} onChange={(e) => setEditTags(e.target.value)} /></div>
+            <div><Label>标签</Label><TagSelector selected={editTags} onChange={setEditTags} /></div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditOpen(false)}>取消</Button>

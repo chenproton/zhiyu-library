@@ -107,6 +107,31 @@ export interface ResourceFormData {
   abilityAttribute?: AbilityAttribute
 }
 
+export interface TagCategory {
+  id: string
+  name: string
+}
+
+export interface TagDefinition {
+  id: string
+  name: string
+  categoryId: string
+  color: string
+}
+
+const TAG_COLORS = [
+  '#3b82f6', '#ef4444', '#22c55e', '#f97316', '#8b5cf6',
+  '#ec4899', '#06b6d4', '#eab308', '#14b8a6', '#f43f5e',
+  '#6366f1', '#84cc16', '#0ea5e9', '#d946ef', '#10b981',
+  '#f59e0b', '#64748b', '#78716c',
+]
+
+export function randomTagColor(existingColors: string[] = []): string {
+  const available = TAG_COLORS.filter(c => !existingColors.includes(c))
+  if (available.length > 0) return available[Math.floor(Math.random() * available.length)]
+  return TAG_COLORS[Math.floor(Math.random() * TAG_COLORS.length)]
+}
+
 export const COLLEGES = [
   '计算机科学与技术学院',
   '电子信息工程学院',

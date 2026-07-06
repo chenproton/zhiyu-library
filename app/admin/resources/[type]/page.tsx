@@ -17,6 +17,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Label } from "@/components/ui/label"
 import { useData } from "@/components/providers/data-provider"
+import { TagSelector } from "@/components/tag-selector"
 import { useToast } from "@/hooks/use-toast"
 import { RESOURCE_TYPE_LABELS, RESOURCE_STATUS_LABELS, COLLEGES, ALL_ABILITY_ATTRIBUTES } from "@/lib/types"
 import type { ResourceType, ResourceStatus, Resource, AbilityAttribute } from "@/lib/types"
@@ -177,12 +178,14 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
     resources, deleteResource,
     batchDelete,
     updateResource, createResource,
+    getTagColor,
   } = useData()
   const { toast } = useToast()
 
   const [search, setSearch] = useState("")
   const [collegeFilter, setCollegeFilter] = useState("all")
   const [statusFilter, setStatusFilter] = useState<ResourceStatus | "all">("all")
+  const [tagFilter, setTagFilter] = useState<string[]>([])
   const [selectedIds, setSelectedIds] = useState<string[]>([])
 
   const [addOpen, setAddOpen] = useState(false)
@@ -191,6 +194,7 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
   const [formTitle, setFormTitle] = useState("")
   const [formContent, setFormContent] = useState("")
   const [formDesc, setFormDesc] = useState("")
+  const [formTags, setFormTags] = useState<string[]>([])
   const [formKnowledgeCode, setFormKnowledgeCode] = useState("")
   const [formKnowledgeCourses, setFormKnowledgeCourses] = useState<string[]>([])
   const [formAbilityAttribute, setFormAbilityAttribute] = useState<AbilityAttribute | "">("")
@@ -232,14 +236,31 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
         (r.abilityAttribute && r.abilityAttribute.toLowerCase().includes(q))
       )
     }
+    if (tagFilter.length > 0) {
+      list = list.filter((r) => tagFilter.some((t) => r.tags.includes(t)))
+    }
     return list
-  }, [resources, type, collegeFilter, statusFilter, search])
+  }, [resources, type, collegeFilter, statusFilter, search, tagFilter])
+
+  const allUsedTags = useMemo(() => {
+    const tagCounts = new Map<string, number>()
+    const list = resources.filter((r) => r.type === type)
+    for (const r of list) {
+      for (const t of r.tags) {
+        tagCounts.set(t, (tagCounts.get(t) || 0) + 1)
+      }
+    }
+    return Array.from(tagCounts.entries())
+      .sort((a, b) => b[1] - a[1])
+      .map(([name, count]) => ({ name, count }))
+  }, [resources, type])
 
   const toggleSelect = (id: string) => setSelectedIds((prev) => prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id])
   const toggleSelectAll = () => { if (selectedIds.length === filtered.length) setSelectedIds([]); else setSelectedIds(filtered.map((r) => r.id)) }
 
   const resetForm = () => {
     setFormTitle(""); setFormContent(""); setFormDesc("");
+    setFormTags([]);
     setFormKnowledgeCode(""); setFormKnowledgeCourses([]);
     setFormAbilityAttribute("");
     setFormVenueLocation(""); setFormVenueOpenTime(""); setFormVenueCapacity(""); setFormVenueContact("");
@@ -258,6 +279,7 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
     setFormTitle(resource.title)
     setFormContent(resource.content)
     setFormDesc(resource.description)
+    setFormTags([...resource.tags])
     setFormKnowledgeCode(resource.knowledgeCode || "")
     setFormKnowledgeCourses(resource.knowledgeCourses?.split(',').filter(Boolean) || [])
     setFormAbilityAttribute(resource.abilityAttribute || "")
@@ -280,6 +302,7 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
     const base: Partial<ResourceFormData> = {
       title: formTitle.trim(),
       description: formDesc.trim(),
+      tags: formTags.filter(t => t.length > 0).slice(0, 10),
     }
     switch (type) {
       case "knowledge-point":
@@ -395,8 +418,37 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
               <SelectTrigger className="w-[120px]"><SelectValue placeholder="状态" /></SelectTrigger>
               <SelectContent><SelectItem value="all">全部状态</SelectItem><SelectItem value="pending">待审核</SelectItem><SelectItem value="approved">已通过</SelectItem><SelectItem value="rejected">已驳回</SelectItem></SelectContent>
             </Select>
-            <Button variant="outline" size="sm" onClick={() => { setSearch(""); setCollegeFilter("all"); setStatusFilter("all") }}><RotateCcw className="size-4 mr-1" />重置</Button>
+            <Button variant="outline" size="sm" onClick={() => { setSearch(""); setCollegeFilter("all"); setStatusFilter("all"); setTagFilter([]) }}><RotateCcw className="size-4 mr-1" />重置</Button>
           </div>
+          {allUsedTags.length > 0 && (
+            <div className="flex items-start gap-3 mt-3 pt-3 border-t border-dashed">
+              <span className="text-xs text-gray-400 mt-1 shrink-0">标签：</span>
+              <div className="flex gap-1.5 flex-wrap">
+                {allUsedTags.map(({ name, count }) => {
+                  const active = tagFilter.includes(name)
+                  const color = getTagColor(name)
+                  return (
+                    <span
+                      key={name}
+                      onClick={() => {
+                        if (active) setTagFilter(tagFilter.filter(t => t !== name))
+                        else setTagFilter([...tagFilter, name])
+                      }}
+                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] cursor-pointer transition-colors border"
+                      style={{
+                        color: active ? '#fff' : color,
+                        backgroundColor: active ? color : `${color}10`,
+                        borderColor: active ? color : `${color}30`,
+                      }}
+                    >
+                      {name}
+                      <span style={{ opacity: active ? 0.7 : 0.4 }}>{count}</span>
+                    </span>
+                  )
+                })}
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -567,6 +619,11 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
               <Textarea placeholder={type === "ability-point" ? "输入能力点描述" : "输入资源简介、用途说明等"} rows={2} onChange={(e) => setFormDesc(e.target.value)} value={formDesc} maxLength={500} />
             </div>
 
+            <div className="space-y-1.5">
+              <Label className="text-sm text-gray-700">标签</Label>
+              <TagSelector selected={formTags} onChange={setFormTags} />
+            </div>
+
             {type === "knowledge-point" && (
               <div className="space-y-1.5">
                 <Label className="text-sm text-gray-700">关联颗粒课</Label>
@@ -654,6 +711,11 @@ export default function ResourceTypePage({ params }: { params: Promise<{ type: s
             <div className="space-y-1.5">
               <Label className="text-sm text-gray-700">{type === "ability-point" ? "能力点描述" : "资源描述"}</Label>
               <Textarea value={formDesc} onChange={(e) => setFormDesc(e.target.value)} maxLength={500} rows={3} />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-sm text-gray-700">标签</Label>
+              <TagSelector selected={formTags} onChange={setFormTags} />
             </div>
 
             {type === "knowledge-point" && (

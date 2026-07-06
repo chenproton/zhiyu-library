@@ -1,13 +1,16 @@
 "use client"
 
 import React, { createContext, useContext, useState, useCallback } from 'react'
-import type { Resource, ResourceFormData, ResourceStatus, ResourceType } from '@/lib/types'
-import { mockResources, mockCurrentUser, mockFavoriteIds } from '@/lib/mock-data'
+import type { Resource, ResourceFormData, ResourceStatus, ResourceType, TagCategory, TagDefinition } from '@/lib/types'
+import { randomTagColor } from '@/lib/types'
+import { mockResources, mockCurrentUser, mockFavoriteIds, mockTagCategories, mockTagDefinitions } from '@/lib/mock-data'
 
 interface DataContextValue {
   resources: Resource[]
   favorites: Set<string>
   currentUser: typeof mockCurrentUser
+  tagCategories: TagCategory[]
+  tagDefinitions: TagDefinition[]
   getResource: (id: string) => Resource | undefined
   getFavorites: () => Resource[]
   isFavorite: (id: string) => boolean
@@ -27,6 +30,14 @@ interface DataContextValue {
   getMySharedResources: () => Resource[]
   getMyUnsharedResources: () => Resource[]
   getPendingResources: () => Resource[]
+  addTagCategory: (name: string) => TagCategory
+  updateTagCategory: (id: string, name: string) => void
+  deleteTagCategory: (id: string) => void
+  addTag: (name: string, categoryId: string) => TagDefinition
+  updateTag: (id: string, name: string) => void
+  deleteTag: (id: string) => void
+  getTagColor: (tagName: string) => string
+  getAllUsedTagNames: () => string[]
 }
 
 const DataContext = createContext<DataContextValue | null>(null)
@@ -34,6 +45,8 @@ const DataContext = createContext<DataContextValue | null>(null)
 export function DataProvider({ children }: { children: React.ReactNode }) {
   const [resources, setResources] = useState<Resource[]>(() => mockResources.map(r => ({ ...r })))
   const [favorites, setFavorites] = useState<Set<string>>(() => new Set(mockFavoriteIds))
+  const [tagCategories, setTagCategories] = useState<TagCategory[]>(() => [...mockTagCategories])
+  const [tagDefinitions, setTagDefinitions] = useState<TagDefinition[]>(() => [...mockTagDefinitions])
 
   const getResource = useCallback((id: string) => resources.find(r => r.id === id), [resources])
 
@@ -180,10 +193,89 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const getPendingResources = useCallback(() =>
     resources.filter(r => r.status === 'pending'), [resources])
 
+  const addTagCategory = useCallback((name: string) => {
+    const newCategory: TagCategory = { id: `cat-${Date.now()}`, name }
+    setTagCategories(prev => [...prev, newCategory])
+    return newCategory
+  }, [])
+
+  const updateTagCategory = useCallback((id: string, name: string) => {
+    setTagCategories(prev => prev.map(c => c.id === id ? { ...c, name } : c))
+  }, [])
+
+  const deleteTagCategory = useCallback((id: string) => {
+    setTagCategories(prev => prev.filter(c => c.id !== id))
+    setTagDefinitions(prev => {
+      const removedTagNames = prev.filter(t => t.categoryId === id).map(t => t.name)
+      setResources(res => res.map(r => ({
+        ...r,
+        tags: r.tags.filter(t => !removedTagNames.includes(t)),
+      })))
+      return prev.filter(t => t.categoryId !== id)
+    })
+  }, [])
+
+  const addTag = useCallback((name: string, categoryId: string) => {
+    const existingColors = tagDefinitions
+      .filter(t => t.categoryId === categoryId)
+      .map(t => t.color)
+    const newTag: TagDefinition = {
+      id: `tag-${Date.now()}`,
+      name,
+      categoryId,
+      color: randomTagColor(existingColors),
+    }
+    setTagDefinitions(prev => [...prev, newTag])
+    return newTag
+  }, [tagDefinitions])
+
+  const updateTag = useCallback((id: string, name: string) => {
+    const oldTag = tagDefinitions.find(t => t.id === id)
+    if (!oldTag) return
+    const oldName = oldTag.name
+    setTagDefinitions(prev => prev.map(t => t.id === id ? { ...t, name } : t))
+    if (oldName !== name) {
+      setResources(prev => prev.map(r => ({
+        ...r,
+        tags: r.tags.map(t => t === oldName ? name : t),
+      })))
+    }
+  }, [tagDefinitions])
+
+  const deleteTag = useCallback((id: string) => {
+    const tagToDelete = tagDefinitions.find(t => t.id === id)
+    setTagDefinitions(prev => prev.filter(t => t.id !== id))
+    if (tagToDelete) {
+      setResources(prev => prev.map(r => ({
+        ...r,
+        tags: r.tags.filter(t => t !== tagToDelete.name),
+      })))
+    }
+  }, [tagDefinitions])
+
+  const getTagColor = useCallback((tagName: string) => {
+    const def = tagDefinitions.find(t => t.name === tagName)
+    if (def) return def.color
+    const usedColors = tagDefinitions.map(t => t.color)
+    return randomTagColor(usedColors)
+  }, [tagDefinitions])
+
+  const getAllUsedTagNames = useCallback(() => {
+    const names = new Set<string>()
+    for (const r of resources) {
+      for (const t of r.tags) {
+        names.add(t)
+      }
+    }
+    return Array.from(names)
+  }, [resources])
+
   const value: DataContextValue = {
     resources,
     favorites,
     currentUser: mockCurrentUser,
+    tagCategories,
+    tagDefinitions,
     getResource,
     getFavorites,
     isFavorite,
@@ -203,6 +295,14 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     getMySharedResources,
     getMyUnsharedResources,
     getPendingResources,
+    addTagCategory,
+    updateTagCategory,
+    deleteTagCategory,
+    addTag,
+    updateTag,
+    deleteTag,
+    getTagColor,
+    getAllUsedTagNames,
   }
 
   return (

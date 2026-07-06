@@ -1,4 +1,4 @@
-import type { Resource, User } from './types'
+import type { Resource, User, TagCategory, TagDefinition } from './types'
 
 export const mockCurrentUser: User = {
   id: 'user-admin',
@@ -829,6 +829,30 @@ export const mockResources: Resource[] = [
     createdAt: new Date('2025-09-15'),
     updatedAt: new Date('2026-02-10'),
   },
+]
+
+export const mockTagCategories: TagCategory[] = [
+  { id: 'cat-1', name: '学科' },
+  { id: 'cat-2', name: '层次' },
+  { id: 'cat-3', name: '资源形式' },
+  { id: 'cat-4', name: '自定义' },
+]
+
+export const mockTagDefinitions: TagDefinition[] = [
+  { id: 'tag-1', name: '高等数学', categoryId: 'cat-1', color: '#3b82f6' },
+  { id: 'tag-2', name: '数据结构', categoryId: 'cat-1', color: '#ef4444' },
+  { id: 'tag-3', name: '程序设计', categoryId: 'cat-1', color: '#22c55e' },
+  { id: 'tag-4', name: '英语', categoryId: 'cat-1', color: '#f97316' },
+  { id: 'tag-5', name: '物理', categoryId: 'cat-1', color: '#8b5cf6' },
+  { id: 'tag-6', name: '思政', categoryId: 'cat-1', color: '#ec4899' },
+  { id: 'tag-7', name: '本科', categoryId: 'cat-2', color: '#06b6d4' },
+  { id: 'tag-8', name: '研究生', categoryId: 'cat-2', color: '#eab308' },
+  { id: 'tag-9', name: '精品课程', categoryId: 'cat-3', color: '#14b8a6' },
+  { id: 'tag-10', name: '教学大纲', categoryId: 'cat-3', color: '#f43f5e' },
+  { id: 'tag-11', name: '试题库', categoryId: 'cat-3', color: '#6366f1' },
+  { id: 'tag-12', name: '实验指导', categoryId: 'cat-3', color: '#84cc16' },
+  { id: 'tag-13', name: '微积分', categoryId: 'cat-1', color: '#0ea5e9' },
+  { id: 'tag-14', name: '算法', categoryId: 'cat-1', color: '#d946ef' },
 ]
 
 export const mockFavoriteIds: Set<string> = new Set([

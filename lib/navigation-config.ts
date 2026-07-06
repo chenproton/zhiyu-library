@@ -57,6 +57,13 @@ export const backendNavigationConfig: PlatformNavigationConfig = {
       ],
     },
     {
+      id: "tag-management",
+      label: "标签管理",
+      icon: "tag",
+      href: "/admin/tags",
+      matchers: ["/admin/tags"],
+    },
+    {
       id: "audit-center",
       label: "资源审核管理",
       icon: "badgeCheck",

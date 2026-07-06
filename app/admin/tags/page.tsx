@@ -353,7 +353,7 @@ export default function TagsPage() {
       </Dialog>
 
       <Dialog open={resourceDialogOpen} onOpenChange={setResourceDialogOpen}>
-        <DialogContent className="max-w-3xl max-h-[80vh] flex flex-col">
+        <DialogContent className="max-w-5xl max-h-[90vh] flex flex-col">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Tag className="size-4 text-primary" />

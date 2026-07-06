@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
-import { Plus, Pencil, Trash2, Tag, FolderOpen, Hash, Eye } from "lucide-react"
+import { Plus, Pencil, Trash2, Tag, FolderOpen, Hash, Eye, Unlink } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
@@ -19,7 +19,7 @@ export default function TagsPage() {
   const {
     resources, tagCategories, tagDefinitions,
     addTagCategory, updateTagCategory, deleteTagCategory,
-    addTag, updateTag, deleteTag,
+    addTag, updateTag, deleteTag, updateResource,
   } = useData()
 
   const [selectedCatId, setSelectedCatId] = useState<string>(tagCategories[0]?.id || "")
@@ -46,6 +46,15 @@ export default function TagsPage() {
 
   const getResourcesByTag = (tagName: string) => {
     return resources.filter(r => r.tags.includes(tagName))
+  }
+
+  const removeTagFromResource = (resourceId: string, tagName: string) => {
+    const resource = resources.find(r => r.id === resourceId)
+    if (resource) {
+      updateResource(resourceId, {
+        tags: resource.tags.filter(t => t !== tagName),
+      })
+    }
   }
 
   const STATUS_COLORS: Record<ResourceStatus, string> = {
@@ -360,6 +369,7 @@ export default function TagsPage() {
                   <TableHead className="w-20">状态</TableHead>
                   <TableHead className="w-24">院系</TableHead>
                   <TableHead className="w-28">上传时间</TableHead>
+                  <TableHead className="w-20">操作</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -388,11 +398,21 @@ export default function TagsPage() {
                         {resource.createdAt.toLocaleDateString("zh-CN")}
                       </span>
                     </TableCell>
+                    <TableCell>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-7 text-xs text-red-500"
+                        onClick={() => removeTagFromResource(resource.id, resourceDialogTag)}
+                      >
+                        <Unlink className="size-3 mr-1" />解除
+                      </Button>
+                    </TableCell>
                   </TableRow>
                 ))}
                 {getResourcesByTag(resourceDialogTag).length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center py-8 text-gray-400">
+                    <TableCell colSpan={6} className="text-center py-8 text-gray-400">
                       暂无使用该标签的资源
                     </TableCell>
                   </TableRow>
